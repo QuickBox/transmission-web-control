@@ -361,6 +361,41 @@
 	background: var(--qb-pill-bg);
 }
 
+/* When the bar is full the version and port chips give way (version first),
+   then the rates, so the connection state, free space and counts stay whole. */
+.chip {
+	flex: none;
+}
+
+.chip[data-chip="version"],
+.chip[data-chip="port"],
+.chip[data-chip="down"],
+.chip[data-chip="up"] {
+	min-width: 0;
+}
+
+.chip[data-chip="down"],
+.chip[data-chip="up"] {
+	flex: 0 1 auto;
+}
+
+.chip[data-chip="version"] {
+	flex: 0 16 auto;
+}
+
+.chip[data-chip="port"] {
+	flex: 0 4 auto;
+}
+
+.chip[data-chip="version"] .chip-value,
+.chip[data-chip="port"] .chip-value,
+.chip[data-chip="down"] .chip-value,
+.chip[data-chip="up"] .chip-value {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .chip .icon {
 	color: var(--qb-icon);
 }

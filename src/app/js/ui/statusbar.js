@@ -56,6 +56,8 @@ export function mount(root, ctx, options = {}) {
   tooltip(port.node, () => t('main.statusbar.port'));
   tooltip(version.node, () => t('main.statusbar.versionTip'));
 
+  free.value.textContent = t('main.statusbar.freeChecking');
+
   clear(root, down.node, up.node, alt.node, free.node, port.node, el('span', { class: 'chip-spacer' }), connection, version.node, counts.node);
 
   function rate(speed, limited, limit) {
@@ -73,8 +75,11 @@ export function mount(root, ctx, options = {}) {
   }
 
   function applyCounts() {
-    const { torrents, selection } = store.get();
-    const total = t('core.count.torrents', { count: torrents.size });
+    const { torrents, selection, order, filter } = store.get();
+    const all = t('core.count.torrents', { count: torrents.size });
+    // With a filter or search active the list is shorter than the daemon's set.
+    const filtered = Boolean(filter) && (filter.status !== 'all' || filter.label || filter.tracker || filter.folder || filter.search);
+    const total = filtered && order.length !== torrents.size ? t('main.statusbar.countsOf', { shown: ctx.fmt.count(order.length), total: all }) : all;
     counts.value.textContent = selection.size > 0 ? `${total} · ${t('core.count.selected', { count: selection.size })}` : total;
   }
 
@@ -186,6 +191,8 @@ export function mount(root, ctx, options = {}) {
       refreshPort();
     }),
     store.subscribe('torrents', applyCounts),
+    store.subscribe('order', applyCounts),
+    store.subscribe('filter', applyCounts),
     store.subscribe('selection', applyCounts),
     store.subscribe('connection', () => {
       applyConnection();

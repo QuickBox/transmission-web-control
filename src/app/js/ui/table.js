@@ -26,6 +26,9 @@ export const ROW_HEIGHT = Object.freeze({ comfortable: 40, compact: 32, cards: 1
 export const CARD_MAX_WIDTH = 720;
 
 const OVERSCAN = 6;
+/** Status pill: about 6.2px per character of label plus the dot, padding and cell inset. */
+const STATUS_PX_PER_CHAR = 6.2;
+const STATUS_EXTRA_PX = 60;
 /** Below this width the details open as a sheet over the list (see `details/index.js`). */
 const SHEET_QUERY = '(max-width: 959px)';
 const sheetLayout = () => typeof globalThis.matchMedia === 'function' && globalThis.matchMedia(SHEET_QUERY).matches;
@@ -44,8 +47,8 @@ const countOrEmpty = (ctx, n) => (n === null || n === undefined ? ctx.fmt.count(
  *   value: (t: object) => string|number|null, text?: (t: object, ctx: object) => string }[]}
  */
 export const COLUMNS = Object.freeze([
-  { id: 'name', width: 'minmax(220px, 1fr)', sortable: true, narrow: 0, value: (t) => t.name },
-  { id: 'status', width: 'minmax(128px, max-content)', sortable: true, narrow: 0, value: (t) => STATES.indexOf(t.state) },
+  { id: 'name', width: 'minmax(180px, 1fr)', sortable: true, narrow: 0, value: (t) => t.name },
+  { id: 'status', width: '128px', sortable: true, narrow: 0, value: (t) => STATES.indexOf(t.state) },
   { id: 'percentDone', width: '132px', sortable: true, narrow: 0, value: (t) => t.percentDone },
   { id: 'totalSize', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.totalSize, text: (t, ctx) => ctx.fmt.bytes(t.totalSize) },
   { id: 'rateDownload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateDownload, text: (t, ctx) => (t.rateDownload > 0 ? ctx.fmt.speed(t.rateDownload) : EMPTY) },
@@ -69,8 +72,9 @@ const COLUMN_BY_ID = new Map(COLUMNS.map((c) => [c.id, c]));
 
 /**
  * Columns shown until the user picks their own set (`prefs.columns`). The
- * fixed widths sum to about 1110px, so the set fits a 1440px window with the
- * sidebar docked and no sideways scroll; the name column takes the rest.
+ * fixed widths sum to about 900px in English (the status column grows to fit
+ * the longest translated state label), so the set fits a 1440px window with
+ * the sidebar docked and no sideways scroll; the name column takes the rest.
  */
 export const DEFAULT_COLUMNS = Object.freeze([
   'name', 'status', 'percentDone', 'totalSize', 'rateDownload', 'rateUpload', 'eta',
@@ -219,6 +223,12 @@ export function mount(root, ctx) {
     store.set({ prefs: { ...prefs, sort: next } });
   }
 
+  /** The status column, widened so the longest translated label fits on one line and every pill starts at the same edge. */
+  function statusWidth(base) {
+    const longest = Math.max(...STATES.map((state) => t(`core.status.${state}`).length));
+    return `${Math.max(Number.parseInt(base, 10), Math.ceil(longest * STATUS_PX_PER_CHAR + STATUS_EXTRA_PX))}px`;
+  }
+
   let headKey = null;
 
   function renderHead() {
@@ -263,7 +273,7 @@ export function mount(root, ctx) {
       cells.push(header);
     }
     clear(head, ...cells);
-    grid.style.setProperty('--cols', `44px ${columns.map((c) => c.width).join(' ')}`);
+    grid.style.setProperty('--cols', `44px ${columns.map((c) => (c.id === 'status' ? statusWidth(c.width) : c.width)).join(' ')}`);
   }
 
   // ---- rows ---------------------------------------------------------------

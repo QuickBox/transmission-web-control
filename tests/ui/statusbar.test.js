@@ -56,6 +56,21 @@ test('rates, limits, alt-speed chip and counts follow the store', async () => {
   teardown();
 });
 
+test('the count chip says how many of the daemon’s torrents the active filter shows', async () => {
+  const { ctx, root, teardown } = await setup();
+  ctx.store.set({ torrents: new Map([[1, torrent()], [2, torrent({ id: 2 })], [3, torrent({ id: 3 })]]), order: [1, 2, 3] });
+  assert.equal(chipText(root, 'counts'), '3 torrents');
+  ctx.store.set({ filter: { ...ctx.store.get().filter, search: 'x' }, order: [2] });
+  assert.equal(chipText(root, 'counts'), '1 of 3 torrents');
+  ctx.store.set({ selection: new Set([2]) });
+  assert.equal(chipText(root, 'counts'), '1 of 3 torrents · 1 selected');
+  ctx.store.set({ order: [] });
+  assert.equal(chipText(root, 'counts'), '0 of 3 torrents · 1 selected');
+  ctx.store.set({ filter: { ...ctx.store.get().filter, search: '' }, order: [1, 2, 3] });
+  assert.equal(chipText(root, 'counts'), '3 torrents · 1 selected', 'back to the plain total when nothing filters');
+  teardown();
+});
+
 test('version chip labels the RPC integer on legacy daemons and the semver on JSON-RPC', async () => {
   const { root, teardown } = await setup();
   assert.equal(chipText(root, 'version'), 'Transmission 4.0.6 · RPC 17');
@@ -109,6 +124,20 @@ test('free space is fetched once for the download dir, again after the interval 
   assert.equal(frees().length, 3, 'a new download dir refetches at once');
   assert.deepEqual(frees()[2].args, { path: '/elsewhere' });
   teardown();
+});
+
+test('the free-space chip says it is checking until the first answer, then shows the value or a dash', async () => {
+  let answer;
+  const pending = new Promise((resolve) => { answer = resolve; });
+  const held = await setup({ respond: { 'free-space': () => pending } });
+  assert.equal(chipText(held.root, 'free'), 'Checking free space');
+  answer({ path: '/home/user/torrents', sizeBytes: 5_000_000_000 });
+  await flush();
+  assert.equal(chipText(held.root, 'free'), '5.00 GB free');
+  held.teardown();
+  const failed = await setup({ respond: { 'free-space': () => Promise.reject(new Error('no such path')) } });
+  assert.equal(chipText(failed.root, 'free'), '—');
+  failed.teardown();
 });
 
 test('port status: one probe below 4.1, two on 4.1 with per-protocol labels', async () => {

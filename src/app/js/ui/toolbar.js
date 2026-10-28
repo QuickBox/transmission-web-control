@@ -9,6 +9,7 @@
  * bulk bar, so one table drives both surfaces.
  */
 
+import { errorMessage } from '../core/errors.js?v=__QBV__';
 import { preference, setVariant, VARIANTS } from '../core/theme.js?v=__QBV__';
 import { setSession } from '../rpc/session.js?v=__QBV__';
 import {
@@ -58,7 +59,7 @@ const ACTION_BY_ID = new Map(ACTIONS.map((a) => [a.id, a]));
 
 /**
  * Run one action on `ids`. RPC actions resolve after the next poll tick so the
- * list reflects the change; failures surface as an error toast.
+ * list reflects the change; success and failure both surface as a toast.
  * @param {import('../main.js').AppContext} ctx
  * @param {string} actionId
  * @param {number[]} ids
@@ -73,12 +74,15 @@ export async function runAction(ctx, actionId, ids) {
   }
   try {
     await ctx.rpc.call(action.method, { ids });
+    // The daemon applies most of these after the reply, so the list can lag a
+    // poll behind; the notice confirms the request was accepted right away.
+    ctx.ui.toast(ctx.i18n(`main.feedback.done.${action.id}`, { count: ids.length, total: ctx.fmt.count(ids.length) }), { tone: 'success', timeout: 3000 });
     if (ctx.poller) await ctx.poller.tick();
     return true;
   } catch (err) {
     ctx.ui.toast(ctx.i18n('main.feedback.actionFailed', {
       action: ctx.i18n(`main.actions.${action.id}`),
-      message: err && err.message ? err.message : String(err),
+      message: errorMessage(ctx.i18n, err),
     }), { tone: 'error' });
     return false;
   }
@@ -198,7 +202,7 @@ export function mount(root, ctx) {
       store.set({ session: { ...store.get().session, altSpeedEnabled: next } });
     } catch (err) {
       altSpeed.setAttribute('aria-checked', String(!next));
-      ctx.ui.toast(t('main.feedback.actionFailed', { action: t('main.toolbar.altSpeed'), message: err && err.message ? err.message : String(err) }), { tone: 'error' });
+      ctx.ui.toast(t('main.feedback.actionFailed', { action: t('main.toolbar.altSpeed'), message: errorMessage(t, err) }), { tone: 'error' });
     }
   });
 

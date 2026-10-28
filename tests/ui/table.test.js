@@ -144,7 +144,7 @@ test('mount renders a grid with header, rows, aria row counts and publishes orde
   assert.equal(headers[1].getAttribute('data-col'), 'name');
   assert.equal(headers[1].getAttribute('aria-sort'), 'ascending');
   assert.equal(headers[2].getAttribute('aria-sort'), 'none');
-  assert.ok(grid.styles.get('--cols').startsWith('44px minmax(220px, 1fr)'));
+  assert.ok(grid.styles.get('--cols').startsWith('44px minmax(180px, 1fr)'));
   const rows = rowsOf(root);
   assert.equal(rows.length, 5);
   assert.deepEqual(rows.map((r) => r.getAttribute('aria-rowindex')), ['2', '3', '4', '5', '6']);
@@ -354,6 +354,15 @@ test('a plain click selects and shows the details; checkbox, modifier and shift 
   assert.deepEqual([...ctx.store.get().selection], [5]);
   assert.equal(ctx.store.get().focused, 5, 'a plain click shows the torrent');
   assert.equal(rowFor(root, 5).hasAttribute('data-focused'), true);
+  teardown();
+});
+
+test('the status column is sized for the longest state label of the active language', async () => {
+  const { grid, teardown } = await setup({ count: 3 });
+  const widths = grid.styles.get('--cols').split(' ');
+  const status = widths.find((w) => /^\d+px$/.test(w) && Number.parseInt(w, 10) >= 128);
+  assert.ok(status, grid.styles.get('--cols'));
+  assert.ok(Number.parseInt(status, 10) >= 128 && Number.parseInt(status, 10) < 184, 'English fits the floor, not the German width');
   teardown();
 });
 

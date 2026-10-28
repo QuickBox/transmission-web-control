@@ -67,6 +67,25 @@ test('Start/Pause run the RPC on the selection in legacy spelling and tick the p
   teardown();
 });
 
+test('every RPC action confirms with a translated success toast that carries the count', async () => {
+  const { ACTIONS } = await import('../../src/app/js/ui/toolbar.js');
+  const { ctx, toasts, teardown } = await setup();
+  const rpcActions = ACTIONS.filter((a) => a.method);
+  assert.ok(rpcActions.length >= 9);
+  for (const action of rpcActions) {
+    toasts.length = 0;
+    assert.equal(await runAction(ctx, action.id, [4, 5]), true, action.id);
+    assert.equal(toasts.length, 1, `${action.id} shows one toast`);
+    assert.equal(toasts[0].opts.tone, 'success');
+    assert.match(toasts[0].message, /\b2 torrents\b/, `${action.id}: ${toasts[0].message}`);
+    assert.doesNotMatch(toasts[0].message, /main\.|\{\w+\}/, 'no raw key or placeholder');
+  }
+  toasts.length = 0;
+  await runAction(ctx, 'start', [4]);
+  assert.equal(toasts[0].message, 'Started 1 torrent', 'the singular form is used for one');
+  teardown();
+});
+
 test('a failing action surfaces an error toast and resolves false', async () => {
   const { ctx, toasts, teardown } = await setup({ respond: () => Promise.reject(new Error('boom')) });
   const ok = await runAction(ctx, 'start', [1]);
@@ -74,6 +93,11 @@ test('a failing action surfaces an error toast and resolves false', async () => 
   assert.equal(toasts.length, 1);
   assert.equal(toasts[0].message, 'Start failed: boom', 'label first, as the other catalogs order it');
   assert.equal(toasts[0].opts.tone, 'error');
+  const { RpcError } = await import('../../src/app/js/rpc/client.js');
+  toasts.length = 0;
+  ctx.rpc.call = () => Promise.reject(new RpcError(0, 'Failed to fetch'));
+  await runAction(ctx, 'pause', [1]);
+  assert.equal(toasts[0].message, 'Pause failed: Cannot reach Transmission. Retrying.', 'a network failure is not the browser text');
   assert.equal(await runAction(ctx, 'start', []), false, 'nothing selected: no request');
   assert.equal(await runAction(ctx, 'nope', [1]), false);
   teardown();
