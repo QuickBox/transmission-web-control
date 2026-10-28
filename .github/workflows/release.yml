@@ -1,0 +1,132 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Compute, write, tag and publish the release
+        run: |
+          set -eu
+
+          tarball() { printf 'transmission-web-control-v%s.tar.gz' "$1"; }
+          tag_exists() { git ls-remote --tags origin "refs/tags/v$1" | grep -q .; }
+          release_exists() { gh release view "v$1" >/dev/null 2>&1; }
+          assets_complete() {
+            names=$(gh release view "v$1" --json assets --jq '.assets[].name' 2>/dev/null) || return 1
+            printf '%s\n' "$names" | grep -qxF "$(tarball "$1")" && printf '%s\n' "$names" | grep -qxF SHA256SUMS
+          }
+          published() { tag_exists "$1" && release_exists "$1" && assets_complete "$1"; }
+
+          # Publish a version idempotently from whatever a half-finished earlier
+          # run left behind: tag the target, build the asset from the tagged tree,
+          # then create the release with both assets, or upload them to a release
+          # that is missing them.
+          publish() { # <ver> <target-sha>
+            ver="$1" target="$2"
+            bash bin/check-version.sh consistency || { echo "::error::version mismatch; refusing to tag v$ver"; exit 1; }
+            if tag_exists "$ver"; then
+              git fetch -q origin "+refs/tags/v$ver:refs/tags/v$ver"
+            else
+              git tag "v$ver" "$target"
+              git push origin "refs/tags/v$ver"
+            fi
+            rel_sha=$(git rev-list -n1 "v$ver")
+            out="$RUNNER_TEMP/assets-v$ver"
+            rm -rf "$out"
+            bash bin/release.sh --asset "$out" --ref "v$ver" || { echo "::error::asset build failed for v$ver"; exit 1; }
+            ( cd "$out" && sha256sum -c SHA256SUMS ) || { echo "::error::asset checksum mismatch for v$ver"; exit 1; }
+            git show "v$ver:changelogs/v$ver.md" > "$out/notes.md" || { echo "::error::v$ver has no changelogs/v$ver.md"; exit 1; }
+            if release_exists "$ver"; then
+              assets_complete "$ver" && { echo "v$ver already released"; return 0; }
+              echo "v$ver is released without its assets; uploading them"
+              gh release upload "v$ver" "$out/$(tarball "$ver")" "$out/SHA256SUMS" --clobber
+            else
+              gh release create "v$ver" --verify-tag --title "transmission-web-control v$ver" \
+                --notes-file "$out/notes.md" "$out/$(tarball "$ver")" "$out/SHA256SUMS"
+            fi
+          }
+
+          V=$(sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' package.json | head -1)
+
+          # Skip only when this is the bot's own release commit AND the version is
+          # fully published. A stranded commit (no tag, no release, or a release
+          # without its assets) falls through and is recovered below.
+          if [ "$(git log -1 --format='%an')" = "github-actions[bot]" ] \
+             && git log -1 --format='%s' | grep -q '^chore(release):' \
+             && published "$V"; then
+            echo "v$V already tagged and released; nothing to do"
+            exit 0
+          fi
+
+          if [ -n "$V" ] && [ -f "changelogs/v$V.md" ] && ! published "$V"; then
+            # Prepared or recovery: a staged version that is not fully published.
+            publish "$V" "$GITHUB_SHA"
+            ver="$V"; sha="$rel_sha"
+          else
+            # Generated: derive the version and changelog from the commits.
+            if [ -z "$(git tag --merged HEAD --list 'v[0-9]*.[0-9]*.[0-9]*')" ]; then
+              echo "::error::no vX.Y.Z tag is reachable from main; seed the first release on devop with bin/release.sh --version X.Y.Z --since <ref> and commit it as chore(release): vX.Y.Z"
+              exit 1
+            fi
+            hl=""
+            [ -f release-notes/next.md ] && hl="--highlights release-notes/next.md"
+            set +e
+            # shellcheck disable=SC2086
+            bash bin/release.sh --ci $hl
+            rc=$?
+            set -e
+            if [ "$rc" = 3 ]; then
+              echo "nothing to release"
+              exit 0
+            fi
+            [ "$rc" = 0 ] || { echo "::error::release generation failed (rc=$rc)"; exit 1; }
+            ver=$(sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' package.json | head -1)
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            [ -f release-notes/next.md ] && git rm -q release-notes/next.md
+            git add package.json src/app/js/version.js changelogs CHANGELOG.md
+            git commit -q -m "chore(release): v$ver"
+            git push origin "HEAD:main"
+            publish "$ver" "$(git rev-parse HEAD)"
+            sha="$rel_sha"
+          fi
+
+          # Carry the released state back to the working branch.
+          if ! git ls-remote --exit-code --heads origin devop >/dev/null 2>&1; then
+            echo "::warning::no devop branch on origin; v$ver shipped, nothing to back-merge"
+            exit 0
+          fi
+          git fetch -q origin devop
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -B devop origin/devop
+          if git merge --no-ff -m "Merge branch 'main' into devop" "$sha"; then
+            git push origin devop
+            echo "back-merged v$ver into devop"
+          else
+            conflicts=$(git diff --name-only --diff-filter=U | tr '\n' ' ')
+            git merge --abort
+            echo "::warning::back-merge of v$ver conflicts on: $conflicts (the release shipped; resolve the back-merge by hand)"
+            exit 0
+          fi

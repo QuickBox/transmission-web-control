@@ -1,0 +1,70 @@
+name: ci
+
+# KEEP IN SYNC: bin/ci-local.sh runs these same steps in the same order locally.
+# Change one, change the other.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Static gates over the shipped app
+        run: node tools/check.mjs
+
+      - name: Self-test the static gates
+        run: node tools/check.mjs --selftest
+
+      - name: Syntax-check the app modules
+        run: find src/app -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Unit tests
+        run: node --test "tests/**/*.test.js"
+
+      - name: Verify the pushed commit messages are conventional
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          zero=0000000000000000000000000000000000000000
+          if [ "$EVENT" = pull_request ]; then
+            range="$PR_BASE..$SHA"
+          elif [ "$BEFORE" = "$zero" ]; then
+            if git fetch -q origin main 2>/dev/null; then range="FETCH_HEAD..$SHA"; else range="$SHA"; fi
+          else
+            range="$BEFORE..$SHA"
+          fi
+          echo "checking $range"
+          bash bin/check-version.sh messages "$range"
+
+      - name: Verify one consistent version across the sources
+        run: bash bin/check-version.sh consistency
+
+      - name: Self-test the release tool
+        run: bash bin/release.sh --selftest
+
+      - name: Self-test the version guards
+        run: bash bin/check-version.sh --selftest

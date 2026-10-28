@@ -1,0 +1,8 @@
+# The source archive GitHub attaches to a release carries the web interface
+# and its notes. Development-only trees are left out of it.
+.github/ export-ignore
+bin/ export-ignore
+tests/ export-ignore
+tools/ export-ignore
+package.json export-ignore
+.gitattributes export-ignore
