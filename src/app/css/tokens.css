@@ -237,11 +237,17 @@
 	--qb-destructive-solid: #dc2626;
 	--qb-destructive-solid-hover: #b91c1c;
 	--qb-switch-thumb: var(--qb-foreground);
+	--qb-brand-green: #26ae7f;
+	--qb-brand-green-deep: #298767;
+	--qb-brand-grey: #ababab;
+	--qb-brand-grey-light: #dddedf;
 	color-scheme: dark;
 	accent-color: var(--qb-primary);
 }
 
 :root[data-qb-variant="defaulted"] {
 	--qb-switch-thumb: #ffffff;
+	--qb-brand-grey: #8f9196;
+	--qb-brand-grey-light: #c9cbcf;
 	color-scheme: light;
 }

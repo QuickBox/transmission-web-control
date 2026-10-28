@@ -25,6 +25,13 @@ test('action table: every entry has an icon and exactly one of method/dialog', (
 
 test('mounts the groups; selection enables the action buttons', async () => {
   const { ctx, root, teardown } = await setup();
+  const mark = root.querySelector('.tb-mark');
+  assert.equal(mark.textContent, '', 'the brand is the mark, not a letter');
+  const brand = mark.querySelector('svg');
+  assert.equal(brand.getAttribute('aria-hidden'), 'true', 'decorative beside the wordmark');
+  assert.equal(brand.children.length, 10);
+  assert.ok(brand.children.every((s) => /^var\(--qb-brand-/.test(s.styles.get('fill'))), 'brand fills come from tokens');
+  assert.equal(root.querySelector('.tb-wordmark').textContent, 'Transmission');
   assert.ok(byLabel(root, 'Add torrent'));
   assert.ok(root.querySelector('.tb-hamburger'));
   assert.ok(root.querySelector('.tb-more'));

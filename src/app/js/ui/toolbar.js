@@ -15,6 +15,7 @@ import {
   openAbout, openAdd, openAutoMatch, openLabels, openLimits, openLocation, openRemove, openReplaceTrackers, openSettings,
 } from './dialogs/index.js?v=__QBV__';
 import { createSearch } from './search.js?v=__QBV__';
+import { quickboxMark } from '../core/brand.js?v=__QBV__';
 
 /** Dialog openers by action, each taking the selected ids. */
 const DIALOGS = Object.freeze({
@@ -125,7 +126,7 @@ export function mount(root, ctx) {
   }, { class: 'tb-hamburger', attrs: { 'aria-controls': 'sidebar', 'aria-expanded': 'false' } });
 
   const brand = el('div', { class: 'tb-brand' }, [
-    el('span', { class: 'tb-mark', 'aria-hidden': 'true', text: 'Q' }),
+    el('span', { class: 'tb-mark', 'aria-hidden': 'true' }, quickboxMark({ size: 30 })),
     el('span', { class: 'tb-wordmark', text: t('core.app.name') }),
   ]);
 
