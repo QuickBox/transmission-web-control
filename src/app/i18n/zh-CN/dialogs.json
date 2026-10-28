@@ -1,0 +1,315 @@
+{
+  "add": {
+    "title": "添加种子",
+    "browse": "浏览…",
+    "dropHint": "将 .torrent 文件拖到此处，或",
+    "selectedFiles": "已选文件",
+    "removeFile": "移除 {name}",
+    "notTorrent": "这种方式只能添加 .torrent 文件。",
+    "links": "磁力链接或网址",
+    "linksPlaceholder": "每行一个",
+    "invalidLink": "不是磁力链接或网址：{line}",
+    "directory": "下载到",
+    "free": "可用 {free}",
+    "freeOf": "可用 {free}，共 {total}",
+    "freeChecking": "正在检查可用空间…",
+    "freeUnknown": "可用空间未知",
+    "labels": "标签",
+    "labelsPlaceholder": "用逗号分隔",
+    "labelsFailed": "已添加，但标签未能保存：{message}",
+    "start": "添加后立即开始",
+    "submit": "添加",
+    "noAnswer": "Transmission 未确认该种子",
+    "added": {
+      "one": "已添加 {total} 个种子",
+      "other": "已添加 {total} 个种子"
+    },
+    "duplicates": {
+      "one": "{total} 个种子已在列表中",
+      "other": "{total} 个种子已在列表中"
+    },
+    "someFailed": {
+      "one": "{total} 个无法添加",
+      "other": "{total} 个无法添加"
+    },
+    "failedOne": "无法添加 {name}：{message}",
+    "failedAll": {
+      "one": "{total} 个种子无法添加",
+      "other": "{total} 个种子均无法添加"
+    }
+  },
+  "drop": {
+    "title": "拖放以添加种子",
+    "hint": "仅限 .torrent 文件"
+  },
+  "remove": {
+    "titleOne": "移除此种子？",
+    "titleMany": {
+      "one": "移除 {total} 个种子？",
+      "other": "移除 {total} 个种子？"
+    },
+    "message": {
+      "one": "它将从列表中移除。已下载的数据会保留在磁盘上，除非你在下方选择删除。",
+      "other": "它们将从列表中移除。已下载的数据会保留在磁盘上，除非你在下方选择删除。"
+    },
+    "andMore": {
+      "one": "以及另外 {total} 个",
+      "other": "以及另外 {total} 个"
+    },
+    "deleteData": "同时删除已下载的数据",
+    "dataWarning": "这些文件将从磁盘中删除，且无法撤销。",
+    "confirm": "移除",
+    "confirmDelete": "移除并删除数据",
+    "done": {
+      "one": "已移除 {total} 个种子",
+      "other": "已移除 {total} 个种子"
+    },
+    "failed": "无法移除：{message}"
+  },
+  "failed": "出错了",
+  "rename": {
+    "title": "重命名种子",
+    "label": "新名称",
+    "empty": "请输入名称。",
+    "slash": "名称不能包含斜杠。",
+    "dots": "名称不能是 . 或 ..",
+    "done": "已重命名为 {name}"
+  },
+  "location": {
+    "titleOne": "设置数据位置",
+    "titleMany": {
+      "one": "设置 {total} 个种子的位置",
+      "other": "设置 {total} 个种子的位置"
+    },
+    "folder": "文件夹",
+    "differ": "所选种子位于不同的文件夹，此处显示第一个种子的文件夹。",
+    "mode": "数据",
+    "move": "将数据移动到此文件夹",
+    "find": "数据已在此文件夹中",
+    "submit": "设置位置",
+    "empty": "请输入文件夹。",
+    "moving": {
+      "one": "正在移动 {total} 个种子",
+      "other": "正在移动 {total} 个种子"
+    },
+    "pointed": {
+      "one": "已设置 {total} 个种子的位置",
+      "other": "已设置 {total} 个种子的位置"
+    },
+    "failed": "无法设置位置：{message}"
+  },
+  "labels": {
+    "titleOne": "标签",
+    "titleMany": {
+      "one": "{total} 个种子的标签",
+      "other": "{total} 个种子的标签"
+    },
+    "existing": "已使用的标签",
+    "add": "添加标签",
+    "browserOnly": "此版本的 Transmission 没有自带标签功能，因此标签仅保存在此浏览器中。",
+    "importOffer": {
+      "one": "{total} 个种子的标签保存在此浏览器中。将它们复制到 Transmission，所有设备即可看到；浏览器中的副本会保留。",
+      "other": "{total} 个种子的标签保存在此浏览器中。将它们复制到 Transmission，所有设备即可看到；浏览器中的副本会保留。"
+    },
+    "importAction": "复制到 Transmission",
+    "imported": {
+      "one": "已复制 {total} 个种子的标签",
+      "other": "已复制 {total} 个种子的标签"
+    },
+    "importFailed": "无法复制标签：{message}",
+    "tooLong": "标签最多 128 个字符。",
+    "saved": "标签已保存",
+    "failed": "无法保存标签：{message}"
+  },
+  "limits": {
+    "title": "速度限制",
+    "torrents": {
+      "one": "所选种子",
+      "other": "已选 {total} 个种子"
+    },
+    "alt": "备用速度",
+    "altHelp": "备用速度开启时，将使用它代替全局限制。",
+    "altEnabled": "已开启备用速度",
+    "altDown": "下载限制",
+    "altUp": "上传限制",
+    "mixed": "所选种子的值各不相同；只会保存你修改过的字段。",
+    "readFailed": "无法读取当前限制。",
+    "invalid": "请输入整数（单位 kB/s）。",
+    "saved": "速度限制已保存",
+    "failed": "无法保存限制：{message}"
+  },
+  "about": {
+    "title": "关于",
+    "product": "Transmission 网页界面",
+    "uiVersion": "版本 {version}",
+    "transmission": "Transmission",
+    "rpc": "RPC",
+    "rpcSemver": "RPC {semver}",
+    "rpcVersion": "版本 {rpc}",
+    "jsonrpc": "JSON-RPC",
+    "legacy": "旧版协议",
+    "unknown": "未知",
+    "credit": "基于 ronggang 的 Transmission Web Control（MIT）",
+    "original": "原版网页界面"
+  },
+  "settings": {
+    "title": "设置",
+    "saved": "设置已保存",
+    "failed": "无法保存：{message}",
+    "loadFailed": "无法加载设置：{message}",
+    "invalid": "请先修正高亮的值。",
+    "pages": {
+      "downloading": "下载",
+      "speed": "速度",
+      "network": "网络",
+      "queue": "队列",
+      "seeding": "做种",
+      "blocklist": "封锁列表",
+      "interface": "界面"
+    },
+    "rows": {
+      "downloadDir": "下载文件夹",
+      "startAddedTorrents": "添加种子后立即开始",
+      "trashOriginalTorrentFiles": "添加后删除 .torrent 文件",
+      "renamePartialFiles": "为未完成的文件加上 .part 后缀",
+      "incompleteDirEnabled": "将未完成的文件保存在单独的文件夹",
+      "incompleteDir": "未完成文件夹",
+      "sequentialDownload": "按顺序下载新种子",
+      "scriptTorrentAddedEnabled": "添加种子时运行脚本",
+      "scriptTorrentAddedFilename": "添加时的脚本",
+      "scriptTorrentDoneEnabled": "种子完成时运行脚本",
+      "scriptTorrentDoneFilename": "完成时的脚本",
+      "scriptTorrentDoneSeedingEnabled": "做种结束时运行脚本",
+      "scriptTorrentDoneSeedingFilename": "做种结束时的脚本",
+      "defaultTrackers": "默认追踪器",
+      "speedLimitDownEnabled": "限制下载速度",
+      "speedLimitDown": "下载限制",
+      "speedLimitUpEnabled": "限制上传速度",
+      "speedLimitUp": "上传限制",
+      "altSpeedDown": "备用下载限制",
+      "altSpeedUp": "备用上传限制",
+      "altSpeedTimeEnabled": "按计划使用备用速度",
+      "altSpeedTimeBegin": "从",
+      "altSpeedTimeEnd": "到",
+      "altSpeedTimeDay": "日期",
+      "peerPort": "对等节点端口",
+      "peerPortRandomOnStart": "启动时随机选择端口",
+      "portForwardingEnabled": "通过 UPnP 或 NAT-PMP 转发端口",
+      "encryption": "加密",
+      "peerLimitGlobal": "对等节点总数上限",
+      "peerLimitPerTorrent": "每个种子的对等节点上限",
+      "dhtEnabled": "使用 DHT",
+      "pexEnabled": "使用对等节点交换（PEX）",
+      "lpdEnabled": "使用本地对等节点发现",
+      "utpEnabled": "使用 µTP",
+      "tcpEnabled": "使用 TCP",
+      "preferredTransports": "传输协议",
+      "downloadQueueEnabled": "限制同时下载的数量",
+      "downloadQueueSize": "同时下载数",
+      "seedQueueEnabled": "限制同时做种的数量",
+      "seedQueueSize": "同时做种数",
+      "queueStalledEnabled": "将停滞的种子视为非活动",
+      "queueStalledMinutes": "停滞超过",
+      "seedRatioLimited": "达到分享率时停止做种",
+      "seedRatioLimit": "分享率",
+      "idleSeedingLimitEnabled": "空闲时停止做种",
+      "idleSeedingLimit": "空闲超过",
+      "blocklistEnabled": "使用封锁列表",
+      "blocklistUrl": "封锁列表网址"
+    },
+    "scriptHelp": "Transmission 会运行此程序，并通过 TR_TORRENT_NAME、TR_TORRENT_DIR 和 TR_TORRENT_HASH 等环境变量传入种子的详细信息。",
+    "defaultTrackersHelp": "会添加到每个公开种子。每行一个地址；空行表示开始新的一层。",
+    "transportsHelp": "此版本的 Transmission 在其设置文件中设定传输协议；此处仅供参考。",
+    "languageHelp": "更改语言会重新加载页面。",
+    "encryption": {
+      "required": "必须加密",
+      "preferred": "优先加密",
+      "tolerated": "允许不加密"
+    },
+    "custom": "自定义（{value}）",
+    "kbps": "kB/s",
+    "minutes": "分钟",
+    "seconds": "秒",
+    "days": {
+      "0": "周日",
+      "1": "周一",
+      "2": "周二",
+      "3": "周三",
+      "4": "周四",
+      "5": "周五",
+      "6": "周六"
+    },
+    "portStatus": "端口",
+    "testPort": "测试端口",
+    "testing": "测试中…",
+    "port": {
+      "ipv4": "IPv4 {state}",
+      "ipv6": "IPv6 {state}",
+      "any": "端口{state}",
+      "open": "已开放",
+      "closed": "已关闭",
+      "unknown": "状态未知"
+    },
+    "portFailed": "无法测试端口：{message}",
+    "blocklistSize": {
+      "one": "{total} 条规则",
+      "other": "{total} 条规则"
+    },
+    "blocklistUpdate": "立即更新",
+    "blocklistUpdated": "封锁列表已更新",
+    "blocklistFailed": "无法更新封锁列表：{message}",
+    "pollInterval": "刷新间隔",
+    "backup": "设置文件",
+    "export": "导出",
+    "import": "导入",
+    "importInvalid": "这不是本界面的设置文件。",
+    "imported": "设置已导入",
+    "importFailed": "无法导入：{message}",
+    "list": "种子列表",
+    "listHelp": "这些设置会立即生效。",
+    "compactRows": "紧凑行",
+    "columns": "列",
+    "columnsReset": "恢复默认"
+  },
+  "replace": {
+    "title": "替换追踪器",
+    "submit": "替换",
+    "find": "要替换的通告地址",
+    "with": "替换为",
+    "matches": {
+      "one": "{total} 个种子在使用它",
+      "other": "{total} 个种子在使用它"
+    },
+    "same": "两个地址相同。",
+    "none": "范围内没有种子使用此地址。",
+    "done": {
+      "one": "已更新 {total} 个种子",
+      "other": "已更新 {total} 个种子"
+    },
+    "failed": "已在 {done} / {total} 处停止：{message}",
+    "scopeSelected": {
+      "one": "在所选种子中查找。",
+      "other": "在所选的 {total} 个种子中查找。"
+    },
+    "scopeAll": "在所有种子中查找。"
+  },
+  "match": {
+    "title": "查找数据",
+    "submit": "开始",
+    "description": {
+      "one": "将 {total} 个种子指向已包含其数据的文件夹。不会移动任何文件。",
+      "other": "将 {total} 个种子指向已包含其数据的文件夹。不会移动任何文件。"
+    },
+    "folders": "要尝试的文件夹",
+    "help": "每行一个文件夹，按顺序尝试。种子会保留校验时首个找到其数据的文件夹。",
+    "noFolders": "请至少输入一个文件夹。",
+    "trying": "{name}（第 {n} 个，共 {of} 个）：正在校验 {folder}（第 {i} 个，共 {folders} 个）",
+    "notFound": "没有匹配的文件夹",
+    "hasData": "已有数据",
+    "stop": "停止",
+    "stopping": "将在本次校验后停止…",
+    "stopped": "已停止",
+    "finished": "已为 {found} / {total} 个找到数据",
+    "failed": "已停止：{message}"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "columns": {
+    "name": "Nome",
+    "status": "Status",
+    "percentDone": "Progresso",
+    "totalSize": "Tamanho",
+    "rateDownload": "Download",
+    "rateUpload": "Upload",
+    "eta": "Restante",
+    "uploadRatio": "Proporção",
+    "seederCount": "Semeadores",
+    "leecherCount": "Sanguessugas",
+    "uploadedEver": "Enviado",
+    "addedDate": "Adicionado em",
+    "doneDate": "Concluído em",
+    "activityDate": "Última atividade",
+    "queuePosition": "Fila",
+    "downloadDir": "Localização",
+    "labels": "Rótulos",
+    "trackers": "Rastreadores",
+    "id": "ID"
+  },
+  "table": {
+    "selectAll": "Selecionar todos os torrents da lista",
+    "selectRow": "Selecionar {name}",
+    "sortAscending": "Ordenar por {column}, crescente",
+    "sortDescending": "Ordenar por {column}, decrescente",
+    "trackerWarning": "Aviso do rastreador",
+    "noTorrents": "Nenhum torrent ainda. Adicione um com o botão acima ou solte um arquivo em qualquer lugar.",
+    "noMatches": "Nenhum torrent corresponde ao filtro atual."
+  },
+  "actions": {
+    "menu": "Filtros",
+    "add": "Adicionar torrent",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "verify": "Verificar dados locais",
+    "reannounce": "Pedir mais pares ao rastreador",
+    "forceStart": "Forçar início",
+    "remove": "Remover",
+    "move": "Definir localização",
+    "limits": "Limites de velocidade",
+    "labels": "Rótulos",
+    "queue": "Fila",
+    "queueTop": "Mover para o topo",
+    "queueUp": "Mover para cima",
+    "queueDown": "Mover para baixo",
+    "queueBottom": "Mover para o fim",
+    "settings": "Configurações",
+    "about": "Sobre",
+    "replaceTrackers": "Substituir rastreadores",
+    "findData": "Localizar dados"
+  },
+  "search": {
+    "placeholder": "Buscar torrents",
+    "clear": "Limpar busca",
+    "open": "Buscar"
+  },
+  "toolbar": {
+    "transferGroup": "Transferência",
+    "manageGroup": "Gerenciar",
+    "rates": "Download {down}, upload {up}",
+    "altSpeed": "Limites de velocidade temporários",
+    "collapse": "Recolher barra lateral",
+    "expand": "Expandir barra lateral"
+  },
+  "sidebar": {
+    "status": "Status",
+    "labels": "Rótulos",
+    "trackers": "Rastreadores",
+    "folders": "Pastas",
+    "all": "Todos",
+    "active": "Ativos",
+    "stopped": "Pausados",
+    "warning": "Aviso",
+    "noLabels": "Nenhum rótulo ainda",
+    "noTrackers": "Nenhum rastreador",
+    "noFolders": "Nenhuma pasta"
+  },
+  "statusbar": {
+    "down": "Taxa de download",
+    "up": "Taxa de upload",
+    "limit": "{rate} de {limit}",
+    "altSpeed": "Limites de velocidade temporários",
+    "altSpeedOn": "Limites ativos",
+    "free": "Espaço livre na pasta de download",
+    "freeValue": "{free} livres",
+    "port": "Porta de pares",
+    "portOpen": "Porta {protocol} aberta",
+    "portClosed": "Porta {protocol} fechada",
+    "portUnknown": "Porta {protocol} desconhecida",
+    "version": "Transmission {version}",
+    "rpc": "RPC {rpc}"
+  },
+  "bulkbar": {
+    "clear": "Limpar seleção"
+  },
+  "feedback": {
+    "actionFailed": "Falha na ação {action}: {message}"
+  }
+}

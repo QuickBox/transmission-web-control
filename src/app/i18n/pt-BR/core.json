@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "Transmission",
+    "brand": "QuickBox"
+  },
+  "actions": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "save": "Salvar",
+    "apply": "Aplicar",
+    "retry": "Tentar novamente",
+    "back": "Voltar",
+    "more": "Mais",
+    "copy": "Copiar",
+    "copied": "Copiado"
+  },
+  "connection": {
+    "connecting": "Conectando ao Transmission…",
+    "online": "Conectado",
+    "offline": "Não foi possível alcançar o Transmission. Tentando novamente.",
+    "unauthorized": "O Transmission recusou o login. Verifique o usuário e a senha do RPC.",
+    "restored": "Conexão restabelecida"
+  },
+  "status": {
+    "stopped": "Parado",
+    "queued": "Na fila",
+    "checking": "Verificando",
+    "downloading": "Baixando",
+    "seeding": "Semeando",
+    "finished": "Concluído",
+    "error": "Erro"
+  },
+  "count": {
+    "torrents": {
+      "one": "{count} torrent",
+      "other": "{count} torrents"
+    },
+    "selected": {
+      "one": "{count} selecionado",
+      "other": "{count} selecionados"
+    }
+  },
+  "units": {
+    "size1000": "B kB MB GB TB PB",
+    "size1024": "B KiB MiB GiB TiB PiB",
+    "perSecond": "{size}/s",
+    "day": "{n}d",
+    "hour": "{n}h",
+    "minute": "{n}min",
+    "second": "{n}s"
+  },
+  "theme": {
+    "label": "Tema",
+    "auto": "Automático (painel)",
+    "spectre": "Spectre",
+    "smoked": "Smoked",
+    "reel": "Reel",
+    "defaulted": "Claro"
+  },
+  "language": {
+    "label": "Idioma",
+    "auto": "Automático (painel)"
+  },
+  "a11y": {
+    "skipToList": "Ir para a lista de torrents",
+    "loading": "Carregando",
+    "notifications": "Notificações"
+  },
+  "errors": {
+    "generic": "Algo deu errado: {message}"
+  },
+  "regions": {
+    "toolbar": "Barra de ferramentas",
+    "sidebar": "Filtros",
+    "table": "Torrents",
+    "details": "Detalhes do torrent",
+    "statusbar": "Status"
+  },
+  "dialog": {
+    "close": "Fechar caixa de diálogo"
+  },
+  "toast": {
+    "dismiss": "Dispensar notificação"
+  },
+  "tone": {
+    "info": "Informação",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "error": "Erro"
+  }
+}

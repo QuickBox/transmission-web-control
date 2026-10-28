@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "Transmission",
+    "brand": "QuickBox"
+  },
+  "actions": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "apply": "Appliquer",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "more": "Plus",
+    "copy": "Copier",
+    "copied": "Copié"
+  },
+  "connection": {
+    "connecting": "Connexion à Transmission…",
+    "online": "Connecté",
+    "offline": "Transmission est injoignable. Nouvelle tentative en cours.",
+    "unauthorized": "Transmission a refusé la connexion. Vérifiez le nom d’utilisateur et le mot de passe RPC.",
+    "restored": "Connexion rétablie"
+  },
+  "status": {
+    "stopped": "Arrêté",
+    "queued": "En file d’attente",
+    "checking": "Vérification",
+    "downloading": "Téléchargement",
+    "seeding": "Partage",
+    "finished": "Terminé",
+    "error": "Erreur"
+  },
+  "count": {
+    "torrents": {
+      "one": "{count} torrent",
+      "other": "{count} torrents"
+    },
+    "selected": {
+      "one": "{count} sélectionné",
+      "other": "{count} sélectionnés"
+    }
+  },
+  "units": {
+    "size1000": "B kB MB GB TB PB",
+    "size1024": "B KiB MiB GiB TiB PiB",
+    "perSecond": "{size}/s",
+    "day": "{n} j",
+    "hour": "{n} h",
+    "minute": "{n} min",
+    "second": "{n} s"
+  },
+  "theme": {
+    "label": "Thème",
+    "auto": "Automatique (tableau de bord)",
+    "spectre": "Spectre",
+    "smoked": "Smoked",
+    "reel": "Reel",
+    "defaulted": "Clair"
+  },
+  "language": {
+    "label": "Langue",
+    "auto": "Automatique (tableau de bord)"
+  },
+  "a11y": {
+    "skipToList": "Aller à la liste des torrents",
+    "loading": "Chargement",
+    "notifications": "Notifications"
+  },
+  "errors": {
+    "generic": "Une erreur s’est produite : {message}"
+  },
+  "regions": {
+    "toolbar": "Barre d’outils",
+    "sidebar": "Filtres",
+    "table": "Torrents",
+    "details": "Détails du torrent",
+    "statusbar": "État"
+  },
+  "dialog": {
+    "close": "Fermer la boîte de dialogue"
+  },
+  "toast": {
+    "dismiss": "Ignorer la notification"
+  },
+  "tone": {
+    "info": "Information",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "error": "Erreur"
+  }
+}

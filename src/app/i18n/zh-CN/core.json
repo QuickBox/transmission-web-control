@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "Transmission",
+    "brand": "QuickBox"
+  },
+  "actions": {
+    "ok": "确定",
+    "cancel": "取消",
+    "close": "关闭",
+    "save": "保存",
+    "apply": "应用",
+    "retry": "重试",
+    "back": "返回",
+    "more": "更多",
+    "copy": "复制",
+    "copied": "已复制"
+  },
+  "connection": {
+    "connecting": "正在连接 Transmission…",
+    "online": "已连接",
+    "offline": "无法连接 Transmission，正在重试。",
+    "unauthorized": "Transmission 拒绝了登录。请检查 RPC 用户名和密码。",
+    "restored": "连接已恢复"
+  },
+  "status": {
+    "stopped": "已停止",
+    "queued": "排队中",
+    "checking": "校验中",
+    "downloading": "下载中",
+    "seeding": "做种中",
+    "finished": "已完成",
+    "error": "错误"
+  },
+  "count": {
+    "torrents": {
+      "one": "{count} 个种子",
+      "other": "{count} 个种子"
+    },
+    "selected": {
+      "one": "已选择 {count} 个",
+      "other": "已选择 {count} 个"
+    }
+  },
+  "units": {
+    "size1000": "B kB MB GB TB PB",
+    "size1024": "B KiB MiB GiB TiB PiB",
+    "perSecond": "{size}/s",
+    "day": "{n}天",
+    "hour": "{n}小时",
+    "minute": "{n}分钟",
+    "second": "{n}秒"
+  },
+  "theme": {
+    "label": "主题",
+    "auto": "自动（仪表板）",
+    "spectre": "Spectre",
+    "smoked": "Smoked",
+    "reel": "Reel",
+    "defaulted": "浅色"
+  },
+  "language": {
+    "label": "语言",
+    "auto": "自动（仪表板）"
+  },
+  "a11y": {
+    "skipToList": "跳到种子列表",
+    "loading": "加载中",
+    "notifications": "通知"
+  },
+  "errors": {
+    "generic": "出错了：{message}"
+  },
+  "regions": {
+    "toolbar": "工具栏",
+    "sidebar": "筛选",
+    "table": "种子",
+    "details": "种子详情",
+    "statusbar": "状态栏"
+  },
+  "dialog": {
+    "close": "关闭对话框"
+  },
+  "toast": {
+    "dismiss": "忽略通知"
+  },
+  "tone": {
+    "info": "信息",
+    "success": "成功",
+    "warning": "警告",
+    "error": "错误"
+  }
+}
