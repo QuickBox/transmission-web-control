@@ -129,7 +129,7 @@ export function create(ctx) {
       ok.disabled = true;
       save(area.value).then(() => dialog.close('saved'), (err) => {
         ok.disabled = false;
-        error.textContent = err.message;
+        error.textContent = errorMessage(t, err);
       });
     });
     return dialog;
@@ -162,7 +162,7 @@ export function create(ctx) {
       const tiers = tiersFromTrackers(current.trackers)
         .map((tier) => tier.filter((u) => u !== tracker.announce))
         .filter((tier) => tier.length > 0);
-      return save(tiers).catch((err) => { toast(err.message, { tone: 'error' }); });
+      return save(tiers).catch((err) => { toast(errorMessage(t, err), { tone: 'error' }); });
     });
   }
 
