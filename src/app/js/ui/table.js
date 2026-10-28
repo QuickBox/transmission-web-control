@@ -13,6 +13,7 @@
  */
 
 import { STATES, searchTorrents } from '../rpc/torrents.js?v=__QBV__';
+import { openDetails } from './details/index.js?v=__QBV__';
 
 /** Fired on the region root (bubbling) when the user asks to remove the selection. */
 export const REMOVE_REQUEST = 'remove-request';
@@ -447,9 +448,15 @@ export function mount(root, ctx) {
     renderWindow();
   }
 
+  /** Open the details drawer on a torrent; `focused` is set even before the drawer mounts. */
+  function showDetails(id) {
+    openDetails(id);
+    if (store.get().focused !== id) store.set({ focused: id });
+  }
+
   function onDoubleClick(e) {
     const id = rowIdFromEvent(e);
-    if (id !== null) store.set({ focused: id });
+    if (id !== null) showDetails(id);
   }
 
   function requestRemove() {
@@ -504,7 +511,7 @@ export function mount(root, ctx) {
       case 'Enter':
         if (activeId == null) return;
         e.preventDefault();
-        store.set({ focused: activeId });
+        showDetails(activeId);
         break;
       case 'Delete':
       case 'Backspace':

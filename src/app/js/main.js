@@ -21,6 +21,7 @@ import { RpcError, createClient } from './rpc/client.js?v=__QBV__';
 import { UNKNOWN_CAPS, buildCaps } from './rpc/caps.js?v=__QBV__';
 import { getSession } from './rpc/session.js?v=__QBV__';
 import { createPoller } from './rpc/poller.js?v=__QBV__';
+import { memoryStorage } from './rpc/labels.js?v=__QBV__';
 import * as toolbar from './ui/toolbar.js?v=__QBV__';
 import * as sidebar from './ui/sidebar.js?v=__QBV__';
 import * as table from './ui/table.js?v=__QBV__';
@@ -87,6 +88,45 @@ export const MODULES = Object.freeze([
  * `caps` is replaced once when the daemon was unreachable at boot and comes
  * back; modules read `ctx.caps` when they render, never a copy taken at mount.
  */
+
+/** Storage key for the user's UI preferences (`store.prefs`). */
+export const PREFS_KEY = 'qb-transmission.prefs';
+
+/** `localStorage` when the browser allows it, else an in-memory stand-in. */
+function browserStorage() {
+  try {
+    const storage = globalThis.localStorage;
+    if (storage) {
+      storage.getItem(PREFS_KEY);
+      return storage;
+    }
+  } catch {
+    // Storage blocked (privacy mode, embedded frame): prefs last for this page only.
+  }
+  return memoryStorage();
+}
+
+/** Saved prefs, or `{}` when absent or unreadable. */
+export function loadPrefs(storage) {
+  try {
+    const raw = storage.getItem(PREFS_KEY);
+    const parsed = typeof raw === 'string' && raw !== '' ? JSON.parse(raw) : null;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Persist every `prefs` change; a storage failure is silent, the store still has them. */
+function persistPrefs(store, storage) {
+  return store.subscribe('prefs', (prefs) => {
+    try {
+      storage.setItem(PREFS_KEY, JSON.stringify(prefs));
+    } catch {
+      // Storage full or blocked: keep running.
+    }
+  });
+}
 
 /** Page visibility as the poller's pause source; browser globals through arrows. */
 function documentVisibility() {
@@ -158,9 +198,10 @@ function regionFor(app, name) {
 /**
  * @param {Element} app
  * @param {{ transport?: Function, visibility?: { isHidden: () => boolean, subscribe: (fn: () => void) => () => void },
- *   timers?: { setTimeout: Function, clearTimeout: Function } }} [options]
+ *   timers?: { setTimeout: Function, clearTimeout: Function },
+ *   storage?: { getItem: Function, setItem: Function, removeItem: Function } }} [options]
  *   injection points for tests; the browser defaults are `fetch`, the page
- *   visibility and the global timers
+ *   visibility, the global timers and `localStorage`
  * @returns {Promise<AppContext>}
  */
 export async function boot(app, options = {}) {
@@ -177,7 +218,9 @@ export async function boot(app, options = {}) {
     if (t.has(`core.units.${name}`)) units[name] = t(`core.units.${name}`);
   }
 
-  const store = createStore();
+  const storage = options.storage || browserStorage();
+  const store = createStore({ prefs: loadPrefs(storage) });
+  persistPrefs(store, storage);
   const rpc = createClient(options.transport ? { transport: options.transport } : {});
   const caps = await connect(rpc, store);
   const visibility = options.visibility || documentVisibility();

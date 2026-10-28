@@ -9,7 +9,8 @@ env.doc.getElementById = () => null;
 env.doc.visibilityState = 'visible';
 globalThis.addEventListener = () => {};
 
-const { boot, MODULES } = await import('../../src/app/js/main.js');
+const { PREFS_KEY, boot, loadPrefs, MODULES } = await import('../../src/app/js/main.js');
+const { memoryStorage } = await import('../../src/app/js/rpc/labels.js');
 
 /** Timers that never fire, so the poller's cadence cannot outlive a test. */
 const timers = { setTimeout: () => 1, clearTimeout() {} };
@@ -27,7 +28,7 @@ function app() {
 test('boot connects to the daemon, builds caps, mounts every module and primes the store', async () => {
   const { node, existing } = app();
   const { transport } = recordedTransport('rpc-17');
-  const ctx = await boot(node, { transport, timers });
+  const ctx = await boot(node, { transport, timers, storage: memoryStorage() });
 
   const regions = node.children.map((c) => c.getAttribute('data-region'));
   assert.deepEqual(regions.sort(), MODULES.map(([name]) => name).sort());
@@ -63,7 +64,7 @@ test('boot connects to the daemon, builds caps, mounts every module and primes t
 test('boot with the daemon down still mounts, closes every gate and reports the connection', async () => {
   const { node } = app();
   const transport = async () => new Response('nope', { status: 500 });
-  const ctx = await boot(node, { transport, timers });
+  const ctx = await boot(node, { transport, timers, storage: memoryStorage() });
   assert.equal(node.children.length, MODULES.length);
   assert.equal(ctx.caps.rpc, 0);
   assert.equal(ctx.caps.nativeLabels, false);
@@ -75,7 +76,39 @@ test('boot with the daemon down still mounts, closes every gate and reports the 
 test('a daemon that refuses the login reports unauthorized', async () => {
   const { node } = app();
   const transport = async () => new Response('', { status: 401 });
-  const ctx = await boot(node, { transport, timers });
+  const ctx = await boot(node, { transport, timers, storage: memoryStorage() });
   assert.equal(ctx.store.get().connection.state, 'unauthorized');
+  ctx.poller.stop();
+});
+
+test('prefs are seeded from storage before mount and saved on every change', async () => {
+  const { node } = app();
+  const storage = memoryStorage({ [PREFS_KEY]: JSON.stringify({ detailsTab: 'files', detailsHeight: 45, pollInterval: 9 }) });
+  const { transport } = recordedTransport('rpc-16');
+  const ctx = await boot(node, { transport, timers, storage });
+  assert.deepEqual(ctx.store.get().prefs, { detailsTab: 'files', detailsHeight: 45, pollInterval: 9 });
+  ctx.store.set({ prefs: { ...ctx.store.get().prefs, sort: { key: 'name', dir: 'desc' } } });
+  assert.deepEqual(JSON.parse(storage.getItem(PREFS_KEY)), {
+    detailsTab: 'files', detailsHeight: 45, pollInterval: 9, sort: { key: 'name', dir: 'desc' },
+  });
+  ctx.poller.stop();
+});
+
+test('corrupt or missing prefs fall back to defaults and a failing storage is tolerated', async () => {
+  assert.deepEqual(loadPrefs(memoryStorage({ [PREFS_KEY]: '{not json' })), {});
+  assert.deepEqual(loadPrefs(memoryStorage({ [PREFS_KEY]: '[1,2]' })), {});
+  assert.deepEqual(loadPrefs(memoryStorage()), {});
+  assert.deepEqual(loadPrefs({ getItem() { throw new Error('blocked'); } }), {});
+  const { node } = app();
+  const broken = {
+    getItem: () => '{"pollInterval": 3}',
+    setItem() { throw new Error('quota'); },
+    removeItem() {},
+  };
+  const { transport } = recordedTransport('rpc-16');
+  const ctx = await boot(node, { transport, timers, storage: broken });
+  assert.equal(ctx.store.get().prefs.pollInterval, 3);
+  ctx.store.set({ prefs: { pollInterval: 4 } });
+  assert.equal(ctx.store.get().prefs.pollInterval, 4, 'the store keeps the change even when saving fails');
   ctx.poller.stop();
 });

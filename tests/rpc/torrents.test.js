@@ -218,6 +218,21 @@ test("mergeTorrents: incremental merge keeps base fields, applies removed, repor
   assert.deepEqual([...full.torrents.keys()], [3]);
 });
 
+test("mergeTorrents: every updated row is a new object, untouched rows keep their identity", () => {
+  const { torrents: first } = mergeTorrents(new Map(), {
+    torrents: [{ id: 1, name: "a", hashString: "h1", status: 4 }, { id: 2, name: "b", hashString: "h2", status: 6 }],
+  }, { replace: true });
+  const before1 = first.get(1);
+  const before2 = first.get(2);
+  const { torrents: next } = mergeTorrents(first, { torrents: [{ id: 1, rateDownload: 7 }], removed: [] });
+  assert.notEqual(next, first, "a new Map");
+  assert.notEqual(next.get(1), before1, "the updated row is a fresh object");
+  assert.equal(next.get(1).rateDownload, 7);
+  assert.equal(next.get(1).hash, "h1");
+  assert.equal(next.get(2), before2, "a row absent from the delta is the same object");
+  assert.equal(before1.rateDownload, 0, "the previous object was not mutated");
+});
+
 test("aggregate and search", () => {
   const { torrents } = mergeTorrents(new Map(), {
     torrents: [
