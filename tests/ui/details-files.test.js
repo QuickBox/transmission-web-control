@@ -143,6 +143,24 @@ test('toggling download sends files-unwanted with every index under a folder', a
   assert.equal(refreshes.length, 1);
 });
 
+test('a poll with fresh stats patches the same row nodes and keeps focus', async () => {
+  const { tab, list, calls } = await view(sample);
+  const s01 = rowsOf(list).find((r) => r.textContent.startsWith('S01'));
+  s01.focus();
+  s01.dispatch('focusin');
+  const fresher = {
+    files: sample.files.map((f) => ({ ...f, bytesCompleted: f.length })),
+    fileStats: sample.fileStats.map((st, i) => ({ ...st, bytesCompleted: sample.files[i].length })),
+  };
+  tab.render(torrent(), fresher, { loading: false, error: null });
+  assert.equal(rowsOf(list).find((r) => r.textContent.startsWith('S01')), s01, 'same node after the poll');
+  assert.equal(env.doc.activeElement, s01);
+  assert.match(s01.textContent, /100%/);
+  s01.dispatch('click', { target: s01.querySelector('[data-action="toggle-wanted"]') });
+  await flush();
+  assert.deepEqual(calls.at(-1), { method: 'torrent-set', args: { ids: [1], 'files-unwanted': [0, 1] } }, 'the patched row still acts');
+});
+
 test('keyboard: Space toggles, arrows move and expand, Left returns to the parent', async () => {
   const { list, calls } = await view(sample);
   const focused = () => rowsOf(list).find((r) => r.getAttribute('tabindex') === '0');

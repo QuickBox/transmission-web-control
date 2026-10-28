@@ -194,53 +194,91 @@ export function create(ctx, host) {
     return rows[index] ? rows[index].node : null;
   }
 
-  function priorityChip(node) {
-    if (node.priority === 'mixed') return el('span', { class: 'badge file-priority', text: t('details.files.mixed') });
-    if (node.priority === 1 || node.priority === -1) {
-      return el('span', { class: ['badge', 'file-priority', node.priority === 1 && 'is-high'], text: t(PRIORITY_LABEL[node.priority]) });
-    }
-    return null;
-  }
+  /**
+   * One row node per tree key, kept across polls and patched in place: a row
+   * the user is pressing or has focused stays the same node when fresh stats
+   * arrive, so the press still lands and focus is never dropped.
+   */
+  const rowNodes = new Map();
 
-  function rowFor(index) {
-    const { node, posinset, setsize } = rows[index];
-    const isOpen = node.isDir && expanded.has(node.key);
-    const fraction = node.size > 0 ? node.done / node.size : node.done > 0 ? 1 : 0;
-    const checked = node.wanted === 'mixed' ? 'mixed' : node.wanted === null ? null : String(node.wanted);
-    return el('div', {
-      class: ['file-row', node.wanted === false && 'is-skipped'],
-      role: 'treeitem',
-      'aria-level': node.depth + 1,
-      'aria-setsize': setsize,
-      'aria-posinset': posinset,
-      'aria-expanded': node.isDir ? String(isOpen) : null,
-      'aria-checked': checked,
-      tabindex: index === focusIndex ? '0' : '-1',
-      'data-index': index,
-      style: { top: `${index * ROW_HEIGHT}px`, '--depth': String(node.depth) },
-    }, [
-      el('span', { class: 'file-toggle', 'aria-hidden': 'true', 'data-action': node.isDir ? 'toggle-open' : null }, [
-        node.isDir ? icon(isOpen ? 'panel-expanded' : 'panel-collapsed', { size: 16 }) : null,
-      ]),
-      el('span', {
-        class: ['file-check', checked === 'true' && 'is-on', checked === 'mixed' && 'is-mixed', checked === null && 'is-unknown'],
-        'aria-hidden': 'true', 'data-action': checked === null ? null : 'toggle-wanted',
-      }, [checked === 'true' ? icon('menu-check', { size: 12 }) : null]),
+  function buildRow(node) {
+    const r = { node: null, open: null, checked: undefined, priority: undefined };
+    r.toggle = el('span', { class: 'file-toggle', 'aria-hidden': 'true', 'data-action': node.isDir ? 'toggle-open' : null });
+    r.check = el('span', { class: 'file-check', 'aria-hidden': 'true' });
+    r.name = el('span', { class: 'file-name', text: node.name });
+    r.chip = el('span', { class: 'badge file-priority', hidden: true });
+    r.size = el('span', { class: 'file-size tabular' });
+    r.fill = el('span', { class: 'meter-fill' });
+    r.percent = el('span');
+    r.el = el('div', { class: 'file-row', role: 'treeitem' }, [
+      r.toggle,
+      r.check,
       el('span', { class: 'file-icon', 'aria-hidden': 'true' }, [icon(node.isDir ? 'file-folder' : fileIcon(node.name), { size: 16 })]),
-      el('span', { class: 'file-name', text: node.name }),
-      priorityChip(node),
-      el('span', { class: 'file-size tabular', text: fmt.bytes(node.size) }),
-      el('span', { class: 'file-done tabular' }, [
-        el('span', { class: 'meter meter-sm', 'aria-hidden': 'true' }, [
-          el('span', { class: 'meter-fill', style: { width: `${Math.min(1, fraction) * 100}%` } }),
-        ]),
-        el('span', { text: fmt.percent(fraction, { digits: 0 }) }),
-      ]),
+      r.name,
+      r.chip,
+      r.size,
+      el('span', { class: 'file-done tabular' }, [el('span', { class: 'meter meter-sm', 'aria-hidden': 'true' }, [r.fill]), r.percent]),
       el('button', {
         type: 'button', class: 'btn-icon btn-icon-xs file-more', tabindex: '-1', 'data-action': 'menu',
         'aria-label': t('details.files.actions', { name: node.name }),
       }, [icon('more', { size: 14 })]),
     ]);
+    return r;
+  }
+
+  function setAttr(node, name, value) {
+    if (value == null) node.removeAttribute(name);
+    else if (node.getAttribute(name) !== String(value)) node.setAttribute(name, String(value));
+  }
+
+  function setText(node, text) {
+    if (node.textContent !== text) node.textContent = text;
+  }
+
+  function rowFor(index) {
+    const { node, posinset, setsize } = rows[index];
+    let r = rowNodes.get(node.key);
+    if (!r) {
+      r = buildRow(node);
+      rowNodes.set(node.key, r);
+    }
+    r.node = node;
+    const isOpen = node.isDir && expanded.has(node.key);
+    const fraction = node.size > 0 ? node.done / node.size : node.done > 0 ? 1 : 0;
+    const checked = node.wanted === 'mixed' ? 'mixed' : node.wanted === null ? null : String(node.wanted);
+    r.el.classList.toggle('is-skipped', node.wanted === false);
+    setAttr(r.el, 'aria-level', node.depth + 1);
+    setAttr(r.el, 'aria-setsize', setsize);
+    setAttr(r.el, 'aria-posinset', posinset);
+    setAttr(r.el, 'aria-expanded', node.isDir ? String(isOpen) : null);
+    setAttr(r.el, 'aria-checked', checked);
+    setAttr(r.el, 'tabindex', index === focusIndex ? '0' : '-1');
+    setAttr(r.el, 'data-index', index);
+    r.el.style.setProperty('top', `${index * ROW_HEIGHT}px`);
+    r.el.style.setProperty('--depth', String(node.depth));
+    if (node.isDir && r.open !== isOpen) {
+      r.open = isOpen;
+      r.toggle.replaceChildren(icon(isOpen ? 'panel-expanded' : 'panel-collapsed', { size: 16 }));
+    }
+    if (r.checked !== checked) {
+      r.checked = checked;
+      r.check.classList.toggle('is-on', checked === 'true');
+      r.check.classList.toggle('is-mixed', checked === 'mixed');
+      r.check.classList.toggle('is-unknown', checked === null);
+      setAttr(r.check, 'data-action', checked === null ? null : 'toggle-wanted');
+      r.check.replaceChildren(...(checked === 'true' ? [icon('menu-check', { size: 12 })] : []));
+    }
+    if (r.priority !== node.priority) {
+      r.priority = node.priority;
+      const shown = node.priority === 'mixed' || node.priority === 1 || node.priority === -1;
+      r.chip.hidden = !shown;
+      r.chip.classList.toggle('is-high', node.priority === 1);
+      setText(r.chip, !shown ? '' : node.priority === 'mixed' ? t('details.files.mixed') : t(PRIORITY_LABEL[node.priority]));
+    }
+    setText(r.size, fmt.bytes(node.size));
+    r.fill.style.setProperty('width', `${Math.min(1, fraction) * 100}%`);
+    setText(r.percent, fmt.percent(fraction, { digits: 0 }));
+    return r.el;
   }
 
   function paint() {
@@ -253,9 +291,15 @@ export function create(ctx, host) {
     if (focusIndex < rows.length) keep.add(focusIndex);
     const hadFocus = list.contains(document.activeElement) && document.activeElement !== list;
     const next = new Map();
-    for (const index of keep) next.set(index, rowFor(index));
-    for (const node of painted.values()) node.remove();
-    for (const node of next.values()) list.append(node);
+    for (const index of [...keep].sort((a, b) => a - b)) next.set(index, rowFor(index));
+    // A poll that changes no row membership or order moves no node.
+    const before = [...painted.entries()].sort((a, b) => a[0] - b[0]).map((e) => e[1]);
+    const after = [...next.values()];
+    if (before.length !== after.length || before.some((n, i) => n !== after[i])) {
+      const staying = new Set(after);
+      for (const node of before) if (!staying.has(node)) node.remove();
+      for (const node of after) list.append(node);
+    }
     painted = next;
     if (hadFocus && painted.has(focusIndex)) painted.get(focusIndex).focus({ preventScroll: true });
   }
@@ -441,6 +485,7 @@ export function create(ctx, host) {
     render(torrent, detail, state) {
       if (torrent.id !== torrentId) {
         torrentId = torrent.id;
+        rowNodes.clear();
         expanded = new Set();
         focusIndex = 0;
         list.scrollTop = 0;
@@ -462,6 +507,8 @@ export function create(ctx, host) {
       tree = buildFileTree(filesList, detail.fileStats);
       if (firstBuild) for (const r of tree.roots) if (r.isDir) expanded.add(r.key);
       rows = visibleRows(tree.roots, expanded);
+      const visible = new Set(rows.map((r) => r.node.key));
+      for (const key of rowNodes.keys()) if (!visible.has(key)) rowNodes.delete(key);
       if (focusIndex >= rows.length) focusIndex = Math.max(0, rows.length - 1);
       const wantedCount = Array.isArray(detail.fileStats) ? detail.fileStats.filter((s) => s && s.wanted).length : null;
       // The download split is only news when some files are skipped.

@@ -154,8 +154,25 @@ test('a re-render keeps keyboard focus on the same row action', async () => {
   env.body.replaceChildren(view.root);
   const tor = torrent({ trackers: [tracker({ id: 1 })] });
   view.render(tor, null, ok);
-  view.root.querySelectorAll('button').find((b) => /^Remove/.test(b.getAttribute('aria-label') || '')).focus();
+  const remove = view.root.querySelectorAll('button').find((b) => /^Remove/.test(b.getAttribute('aria-label') || ''));
+  const bar = view.root.querySelector('.trackers-actions button');
+  remove.focus();
   view.render({ ...tor, trackers: [tracker({ id: 1, seederCount: 13 })] }, null, ok);
-  assert.match(env.doc.activeElement.getAttribute('aria-label'), /^Remove tracker\.invalid/);
-  assert.ok(view.root.contains(env.doc.activeElement));
+  assert.ok(view.root.contains(remove), 'the poll patched the row instead of replacing it');
+  assert.equal(view.root.querySelector('.trackers-actions button'), bar, 'the bar button survives the poll');
+  assert.equal(env.doc.activeElement, remove);
+  assert.match(view.root.querySelector('.tracker-counts').textContent, /Seeders 13/);
+});
+
+test('a press that spans a poll still acts on the patched row', async () => {
+  const { ctx, dialogs } = await makeCtx();
+  const view = trackersTab.create(ctx);
+  env.body.replaceChildren(view.root);
+  const tor = torrent({ trackers: [tracker({ id: 1 })] });
+  view.render(tor, null, ok);
+  const edit = view.root.querySelectorAll('button').find((b) => /^Edit/.test(b.getAttribute('aria-label') || ''));
+  view.render({ ...tor, trackers: [tracker({ id: 1, announce: 'https://moved.invalid/announce', host: 'moved.invalid' })] }, null, ok);
+  edit.dispatch('click');
+  assert.equal(dialogs.at(-1).opts.body.querySelector('input').value, 'https://moved.invalid/announce', 'the click edits the tracker as the poll now shows it');
+  assert.equal(edit.getAttribute('aria-label'), 'Edit moved.invalid');
 });

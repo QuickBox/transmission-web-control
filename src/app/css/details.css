@@ -618,6 +618,10 @@
 	font-size: 11px;
 }
 
+.file-priority[hidden] {
+	display: none;
+}
+
 .file-priority.is-high {
 	color: var(--qb-primary-text);
 }

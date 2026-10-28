@@ -101,6 +101,21 @@ test('the Peers table renders untrusted client names as text and labels every ce
   assert.equal(view.root.querySelector('caption').textContent, 'Connected peers');
 });
 
+test('a peers poll patches each address row in place and drops departed peers', async () => {
+  const made = await makeCtx();
+  const view = peers.create(made.ctx);
+  const a = { address: '203.0.113.7', port: 1, clientName: 'A', progress: 0.1, rateToClient: 0, rateToPeer: 0, flagStr: 'D' };
+  const b = { address: '198.51.100.9', port: 2, clientName: 'B', progress: 0.2, rateToClient: 0, rateToPeer: 0, flagStr: 'E' };
+  view.render(torrent(), { peers: [a, b] }, ok);
+  const body = view.root.querySelector('tbody');
+  const rowA = body.children.find((r) => r.textContent.startsWith('203.0.113.7'));
+  view.render(torrent(), { peers: [{ ...a, progress: 0.9 }] }, ok);
+  const rows = body.children;
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0], rowA, 'same row node after the poll');
+  assert.match(rowA.textContent, /90%/);
+});
+
 test('Peers with a missing list, no peers, or a load error show a message', async () => {
   const made = await makeCtx();
   const view = peers.create(made.ctx);

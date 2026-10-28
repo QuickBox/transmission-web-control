@@ -166,49 +166,102 @@ export function create(ctx) {
     });
   }
 
-  function rowButton(iconName, labelKey, vars, focusKey, onClick) {
-    const label = t(labelKey, vars);
-    const button = el('button', {
-      type: 'button', class: 'btn-icon btn-icon-xs', 'aria-label': label, 'data-focus': focusKey, on: { click: onClick },
-    }, [icon(iconName, { size: 14 })]);
-    tooltip(button, label);
+  function rowButton(iconName, onClick) {
+    const button = el('button', { type: 'button', class: 'btn-icon btn-icon-xs', on: { click: onClick } }, [icon(iconName, { size: 14 })]);
+    tooltip(button, () => button.getAttribute('aria-label') || '');
     return button;
   }
 
-  function trackerRow(tracker, editable) {
+  function setText(node, text) {
+    if (node.textContent !== text) node.textContent = text;
+  }
+
+  function setAttr(node, name, value) {
+    if (node.getAttribute(name) !== value) node.setAttribute(name, value);
+  }
+
+  /*
+   * Rows, tier sections and the bar button are built once and patched on each
+   * poll, so a focused or half-pressed control is still the same node when the
+   * next announce result arrives.
+   */
+  const rowNodes = new Map();
+  const tierNodes = [];
+  const editButton = el('button', { type: 'button', class: 'btn btn-secondary', 'data-focus': 'bar', on: { click: () => editList() } }, [
+    icon('header-rename', { size: 16 }), t('details.trackers.edit')]);
+  const addButton = el('button', { type: 'button', class: 'btn btn-secondary', 'data-focus': 'bar', on: { click: () => addTracker() } }, [
+    icon('toolbar-add', { size: 16 }), t('details.trackers.add')]);
+
+  function buildRow(editable) {
+    const r = { tracker: null, health: null };
+    r.glyph = el('span', { class: 'tracker-glyph' });
+    r.host = el('p', { class: 'tracker-host' });
+    r.url = el('p', { class: 'tracker-url mono' });
+    r.last = el('p', { class: 'tracker-last' });
+    r.seeders = el('span');
+    r.leechers = el('span');
+    r.downloads = el('span');
+    r.next = el('span');
+    r.edit = editable ? rowButton('header-rename', () => replaceTracker(r.tracker)) : null;
+    r.remove = editable ? rowButton('toolbar-remove', () => removeTracker(r.tracker)) : null;
+    r.el = el('li', { class: 'tracker' }, [
+      r.glyph,
+      el('div', { class: 'tracker-main' }, [
+        r.host, r.url, r.last,
+        el('p', { class: 'tracker-counts tabular' }, [r.seeders, r.leechers, r.downloads, r.next]),
+      ]),
+      editable ? el('div', { class: 'tracker-actions' }, [r.edit, r.remove]) : null,
+    ]);
+    return r;
+  }
+
+  function updateRow(r, tracker) {
+    r.tracker = tracker;
     const health = trackerHealth(tracker);
-    const glyph = health === 'ok' ? 'menu-check' : health === 'warning' ? 'state-error' : 'state-queued';
+    if (r.health !== health) {
+      if (r.health) r.el.classList.remove(`is-${r.health}`);
+      r.el.classList.add(`is-${health}`);
+      r.health = health;
+      const glyph = health === 'ok' ? 'menu-check' : health === 'warning' ? 'state-error' : 'state-queued';
+      r.glyph.replaceChildren(icon(glyph, { size: 16, label: t(`details.trackers.health.${health}`) }));
+    }
     const host = tracker.host || tracker.announce;
     const next = tracker.nextAnnounceTime > 0 ? tracker.nextAnnounceTime - Math.floor(Date.now() / 1000) : -1;
-    const lastLine = health === 'pending'
+    setText(r.host, host);
+    setText(r.url, tracker.announce);
+    setText(r.last, health === 'pending'
       ? t('details.trackers.notAnnounced')
       : t('details.trackers.lastAnnounce', {
         when: fmt.date(tracker.lastAnnounceTime),
         result: tracker.lastAnnounceResult || t(health === 'ok' ? 'details.trackers.success' : 'details.trackers.failed'),
-      });
-    return el('li', { class: ['tracker', `is-${health}`] }, [
-      el('span', { class: 'tracker-glyph' }, [icon(glyph, { size: 16, label: t(`details.trackers.health.${health}`) })]),
-      el('div', { class: 'tracker-main' }, [
-        el('p', { class: 'tracker-host', text: host }),
-        el('p', { class: 'tracker-url mono', text: tracker.announce }),
-        el('p', { class: 'tracker-last', text: lastLine }),
-        el('p', { class: 'tracker-counts tabular' }, [
-          el('span', { text: t('details.trackers.seeders', { count: count(tracker.seederCount) }) }),
-          el('span', { text: t('details.trackers.leechers', { count: count(tracker.leecherCount) }) }),
-          el('span', { text: t('details.trackers.downloads', { count: count(tracker.downloadCount) }) }),
-          next > 0 ? el('span', { text: t('details.trackers.next', { in: fmt.eta(next) }) }) : null,
-        ]),
-      ]),
-      editable ? el('div', { class: 'tracker-actions' }, [
-        rowButton('header-rename', 'details.trackers.editOneFor', { host }, `edit ${tracker.announce}`, () => replaceTracker(tracker)),
-        rowButton('toolbar-remove', 'details.trackers.removeFor', { host }, `remove ${tracker.announce}`, () => removeTracker(tracker)),
-      ]) : null,
-    ]);
+      }));
+    setText(r.seeders, t('details.trackers.seeders', { count: count(tracker.seederCount) }));
+    setText(r.leechers, t('details.trackers.leechers', { count: count(tracker.leecherCount) }));
+    setText(r.downloads, t('details.trackers.downloads', { count: count(tracker.downloadCount) }));
+    r.next.hidden = !(next > 0);
+    setText(r.next, next > 0 ? t('details.trackers.next', { in: fmt.eta(next) }) : '');
+    if (r.edit) {
+      setAttr(r.edit, 'aria-label', t('details.trackers.editOneFor', { host }));
+      setAttr(r.edit, 'data-focus', `edit ${tracker.announce}`);
+      setAttr(r.remove, 'aria-label', t('details.trackers.removeFor', { host }));
+      setAttr(r.remove, 'data-focus', `remove ${tracker.announce}`);
+    }
+    return r.el;
+  }
+
+  /** Put `nodes` under `parent` in order, moving nothing that is already in place. */
+  function placeChildren(parent, nodes) {
+    const current = parent.children ? [...parent.children] : [];
+    if (current.length === nodes.length && current.every((n, i) => n === nodes[i])) return;
+    const keep = new Set(nodes);
+    for (const n of current) if (!keep.has(n)) n.remove();
+    for (const n of nodes) parent.append(n);
   }
 
   return {
     root,
     render(torrent) {
+      if (current && current.id !== torrent.id) rowNodes.clear();
       current = torrent;
       const active = document.activeElement;
       const focusKey = active && root.contains(active) ? active.getAttribute('data-focus') : null;
@@ -226,15 +279,27 @@ export function create(ctx) {
           tiers: t('details.trackers.tiers', { count: tiers.length, total: fmt.count(tiers.length) }),
         })
         : t('details.trackers.none');
-      actions.replaceChildren(listMode()
-        ? el('button', { type: 'button', class: 'btn btn-secondary', 'data-focus': 'bar', on: { click: editList } }, [
-          icon('header-rename', { size: 16 }), t('details.trackers.edit')])
-        : el('button', { type: 'button', class: 'btn btn-secondary', 'data-focus': 'bar', on: { click: addTracker } }, [
-          icon('toolbar-add', { size: 16 }), t('details.trackers.add')]));
-      list.replaceChildren(...tiers.map((tier, i) => el('section', { class: 'tracker-tier' }, [
-        el('h3', { class: 'detail-label', text: t('details.trackers.tier', { n: fmt.count(i + 1) }) }),
-        el('ul', { class: 'tracker-rows' }, byTier.get(tier).map((tr) => trackerRow(tr, editable))),
-      ])));
+      placeChildren(actions, [listMode() ? editButton : addButton]);
+      const seen = new Set();
+      const sections = tiers.map((tier, i) => {
+        if (!tierNodes[i]) {
+          const heading = el('h3', { class: 'detail-label' });
+          const rowsList = el('ul', { class: 'tracker-rows' });
+          tierNodes[i] = { heading, rowsList, el: el('section', { class: 'tracker-tier' }, [heading, rowsList]) };
+        }
+        const section = tierNodes[i];
+        setText(section.heading, t('details.trackers.tier', { n: fmt.count(i + 1) }));
+        placeChildren(section.rowsList, byTier.get(tier).map((tr) => {
+          const key = `${editable ? 'e' : 'r'} ${tr.id}`;
+          seen.add(key);
+          if (!rowNodes.has(key)) rowNodes.set(key, buildRow(editable));
+          return updateRow(rowNodes.get(key), tr);
+        }));
+        return section.el;
+      });
+      for (const key of rowNodes.keys()) if (!seen.has(key)) rowNodes.delete(key);
+      tierNodes.length = tiers.length;
+      placeChildren(list, sections);
       if (focusKey) {
         const again = [...root.querySelectorAll('[data-focus]')].find((n) => n.getAttribute('data-focus') === focusKey);
         if (again) again.focus();
