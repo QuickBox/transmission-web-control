@@ -479,3 +479,18 @@
 .match-result.is-found .match-folder {
 	color: var(--tr-st-seeding);
 }
+
+.settings-subtitle {
+	margin: 14px 0 2px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.column-boxes {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+	gap: 0 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}

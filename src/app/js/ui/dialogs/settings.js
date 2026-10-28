@@ -9,7 +9,8 @@
  * does not know and never writes the legacy transport flags next to
  * `preferred_transports`. Interface choices (theme, language, refresh
  * interval) apply on Save too; settings can be exported and imported as a
- * JSON file.
+ * JSON file. Row density and the list's columns apply as soon as they change,
+ * so the list behind the dialog shows the result.
  */
 
 import { buildCaps } from '../../rpc/caps.js?v=__QBV__';
@@ -18,6 +19,7 @@ import { ENCRYPTION_VALUES, getSession, setSession, testPort } from '../../rpc/s
 import { VARIANTS, preference, setVariant } from '../../core/theme.js?v=__QBV__';
 import { LANGUAGES, LANGUAGE_NAMES, STORAGE_KEY as LANGUAGE_KEY, saveLanguage } from '../../core/i18n.js?v=__QBV__';
 import { parseAmount } from '../details/options.js?v=__QBV__';
+import { COLUMNS, DEFAULT_COLUMNS, columnsFromPrefs } from '../table.js?v=__QBV__';
 
 export const EXPORT_FORMAT = 'qb-transmission-settings';
 const DAYS = Object.freeze([1, 2, 4, 8, 16, 32, 64]);
@@ -106,6 +108,22 @@ export function timeToMinutes(value) {
   const h = Number(m[1]);
   const min = Number(m[2]);
   return h < 24 && min < 60 ? h * 60 + min : null;
+}
+
+/**
+ * The column set after turning `id` on or off. Name is always on; a column
+ * turned on goes to the end; the result never lists `name` (the list always
+ * puts it first).
+ * @param {object} prefs
+ * @param {string} id
+ * @param {boolean} on
+ * @returns {string[]}
+ */
+export function toggleColumn(prefs, id, on) {
+  const current = columnsFromPrefs(prefs).map((c) => c.id).filter((c) => c !== 'name');
+  if (id === 'name') return current;
+  const without = current.filter((c) => c !== id);
+  return on ? [...without, id] : without;
 }
 
 /** Whether the daemon reports a row's key (rows without a key always show). */
@@ -390,6 +408,38 @@ export function createSettingsDialog(ctx, deps = {}) {
         icon('statusbar-download', { size: 16 }), t('dialogs.settings.export')]);
       const importBtn = el('button', { type: 'button', class: 'btn btn-secondary', on: { click: () => fileInput.click() } }, [
         icon('statusbar-upload', { size: 16 }), t('dialogs.settings.import')]);
+      const prefsNow = () => ctx.store.get().prefs;
+      const setPrefs = (patch) => ctx.store.set({ prefs: { ...prefsNow(), ...patch } });
+      const densityLabel = `${uid}-density-label`;
+      const density = el('button', {
+        type: 'button', class: 'switch', role: 'switch', id: `${uid}-density`, 'aria-labelledby': densityLabel,
+        'aria-checked': String(prefsNow().density === 'compact'),
+        on: {
+          click: () => {
+            const compact = density.getAttribute('aria-checked') !== 'true';
+            density.setAttribute('aria-checked', String(compact));
+            setPrefs({ density: compact ? 'compact' : 'comfortable' });
+          },
+        },
+      });
+      const columnBoxes = el('ul', { class: 'column-boxes', 'aria-labelledby': `${uid}-columns-label` });
+      function renderColumns() {
+        const shown = new Set(columnsFromPrefs(prefsNow()).map((c) => c.id));
+        columnBoxes.replaceChildren(...COLUMNS.map((column) => {
+          const box = el('input', {
+            type: 'checkbox', class: 'checkbox', id: `${uid}-col-${column.id}`, 'data-column': column.id,
+            checked: shown.has(column.id), disabled: column.id === 'name',
+            on: { change: () => setPrefs({ columns: toggleColumn(prefsNow(), column.id, box.checked) }) },
+          });
+          return el('li', {}, [el('label', { class: 'check-row', for: box.id }, [box, el('span', { text: t(`main.columns.${column.id}`) })])]);
+        }));
+      }
+      renderColumns();
+      const resetColumns = el('button', {
+        type: 'button', class: 'btn btn-secondary', text: t('dialogs.settings.columnsReset'),
+        on: { click: () => { setPrefs({ columns: [...DEFAULT_COLUMNS] }); renderColumns(); } },
+      });
+
       return el('div', { class: 'settings-interface' }, [
         el('div', { class: 'option-row' }, [el('label', { class: 'option-label', for: themeSel.id, text: t('core.theme.label') }), themeSel]),
         el('div', { class: 'option-row' }, [el('label', { class: 'option-label', for: langSel.id, text: t('core.language.label') }), langSel]),
@@ -402,6 +452,14 @@ export function createSettingsDialog(ctx, deps = {}) {
           el('span', { class: 'option-label', text: t('dialogs.settings.backup') }),
           el('span', { class: 'option-field' }, [exportBtn, importBtn, fileInput]),
         ]),
+        el('h4', { class: 'settings-subtitle', text: t('dialogs.settings.list') }),
+        el('p', { class: 'field-help settings-help', text: t('dialogs.settings.listHelp') }),
+        el('div', { class: 'option-row' }, [el('span', { class: 'option-label', id: densityLabel, text: t('dialogs.settings.compactRows') }), density]),
+        el('div', { class: 'option-row' }, [
+          el('span', { class: 'option-label', id: `${uid}-columns-label`, text: t('dialogs.settings.columns') }),
+          resetColumns,
+        ]),
+        columnBoxes,
       ]);
     }
 

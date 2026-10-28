@@ -269,7 +269,7 @@ export async function makeCtx({ details = {}, respond } = {}) {
       return null;
     }
   };
-  const t = await loadTranslator({ lang: 'en', namespaces: ['core', 'details', 'dialogs'], load });
+  const t = await loadTranslator({ lang: 'en', namespaces: ['core', 'details', 'dialogs', 'main'], load });
   const calls = [];
   const rpc = {
     call(method, args) {

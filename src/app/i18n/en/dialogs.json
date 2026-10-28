@@ -264,7 +264,12 @@
     "import": "Import",
     "importInvalid": "This is not a settings file from this interface.",
     "imported": "Settings imported",
-    "importFailed": "Could not import: {message}"
+    "importFailed": "Could not import: {message}",
+    "list": "Torrent list",
+    "listHelp": "These apply right away.",
+    "compactRows": "Compact rows",
+    "columns": "Columns",
+    "columnsReset": "Reset to default"
   },
   "replace": {
     "title": "Replace trackers",

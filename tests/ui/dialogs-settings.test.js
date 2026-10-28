@@ -204,3 +204,44 @@ test('export writes a settings file through a Blob; import applies it', async ()
   for (let i = 0; i < 6; i += 1) await flush();
   assert.match(env.toasts.at(-1).message, /not a settings file/);
 });
+
+test('toggleColumn keeps Name implicit, appends turned-on columns and drops turned-off ones', async () => {
+  const { DEFAULT_COLUMNS } = await import('../../src/app/js/ui/table.js');
+  const base = { columns: ['totalSize', 'eta'] };
+  assert.deepEqual(settings.toggleColumn(base, 'id', true), ['totalSize', 'eta', 'id']);
+  assert.deepEqual(settings.toggleColumn(base, 'eta', false), ['totalSize']);
+  assert.deepEqual(settings.toggleColumn(base, 'name', false), ['totalSize', 'eta']);
+  assert.deepEqual(settings.toggleColumn({}, 'eta', false), DEFAULT_COLUMNS.filter((c) => c !== 'name' && c !== 'eta'));
+});
+
+test('row density and columns apply live through prefs; Name is locked; reset restores the default', async () => {
+  const { DEFAULT_COLUMNS, columnsFromPrefs } = await import('../../src/app/js/ui/table.js');
+  const env = await openOn('rpc-15');
+  env.handle.showPage('interface');
+  const density = control(env.body, 'density');
+  assert.equal(density.getAttribute('aria-checked'), 'false');
+  density.dispatch('click');
+  assert.equal(env.ctx.store.get().prefs.density, 'compact', 'applied without Save');
+  density.dispatch('click');
+  assert.equal(env.ctx.store.get().prefs.density, 'comfortable');
+
+  const box = (id) => env.body.querySelectorAll('input').find((i) => i.getAttribute('data-column') === id);
+  assert.equal(box('name').checked, true);
+  assert.equal(box('name').disabled, true, 'Name cannot be turned off');
+  assert.match(box('name').parentNode.textContent, /Name/);
+  assert.equal(box('doneDate').checked, false);
+  box('doneDate').checked = true;
+  box('doneDate').dispatch('change');
+  assert.equal(env.ctx.store.get().prefs.columns.at(-1), 'doneDate');
+  box('eta').checked = false;
+  box('eta').dispatch('change');
+  const ids = columnsFromPrefs(env.ctx.store.get().prefs).map((c) => c.id);
+  assert.equal(ids[0], 'name');
+  assert.ok(ids.includes('doneDate') && !ids.includes('eta'));
+
+  env.body.querySelectorAll('button').find((b) => b.textContent === 'Reset to default').dispatch('click');
+  assert.deepEqual(env.ctx.store.get().prefs.columns, [...DEFAULT_COLUMNS]);
+  assert.equal(box('eta').checked, true);
+  assert.equal(box('doneDate').checked, false);
+  assert.equal(env.record.opts.actions[1].disabled, true, 'live prefs do not need Save');
+});
