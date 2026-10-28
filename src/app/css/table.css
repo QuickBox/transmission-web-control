@@ -1,0 +1,322 @@
+/*
+ * Torrent list: the virtualised grid in `[data-region="table"]` (the scroll
+ * container, `container: torrents`), its sticky header, rows and cells, the
+ * compact density and the card layout under 720px. Row heights are fixed per
+ * layout and mirrored by `ui/table.js` (40 / 32 / 112px).
+ */
+
+.torrents {
+	--row-h: 40px;
+	--cols: 44px minmax(220px, 1fr);
+	position: relative;
+	min-width: 100%;
+	font-size: 13px;
+	color: var(--qb-fg);
+	outline: none;
+}
+
+.torrents[data-density="compact"] {
+	--row-h: 32px;
+	font-size: 12px;
+}
+
+.torrents-head,
+.torrents-row {
+	display: grid;
+	grid-template-columns: var(--cols);
+	align-items: center;
+	min-width: 0;
+}
+
+.torrents-head {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	height: 36px;
+	border-bottom: 1px solid var(--qb-border);
+	background: var(--qb-surface);
+	color: var(--qb-fg-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.torrents-body {
+	position: relative;
+	min-height: 0;
+}
+
+.torrents-row {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: var(--row-h);
+	border-bottom: 1px solid color-mix(in srgb, var(--qb-border) 60%, transparent);
+	cursor: default;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.torrents-row:hover {
+	background: color-mix(in srgb, var(--qb-fg) 4%, transparent);
+}
+
+.torrents-row.is-selected {
+	background: color-mix(in srgb, var(--qb-primary) 14%, transparent);
+}
+
+.torrents-row.is-selected:hover {
+	background: color-mix(in srgb, var(--qb-primary) 20%, transparent);
+}
+
+.torrents-row:focus-visible {
+	outline: 2px solid var(--qb-focus, var(--qb-primary));
+	outline-offset: -2px;
+	z-index: 1;
+}
+
+.torrents-row[data-focused] .cell-name {
+	font-weight: 600;
+}
+
+.cell {
+	min-width: 0;
+	padding: 0 10px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	font-variant-numeric: tabular-nums;
+}
+
+.cell-end {
+	text-align: end;
+}
+
+.cell-check {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+
+.torrents .checkbox {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	accent-color: var(--qb-primary);
+	cursor: pointer;
+}
+
+.cell-name {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.cell-name > .cell-name {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.cell-warning {
+	display: inline-flex;
+	flex: none;
+	color: var(--tr-st-checking);
+}
+
+/* ---- Header sort buttons --------------------------------------------- */
+
+.sort {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	max-width: 100%;
+	height: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: 4px;
+	background: none;
+	color: inherit;
+	font: inherit;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.sort:hover,
+.sort.is-active {
+	color: var(--qb-fg);
+}
+
+.sort:focus-visible {
+	outline: 2px solid var(--qb-focus, var(--qb-primary));
+	outline-offset: 2px;
+}
+
+.sort-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cell-end .sort {
+	flex-direction: row-reverse;
+}
+
+/* ---- Progress -------------------------------------------------------- */
+
+.progress {
+	--st: var(--tr-st-downloading);
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 44px;
+	align-items: center;
+	gap: 8px;
+}
+
+.progress[data-state="stopped"] { --st: var(--tr-st-stopped); }
+.progress[data-state="queued"] { --st: var(--tr-st-queued); }
+.progress[data-state="checking"] { --st: var(--tr-st-checking); }
+.progress[data-state="seeding"] { --st: var(--tr-st-seeding); }
+.progress[data-state="finished"] { --st: var(--tr-st-finished); }
+.progress[data-state="error"] { --st: var(--tr-st-error); }
+
+.progress-bar {
+	position: relative;
+	display: block;
+	height: 6px;
+	border-radius: 3px;
+	background: color-mix(in srgb, var(--st) 18%, transparent);
+	overflow: hidden;
+}
+
+.progress-bar::after {
+	content: "";
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: var(--pct, 0%);
+	border-radius: inherit;
+	background: var(--st);
+}
+
+.progress-text {
+	text-align: end;
+	font-variant-numeric: tabular-nums;
+	color: var(--qb-fg-muted);
+}
+
+/* ---- Empty state ----------------------------------------------------- */
+
+.torrents-empty {
+	padding: 48px 24px;
+	text-align: center;
+	color: var(--qb-fg-muted);
+}
+
+/* ---- Hide-on-narrow tiers -------------------------------------------- */
+
+@container torrents (max-width: 1100px) {
+	.torrents[data-layout="rows"] [data-narrow="3"] {
+		display: none;
+	}
+}
+
+@container torrents (max-width: 900px) {
+	.torrents[data-layout="rows"] [data-narrow="2"],
+	.torrents[data-layout="rows"] [data-narrow="3"] {
+		display: none;
+	}
+}
+
+/* ---- Cards ----------------------------------------------------------- */
+
+@container torrents (max-width: 720px) {
+	.torrents {
+		--row-h: 112px;
+		--cols: none;
+	}
+
+	.torrents-head {
+		display: none;
+	}
+
+	.torrents-row {
+		display: grid;
+		grid-template-columns: 44px minmax(0, 1fr) auto;
+		grid-template-areas:
+			"check name   status"
+			"check bar    bar"
+			"check meta   meta";
+		grid-template-rows: auto 6px auto;
+		row-gap: 8px;
+		padding: 10px 12px 10px 0;
+		align-items: start;
+	}
+
+	.torrents-row .cell {
+		padding: 0;
+		white-space: normal;
+	}
+
+	.torrents-row .cell-check {
+		grid-area: check;
+		align-self: stretch;
+		min-height: 44px;
+	}
+
+	.torrents-row .cell-check .checkbox {
+		width: 20px;
+		height: 20px;
+	}
+
+	.torrents-row .cell-name {
+		grid-area: name;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
+		white-space: normal;
+		overflow-wrap: anywhere;
+		font-weight: 500;
+	}
+
+	.torrents-row .cell-status {
+		grid-area: status;
+		justify-self: end;
+	}
+
+	.torrents-row .cell-percentDone {
+		grid-area: bar;
+	}
+
+	.torrents-row .progress {
+		grid-template-columns: minmax(0, 1fr) 40px;
+	}
+
+	.torrents-row .cell-rateDownload,
+	.torrents-row .cell-rateUpload,
+	.torrents-row .cell-eta,
+	.torrents-row .cell-totalSize {
+		grid-area: meta;
+		display: inline;
+		font-size: 12px;
+		color: var(--qb-fg-muted);
+	}
+
+	.torrents-row .cell-rateDownload:not(:empty)::before { content: "↓ "; }
+	.torrents-row .cell-rateUpload:not(:empty)::before { content: "↑ "; }
+	.torrents-row .cell-rateDownload:not(:empty)::after,
+	.torrents-row .cell-rateUpload:not(:empty)::after,
+	.torrents-row .cell-eta:not(:empty)::after { content: " · "; }
+
+	.torrents-row [data-col]:not(.cell-name):not(.cell-status):not(.cell-percentDone):not(.cell-rateDownload):not(.cell-rateUpload):not(.cell-eta):not(.cell-totalSize) {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.progress-bar::after {
+		transition: width 300ms ease;
+	}
+}

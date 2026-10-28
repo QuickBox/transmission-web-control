@@ -1,64 +1,81 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { installDom, FakeElement } from '../ui/details-dom.js';
+import { recordedTransport } from '../fixtures/load.js';
 
-class FakeNode {
-  constructor(tag) {
-    this.tag = tag;
-    this.attributes = new Map();
-    this.children = [];
-    this.style = { setProperty() {} };
-  }
-  setAttribute(k, v) { this.attributes.set(k, v); }
-  addEventListener() {}
-  append(...nodes) { this.children.push(...nodes); }
-  replaceChildren() { this.children = []; }
-  getAttribute(k) { return this.attributes.has(k) ? this.attributes.get(k) : null; }
-  hasAttribute(k) { return this.attributes.has(k); }
-  removeAttribute(k) { this.attributes.delete(k); }
-  querySelector(sel) {
-    const m = /^\[data-region="(\w+)"\]$/.exec(sel);
-    if (!m) return null;
-    return this.children.find((c) => c.attributes && c.attributes.get('data-region') === m[1]) || null;
-  }
-}
-
-const root = new FakeNode('html');
-globalThis.document = {
-  documentElement: root,
-  cookie: 'Language=de',
-  createElement: (tag) => new FakeNode(tag),
-  createElementNS: (ns, tag) => new FakeNode(tag),
-  getElementById: () => null,
-  addEventListener() {},
-};
+const env = installDom({ width: 1440 });
+env.doc.cookie = 'Language=de';
+env.doc.getElementById = () => null;
+env.doc.visibilityState = 'visible';
 globalThis.addEventListener = () => {};
 
 const { boot, MODULES } = await import('../../src/app/js/main.js');
 
-test('boot mounts every module into its own region and publishes the context', async () => {
-  const app = new FakeNode('div');
-  const existing = new FakeNode('div');
+/** Timers that never fire, so the poller's cadence cannot outlive a test. */
+const timers = { setTimeout: () => 1, clearTimeout() {} };
+
+function app() {
+  const node = new FakeElement('div');
+  node.setAttribute('id', 'app');
+  const existing = new FakeElement('div');
   existing.setAttribute('data-region', 'table');
-  app.append(existing);
+  node.append(existing);
+  env.body.replaceChildren(node);
+  return { node, existing };
+}
 
-  const ctx = await boot(app);
+test('boot connects to the daemon, builds caps, mounts every module and primes the store', async () => {
+  const { node, existing } = app();
+  const { transport } = recordedTransport('rpc-17');
+  const ctx = await boot(node, { transport, timers });
 
-  const regions = app.children.map((c) => c.attributes.get('data-region'));
+  const regions = node.children.map((c) => c.getAttribute('data-region'));
   assert.deepEqual(regions.sort(), MODULES.map(([name]) => name).sort());
-  assert.equal(app.children.filter((c) => c === existing).length, 1);
-  assert.equal(root.attributes.get('lang'), 'de');
+  assert.equal(node.children.filter((c) => c === existing).length, 1);
+  assert.equal(env.doc.documentElement.getAttribute('lang'), 'de');
 
-  assert.deepEqual(Object.keys(ctx).sort(), ['caps', 'fmt', 'i18n', 'rpc', 'store', 'ui']);
+  assert.deepEqual(Object.keys(ctx).sort(), ['caps', 'fmt', 'i18n', 'poller', 'rpc', 'store', 'ui']);
   assert.deepEqual(Object.keys(ctx.ui).sort(),
     ['clear', 'confirm', 'el', 'icon', 'menu', 'openDialog', 'svg', 'toast', 'tooltip']);
-  assert.equal(typeof ctx.i18n, 'function');
   assert.equal(ctx.i18n.lang, 'de');
-  assert.equal(typeof ctx.store.subscribe, 'function');
   assert.equal(ctx.fmt.bytes(1500), '1,50 kB');
-  for (const name of ['icon', 'tooltip', 'toast', 'openDialog', 'confirm', 'menu']) {
-    assert.equal(typeof ctx.ui[name], 'function', name);
-  }
-  assert.equal(existing.attributes.get('aria-label'), 'core.regions.table');
-  assert.equal(root.attributes.get('data-qb-variant'), 'spectre');
-  assert.throws(() => ctx.rpc.call('session-get'), /rpc\.call is not wired yet/);
+  assert.equal(existing.getAttribute('aria-label'), 'core.regions.table');
+  assert.equal(env.doc.documentElement.getAttribute('data-qb-variant'), 'spectre');
+
+  assert.equal(ctx.caps.rpc, 17, 'caps come from the recorded 4.0.6 session-get');
+  assert.equal(ctx.caps.semver, '5.3.0');
+  assert.equal(ctx.caps.trackerList, true);
+  assert.equal(ctx.caps.sequential, false);
+  const state = ctx.store.get();
+  assert.equal(state.connection.state, 'online');
+  assert.equal(typeof state.session.downloadDir, 'string', 'full session stored');
+  assert.equal(state.torrents.size, 6, 'first poll primed the torrent list');
+  assert.ok(Number.isInteger(state.stats.torrentCount));
+  assert.equal(typeof ctx.poller.stop, 'function');
+  assert.equal(ctx.poller.isRunning(), true);
+  const first = transport.calls.find((c) => c.init.headers['X-Transmission-Session-Id']);
+  assert.equal(first.body.method, 'session-get', 'the first authenticated call is the full session-get');
+  const stats = await ctx.rpc.call('session-stats');
+  assert.ok(Number.isInteger(stats.torrentCount), 'ctx.rpc is the live client');
+  ctx.poller.stop();
+});
+
+test('boot with the daemon down still mounts, closes every gate and reports the connection', async () => {
+  const { node } = app();
+  const transport = async () => new Response('nope', { status: 500 });
+  const ctx = await boot(node, { transport, timers });
+  assert.equal(node.children.length, MODULES.length);
+  assert.equal(ctx.caps.rpc, 0);
+  assert.equal(ctx.caps.nativeLabels, false);
+  assert.equal(ctx.store.get().connection.state, 'offline');
+  assert.match(ctx.store.get().connection.error, /HTTP 500/);
+  ctx.poller.stop();
+});
+
+test('a daemon that refuses the login reports unauthorized', async () => {
+  const { node } = app();
+  const transport = async () => new Response('', { status: 401 });
+  const ctx = await boot(node, { transport, timers });
+  assert.equal(ctx.store.get().connection.state, 'unauthorized');
+  ctx.poller.stop();
 });

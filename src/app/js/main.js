@@ -17,6 +17,10 @@ import { tooltip } from './core/tooltip.js?v=__QBV__';
 import { createToast } from './core/toast.js?v=__QBV__';
 import { createDialogs } from './core/dialog.js?v=__QBV__';
 import { menu } from './core/menu.js?v=__QBV__';
+import { RpcError, createClient } from './rpc/client.js?v=__QBV__';
+import { UNKNOWN_CAPS, buildCaps } from './rpc/caps.js?v=__QBV__';
+import { getSession } from './rpc/session.js?v=__QBV__';
+import { createPoller } from './rpc/poller.js?v=__QBV__';
 import * as toolbar from './ui/toolbar.js?v=__QBV__';
 import * as sidebar from './ui/sidebar.js?v=__QBV__';
 import * as table from './ui/table.js?v=__QBV__';
@@ -78,14 +82,46 @@ export const MODULES = Object.freeze([
  *   i18n: import('./core/i18n.js').Translate,
  *   fmt: import('./core/format.js').Formatter,
  *   ui: Ui,
+ *   poller: import('./rpc/poller.js').Poller,
  * }} AppContext
+ * `caps` is replaced once when the daemon was unreachable at boot and comes
+ * back; modules read `ctx.caps` when they render, never a copy taken at mount.
  */
 
-/** A service whose module has not been wired into this build yet. */
-function notWired(name) {
-  return () => {
-    throw new Error(`${name} is not wired yet`);
+/** Page visibility as the poller's pause source; browser globals through arrows. */
+function documentVisibility() {
+  return {
+    isHidden: () => document.visibilityState === 'hidden',
+    subscribe: (fn) => {
+      document.addEventListener('visibilitychange', fn);
+      return () => document.removeEventListener('visibilitychange', fn);
+    },
   };
+}
+
+function connectionFailure(err) {
+  const status = err instanceof RpcError ? err.status : 0;
+  return {
+    state: status === 401 || status === 403 ? 'unauthorized' : 'offline',
+    error: err && err.message ? String(err.message) : 'request failed',
+    since: Date.now(),
+  };
+}
+
+/**
+ * First contact: the full `session-get` that the caps are built from. When
+ * the daemon cannot be reached the shell still mounts, with every gate closed
+ * and the connection banner showing why; the poller keeps retrying.
+ */
+async function connect(rpc, store) {
+  try {
+    const session = await getSession(rpc);
+    store.set({ session });
+    return buildCaps(session, { dialect: rpc.dialect });
+  } catch (err) {
+    store.set({ connection: connectionFailure(err) });
+    return UNKNOWN_CAPS;
+  }
 }
 
 /**
@@ -111,11 +147,6 @@ function wireShell(app, t) {
   });
 }
 
-/** @returns {{ rpc: Rpc, caps: Caps|null }} */
-function buildRpc() {
-  return { rpc: { call: notWired('rpc.call') }, caps: null };
-}
-
 function regionFor(app, name) {
   const existing = app.querySelector(`[data-region="${name}"]`);
   if (existing) return existing;
@@ -126,9 +157,13 @@ function regionFor(app, name) {
 
 /**
  * @param {Element} app
+ * @param {{ transport?: Function, visibility?: { isHidden: () => boolean, subscribe: (fn: () => void) => () => void },
+ *   timers?: { setTimeout: Function, clearTimeout: Function } }} [options]
+ *   injection points for tests; the browser defaults are `fetch`, the page
+ *   visibility and the global timers
  * @returns {Promise<AppContext>}
  */
-export async function boot(app) {
+export async function boot(app, options = {}) {
   startTheme();
   const lang = detectLanguage();
   const t = await loadTranslator({ lang, available: await fetchManifest() });
@@ -142,15 +177,21 @@ export async function boot(app) {
     if (t.has(`core.units.${name}`)) units[name] = t(`core.units.${name}`);
   }
 
-  const { rpc, caps } = buildRpc();
+  const store = createStore();
+  const rpc = createClient(options.transport ? { transport: options.transport } : {});
+  const caps = await connect(rpc, store);
+  const visibility = options.visibility || documentVisibility();
+  const pollerDeps = { client: rpc, store, visibility, timers: options.timers };
+
   /** @type {AppContext} */
   const ctx = {
     rpc,
-    store: createStore(),
+    store,
     caps,
     i18n: t,
     fmt: bindFormat({ locale: t.lang, units }),
     ui: buildUi(t),
+    poller: createPoller({ ...pollerDeps, caps }),
   };
   wireShell(app, t);
 
@@ -161,6 +202,21 @@ export async function boot(app) {
       console.error(`mount ${name} failed`, err);
     }
   }
+
+  // Booted offline: the first successful poll carries the session the caps
+  // need, so rebuild them once and restart the loop with the open gates.
+  if (caps === UNKNOWN_CAPS) {
+    const off = store.subscribe('connection', (connection) => {
+      if (connection.state !== 'online' || ctx.caps !== UNKNOWN_CAPS) return;
+      off();
+      ctx.caps = buildCaps(store.get().session, { dialect: rpc.dialect });
+      ctx.poller.stop();
+      ctx.poller = createPoller({ ...pollerDeps, caps: ctx.caps });
+      ctx.poller.start();
+    });
+  }
+
+  await ctx.poller.start();
   return ctx;
 }
 

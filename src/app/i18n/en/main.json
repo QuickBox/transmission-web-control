@@ -1,0 +1,32 @@
+{
+  "columns": {
+    "name": "Name",
+    "status": "Status",
+    "percentDone": "Progress",
+    "totalSize": "Size",
+    "rateDownload": "Down",
+    "rateUpload": "Up",
+    "eta": "ETA",
+    "uploadRatio": "Ratio",
+    "seederCount": "Seeders",
+    "leecherCount": "Leechers",
+    "uploadedEver": "Uploaded",
+    "addedDate": "Added",
+    "doneDate": "Completed",
+    "activityDate": "Last active",
+    "queuePosition": "Queue",
+    "downloadDir": "Location",
+    "labels": "Labels",
+    "trackers": "Trackers",
+    "id": "ID"
+  },
+  "table": {
+    "selectAll": "Select all torrents in the list",
+    "selectRow": "Select {name}",
+    "sortAscending": "Sort by {column}, ascending",
+    "sortDescending": "Sort by {column}, descending",
+    "trackerWarning": "Tracker warning",
+    "noTorrents": "No torrents yet. Add one with the button above or drop a file anywhere.",
+    "noMatches": "No torrents match the current filter."
+  }
+}
