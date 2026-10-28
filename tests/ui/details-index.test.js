@@ -241,17 +241,17 @@ test('a saved tab and height are restored on mount', async () => {
 
 test('a tab strip that scrolls marks the side that still hides tabs', async () => {
   const { root, teardown } = await setup(375);
-  const strip = root.querySelector('[role="tablist"]');
-  Object.assign(strip, { scrollWidth: 400, clientWidth: 363, scrollLeft: 0 });
-  strip.dispatch('scroll');
-  assert.equal(strip.hasAttribute('data-more-end'), true);
-  assert.equal(strip.hasAttribute('data-more-start'), false);
-  strip.scrollLeft = 37;
-  strip.dispatch('scroll');
-  assert.equal(strip.hasAttribute('data-more-end'), false);
-  assert.equal(strip.hasAttribute('data-more-start'), true);
-  Object.assign(strip, { scrollWidth: 363, scrollLeft: 0 });
-  strip.dispatch('scroll');
-  assert.equal(strip.hasAttribute('data-more-start') || strip.hasAttribute('data-more-end'), false, 'no fade when every tab fits');
-  teardown();
+  try {
+    const strip = root.querySelector('[role="tablist"]');
+    const measure = (scrollWidth, scrollLeft) => {
+      Object.assign(strip, { scrollWidth, clientWidth: 363, scrollLeft });
+      strip.dispatch('scroll');
+      return [strip.hasAttribute('data-more-start'), strip.hasAttribute('data-more-end')];
+    };
+    assert.deepEqual(measure(400, 0), [false, true], 'more tabs to the right');
+    assert.deepEqual(measure(400, 37), [true, false], 'more tabs to the left');
+    assert.deepEqual(measure(363, 0), [false, false], 'no fade when every tab fits');
+  } finally {
+    teardown();
+  }
 });

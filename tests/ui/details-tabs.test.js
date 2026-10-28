@@ -29,6 +29,16 @@ test('General formats through ctx.fmt and shows unknown counts as an em dash', a
   assert.equal(idle.card('Peers').textContent, 'Peers0', 'no sending/receiving split without peers');
 });
 
+test('a General poll updates values in place; its copy buttons stay the same nodes', async () => {
+  const { view } = await generalView(torrent(), { hashString: 'abc', magnetLink: 'magnet:?xt=urn:btih:abc' });
+  const buttons = view.root.querySelectorAll('button');
+  assert.ok(buttons.length > 0, 'General has copy buttons');
+  buttons[0].focus();
+  view.render(torrent({ downloadedEver: 1 }), { hashString: 'abc', magnetLink: 'magnet:?xt=urn:btih:abc' }, ok);
+  assert.deepEqual(view.root.querySelectorAll('button'), buttons);
+  assert.equal(env.doc.activeElement, buttons[0]);
+});
+
 test('General shows static facts once fetched, and an em dash where the daemon has none', async () => {
   const { fact } = await generalView(torrent(), {
     comment: '<script>x</script>', creator: '', pieceCount: 1430, pieceSize: 4194304, isPrivate: true, dateCreated: 0,
