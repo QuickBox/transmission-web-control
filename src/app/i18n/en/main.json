@@ -96,6 +96,6 @@
     "clear": "Clear selection"
   },
   "feedback": {
-    "actionFailed": "Could not {action}: {message}"
+    "actionFailed": "{action} failed: {message}"
   }
 }

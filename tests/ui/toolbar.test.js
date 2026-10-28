@@ -65,7 +65,7 @@ test('a failing action surfaces an error toast and resolves false', async () => 
   const ok = await runAction(ctx, 'start', [1]);
   assert.equal(ok, false);
   assert.equal(toasts.length, 1);
-  assert.match(toasts[0].message, /Could not Start: boom/);
+  assert.equal(toasts[0].message, 'Start failed: boom', 'label first, as the other catalogs order it');
   assert.equal(toasts[0].opts.tone, 'error');
   assert.equal(await runAction(ctx, 'start', []), false, 'nothing selected: no request');
   assert.equal(await runAction(ctx, 'nope', [1]), false);
