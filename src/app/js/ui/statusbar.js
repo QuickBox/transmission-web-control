@@ -14,6 +14,9 @@ export const FREE_SPACE_INTERVAL_MS = 60_000;
 /** A port test that failed outright is not repeated sooner than this. */
 export const PORT_RETRY_MS = 60_000;
 
+/** Below this width the limit text gives way to a marker so the rate itself stays whole. */
+const NARROW_QUERY = '(max-width: 639px)';
+
 const PROTOCOL_LABEL = Object.freeze({ ipv4: 'IPv4', ipv6: 'IPv6' });
 
 /**
@@ -37,11 +40,15 @@ export function mount(root, ctx, options = {}) {
       'data-essential': extra.essential ? '' : null,
       hidden: Boolean(extra.hidden),
     }, [iconName ? icon(iconName, { size: 14 }) : null, value]);
-    return { node, value };
+    return { node, value, full: '' };
   }
 
   const down = chip('down', 'statusbar-download', { essential: true });
   const up = chip('up', 'statusbar-upload', { essential: true });
+  for (const rateChip of [down, up]) {
+    rateChip.marker = el('span', { class: 'chip-limit', hidden: true });
+    rateChip.node.append(rateChip.marker);
+  }
   const alt = chip('alt-speed', 'tab-speed', { hidden: true });
   const free = chip('free', 'meter-disk', { essential: true });
   const port = chip('port', 'statusbar-port');
@@ -49,8 +56,8 @@ export function mount(root, ctx, options = {}) {
   const counts = chip('counts', null);
   const connection = el('span', { class: 'chip chip-connection', 'data-chip': 'connection', role: 'status', 'aria-live': 'polite', hidden: true });
 
-  tooltip(down.node, () => t('main.statusbar.down'));
-  tooltip(up.node, () => t('main.statusbar.up'));
+  tooltip(down.node, () => down.full || t('main.statusbar.down'));
+  tooltip(up.node, () => up.full || t('main.statusbar.up'));
   tooltip(alt.node, () => t('main.statusbar.altSpeed'));
   tooltip(free.node, () => t('main.statusbar.free'));
   tooltip(port.node, () => t('main.statusbar.port'));
@@ -60,16 +67,30 @@ export function mount(root, ctx, options = {}) {
 
   clear(root, down.node, up.node, alt.node, free.node, port.node, el('span', { class: 'chip-spacer' }), connection, version.node, counts.node);
 
-  function rate(speed, limited, limit) {
+  const narrowQuery = typeof globalThis.matchMedia === 'function' ? globalThis.matchMedia(NARROW_QUERY) : null;
+  const isNarrow = () => Boolean(narrowQuery && narrowQuery.matches);
+
+  /**
+   * Fill a rate chip. Wide, a limit reads "rate of limit". Narrow, the chip shows
+   * the rate alone plus a limit marker, and the full text moves to the marker's
+   * accessible name and the chip's tooltip.
+   */
+  function fillRate(chipRef, speed, limited, limit) {
     const text = ctx.fmt.speed(speed || 0);
-    return limited && Number.isFinite(limit) ? t('main.statusbar.limit', { rate: text, limit: ctx.fmt.speed(limit * 1000) }) : text;
+    const hasLimit = limited && Number.isFinite(limit);
+    const full = hasLimit ? t('main.statusbar.limit', { rate: text, limit: ctx.fmt.speed(limit * 1000) }) : '';
+    const compact = hasLimit && isNarrow();
+    chipRef.value.textContent = compact ? text : hasLimit ? full : text;
+    chipRef.full = compact ? full : '';
+    chipRef.marker.hidden = !compact;
+    clear(chipRef.marker, ...(compact ? [icon('tab-speed', { size: 12, label: full })] : []));
   }
 
   function applyStats() {
     const { stats, session } = store.get();
     const altOn = Boolean(session.altSpeedEnabled);
-    down.value.textContent = rate(stats.downloadSpeed, altOn || session.speedLimitDownEnabled, altOn ? session.altSpeedDown : session.speedLimitDown);
-    up.value.textContent = rate(stats.uploadSpeed, altOn || session.speedLimitUpEnabled, altOn ? session.altSpeedUp : session.speedLimitUp);
+    fillRate(down, stats.downloadSpeed, altOn || session.speedLimitDownEnabled, altOn ? session.altSpeedDown : session.speedLimitDown);
+    fillRate(up, stats.uploadSpeed, altOn || session.speedLimitUpEnabled, altOn ? session.altSpeedUp : session.speedLimitUp);
     alt.node.hidden = !altOn;
     alt.value.textContent = altOn ? t('main.statusbar.altSpeedOn') : '';
   }
@@ -207,7 +228,10 @@ export function mount(root, ctx, options = {}) {
   refreshFree(true);
   refreshPort();
 
+  if (narrowQuery && typeof narrowQuery.addEventListener === 'function') narrowQuery.addEventListener('change', applyStats);
+
   return () => {
     for (const off of offs) off();
+    if (narrowQuery && typeof narrowQuery.removeEventListener === 'function') narrowQuery.removeEventListener('change', applyStats);
   };
 }

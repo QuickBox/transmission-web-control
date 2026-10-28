@@ -90,6 +90,44 @@ test('version chip labels the RPC integer on legacy daemons and the semver on JS
   modern.teardown();
 });
 
+test('below 640px a limit shows as a marker while the rate stays whole, and the full text moves to the name and tooltip', async () => {
+  const original = globalThis.matchMedia;
+  const state = { matches: true, listeners: new Set() };
+  globalThis.matchMedia = () => ({
+    get matches() { return state.matches; },
+    addEventListener: (type, fn) => state.listeners.add(fn),
+    removeEventListener: (type, fn) => state.listeners.delete(fn),
+  });
+  try {
+    const made = await chipCtx();
+    const tips = new Map();
+    made.ctx.ui = { ...made.ctx.ui, tooltip: (node, text) => tips.set(node.getAttribute('data-chip'), text) };
+    made.ctx.store.set({ session: { ...made.ctx.store.get().session, speedLimitDownEnabled: true, speedLimitDown: 2048 } });
+    const { regions } = shell(env);
+    made.ctx.store.set({ stats: { downloadSpeed: 1_000_000, uploadSpeed: 20_000, torrentCount: 3 } });
+    const teardown = mount(regions.statusbar, made.ctx, { now: () => 0 });
+    await flush();
+    const root = regions.statusbar;
+    assert.equal(chipText(root, 'down'), '1.00 MB/s', 'narrow: the rate alone');
+    const marker = chip(root, 'down').querySelector('.chip-limit');
+    assert.equal(marker.hidden, false);
+    assert.equal(marker.querySelector('svg, .icon').getAttribute('aria-label'), '1.00 MB/s of 2.05 MB/s', 'the marker carries the full text');
+    assert.equal(tips.get('down')(), '1.00 MB/s of 2.05 MB/s', 'and so does the tooltip');
+    assert.equal(chip(root, 'up').querySelector('.chip-limit').hidden, true, 'an unlimited chip has no marker');
+    assert.equal(tips.get('up')(), 'Upload rate');
+
+    state.matches = false;
+    for (const fn of state.listeners) fn();
+    assert.equal(chipText(root, 'down'), '1.00 MB/s of 2.05 MB/s', 'wide: the full text, unchanged');
+    assert.equal(chip(root, 'down').querySelector('.chip-limit').hidden, true);
+    assert.equal(tips.get('down')(), 'Download rate');
+    teardown();
+    assert.equal(state.listeners.size, 0, 'teardown removes the width listener');
+  } finally {
+    globalThis.matchMedia = original;
+  }
+});
+
 test('every chip tooltip renders without an unfilled placeholder', async () => {
   const made = await chipCtx();
   const tips = new Map();

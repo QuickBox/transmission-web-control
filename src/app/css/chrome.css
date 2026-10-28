@@ -400,6 +400,16 @@
 	color: var(--qb-icon);
 }
 
+.chip-limit {
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+}
+
+.chip-limit[hidden] {
+	display: none;
+}
+
 .chip[hidden],
 .search-clear[hidden] {
 	display: none;
