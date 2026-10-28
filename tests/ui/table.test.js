@@ -290,6 +290,73 @@ test('virtual window: 5,000 rows render only the visible slice and keep aria ind
   teardown();
 });
 
+/** A poll: a new object for every torrent that changed, the same object for the rest. */
+function poll(ctx, changed) {
+  const next = new Map(ctx.store.get().torrents);
+  for (const id of changed) next.set(id, { ...next.get(id), rateDownload: 1000 + (next.get(id).rateDownload || 0) });
+  ctx.store.set({ torrents: next });
+}
+
+test('row nodes survive a poll, so a click straddling it still lands on the row', async () => {
+  const { ctx, root, teardown } = await setup({ count: 8 });
+  const held = rowFor(root, 3);
+  const heldCheck = held.querySelector('.cell-check');
+  const heldName = held.querySelector('.cell-name');
+  poll(ctx, [3, 4]);
+  assert.equal(rowFor(root, 3), held, 'the row element is the same node');
+  assert.equal(held.parentNode !== null && root.contains(held), true, 'and still attached');
+  assert.equal(held.querySelector('.cell-check'), heldCheck, 'the checkbox cell is kept');
+  assert.notEqual(held.querySelector('.cell-name'), heldName, 'data cells of a changed torrent are rebuilt');
+  assert.match(held.querySelector('.cell-rateDownload').textContent, /B\/s/, 'and show the new value');
+  click(held);
+  assert.deepEqual([...ctx.store.get().selection], [3]);
+  assert.equal(held.getAttribute('aria-selected'), 'true');
+  teardown();
+});
+
+test('a poll leaves untouched rows and the body children alone', async () => {
+  const { ctx, root, teardown } = await setup({ count: 8 });
+  const before = rowsOf(root);
+  const cells = before.map((r) => r.children.slice());
+  const body = root.querySelector('.torrents-body');
+  let replaced = 0;
+  const original = body.replaceChildren.bind(body);
+  body.replaceChildren = (...nodes) => { replaced += 1; return original(...nodes); };
+  poll(ctx, [2]);
+  assert.equal(replaced, 0, 'the window kept its membership and order');
+  assert.deepEqual(rowsOf(root), before, 'same nodes in the same order');
+  before.forEach((row, i) => {
+    if (Number(row.getAttribute('data-id')) === 2) return;
+    assert.deepEqual(row.children, cells[i], `row ${row.getAttribute('data-id')} kept every cell`);
+  });
+  teardown();
+});
+
+test('the header is not rebuilt by a poll', async () => {
+  const { ctx, root, teardown } = await setup({ count: 8 });
+  const head = root.querySelector('.torrents-head');
+  const button = head.querySelector('button');
+  poll(ctx, [1]);
+  assert.equal(head.querySelector('button'), button);
+  click(button);
+  assert.equal(ctx.store.get().prefs.sort.key, 'name');
+  teardown();
+});
+
+test('a plain click selects and shows the details; checkbox, modifier and shift clicks only select', async () => {
+  const { ctx, root, teardown } = await setup({ count: 8 });
+  assert.equal(ctx.store.get().focused, null);
+  click(rowFor(root, 2), { ctrlKey: true });
+  click(rowFor(root, 3).querySelector('.checkbox'));
+  click(rowFor(root, 4), { shiftKey: true });
+  assert.equal(ctx.store.get().focused, null, 'selection-only clicks leave the details alone');
+  click(rowFor(root, 5));
+  assert.deepEqual([...ctx.store.get().selection], [5]);
+  assert.equal(ctx.store.get().focused, 5, 'a plain click shows the torrent');
+  assert.equal(rowFor(root, 5).hasAttribute('data-focused'), true);
+  teardown();
+});
+
 test('an idle rate shows a muted dash and a live rate shows its speed', async () => {
   const made = await tableCtx();
   const root = new FakeElement('div');
@@ -322,7 +389,10 @@ test('a row missing optional fields renders without throwing', async () => {
   assert.ok(row, 'row rendered');
   assert.equal(row.querySelectorAll('[role="gridcell"]').length, COLUMNS.length + 1);
   assert.equal(row.querySelector('.cell-seederCount').textContent, '—');
-  assert.equal(row.querySelector('.cell-labels').textContent, '');
+  assert.equal(row.querySelector('.cell-labels').textContent, '—', 'no labels shows the dash');
+  assert.equal(row.querySelector('.cell-trackers').textContent, '—');
+  assert.equal(row.querySelector('.cell-downloadDir').textContent, '—');
+  assert.equal(row.querySelector('.cell-labels').hasAttribute('data-empty'), true);
   assert.equal(row.querySelector('.cell-eta').textContent, '—');
   assert.equal(row.querySelector('.progress').getAttribute('aria-valuenow'), '0');
   assert.equal(root.querySelector('.torrents-empty').hidden, true);

@@ -26,6 +26,9 @@ export const ROW_HEIGHT = Object.freeze({ comfortable: 40, compact: 32, cards: 1
 export const CARD_MAX_WIDTH = 720;
 
 const OVERSCAN = 6;
+/** Below this width the details open as a sheet over the list (see `details/index.js`). */
+const SHEET_QUERY = '(max-width: 959px)';
+const sheetLayout = () => typeof globalThis.matchMedia === 'function' && globalThis.matchMedia(SHEET_QUERY).matches;
 /** Tracker-warning glyph; `table.css` tints it with the checking hue. */
 const WARNING_ICON = 'state-error';
 
@@ -56,9 +59,9 @@ export const COLUMNS = Object.freeze([
   { id: 'doneDate', width: '156px', sortable: true, narrow: 3, value: (t) => t.doneDate, text: (t, ctx) => ctx.fmt.date(t.doneDate) },
   { id: 'activityDate', width: '156px', sortable: true, narrow: 3, value: (t) => t.activityDate, text: (t, ctx) => ctx.fmt.date(t.activityDate) },
   { id: 'queuePosition', width: '64px', align: 'end', sortable: true, narrow: 3, value: (t) => t.queuePosition, text: (t, ctx) => ctx.fmt.count(t.queuePosition) },
-  { id: 'downloadDir', width: '220px', sortable: true, narrow: 3, value: (t) => t.downloadDir, text: (t) => t.downloadDir },
-  { id: 'labels', width: '150px', sortable: true, narrow: 3, value: (t) => joinList(t.labels), text: (t) => joinList(t.labels) },
-  { id: 'trackers', width: '170px', sortable: true, narrow: 3, value: (t) => joinList(t.trackerHosts), text: (t) => joinList(t.trackerHosts) },
+  { id: 'downloadDir', width: '220px', sortable: true, narrow: 3, value: (t) => t.downloadDir, text: (t) => t.downloadDir || EMPTY },
+  { id: 'labels', width: '150px', sortable: true, narrow: 3, value: (t) => joinList(t.labels), text: (t) => joinList(t.labels) || EMPTY },
+  { id: 'trackers', width: '170px', sortable: true, narrow: 3, value: (t) => joinList(t.trackerHosts), text: (t) => joinList(t.trackerHosts) || EMPTY },
   { id: 'id', width: '56px', align: 'end', sortable: true, narrow: 3, value: (t) => t.id, text: (t, ctx) => ctx.fmt.count(t.id) },
 ]);
 
@@ -216,9 +219,16 @@ export function mount(root, ctx) {
     store.set({ prefs: { ...prefs, sort: next } });
   }
 
+  let headKey = null;
+
   function renderHead() {
     const allVisible = rows.length > 0 && rows.every((r) => selection().has(r.id));
     const someVisible = !allVisible && rows.some((r) => selection().has(r.id));
+    // The header is rebuilt only when something it shows has changed, so a
+    // click on a sort button or the select-all box is never interrupted by a poll.
+    const key = [columns.map((c) => c.id).join(','), sort.key, sort.dir, allVisible, someVisible].join('|');
+    if (key === headKey) return;
+    headKey = key;
     const selectAll = el('input', {
       type: 'checkbox',
       class: 'checkbox',
@@ -298,37 +308,77 @@ export function mount(root, ctx) {
     return cell;
   }
 
-  function renderRow(torrent, index) {
-    const selected = selection().has(torrent.id);
-    const checkbox = el('input', {
-      type: 'checkbox',
-      class: 'checkbox',
-      tabindex: -1,
-      checked: selected,
-      'aria-label': t('main.table.selectRow', { name: torrent.name }),
-    });
-    const row = el('div', {
-      class: ['torrents-row', selected && 'is-selected'],
-      role: 'row',
-      'aria-rowindex': index + 2,
-      'aria-selected': selected ? 'true' : 'false',
-      'data-id': torrent.id,
-      'data-state': torrent.state,
-      'data-focused': store.get().focused === torrent.id ? '' : null,
-      tabindex: torrent.id === activeId ? 0 : -1,
-      style: { top: `${index * rowHeight()}px` },
-    }, [el('div', { role: 'gridcell', class: 'cell cell-check', 'data-col': 'check' }, checkbox)]);
+  /**
+   * One node per torrent id inside the window, kept across renders. A poll
+   * patches attributes in place and replaces the data cells only for torrents
+   * whose object changed; the row element itself, its checkbox cell and its
+   * focus survive, so a click whose mousedown and mouseup straddle a poll
+   * still lands on the same row.
+   */
+  const rowEntries = new Map();
+  let renderedNodes = [];
+
+  const rowShape = () => `${layout}|${columns.map((c) => c.id).join(',')}`;
+
+  function dataCells(torrent) {
+    const cells = [];
     const cardOnly = layout === 'cards';
     for (const column of columns) {
       if (cardOnly && !CARD_COLUMNS.includes(column.id)) continue;
-      row.append(renderCell(column, torrent));
+      cells.push(renderCell(column, torrent));
     }
     if (cardOnly) {
       for (const id of CARD_COLUMNS) {
-        if (!columns.some((c) => c.id === id)) row.append(renderCell(COLUMN_BY_ID.get(id), torrent));
+        if (!columns.some((c) => c.id === id)) cells.push(renderCell(COLUMN_BY_ID.get(id), torrent));
       }
     }
-    return row;
+    return cells;
+  }
+
+  function createRow(torrent) {
+    const checkbox = el('input', { type: 'checkbox', class: 'checkbox', tabindex: -1 });
+    const node = el('div', {
+      class: 'torrents-row',
+      role: 'row',
+      'data-id': torrent.id,
+    }, [el('div', { role: 'gridcell', class: 'cell cell-check', 'data-col': 'check' }, checkbox)]);
+    return { node, checkbox, torrent: null, shape: null, top: null, label: null };
+  }
+
+  function syncRow(entry, torrent, index) {
+    const { node, checkbox } = entry;
+    const selected = selection().has(torrent.id);
+    const attr = (name, value) => {
+      if (value === null) {
+        if (node.hasAttribute(name)) node.removeAttribute(name);
+      } else if (node.getAttribute(name) !== value) {
+        node.setAttribute(name, value);
+      }
+    };
+    node.classList.toggle('is-selected', selected);
+    attr('aria-rowindex', String(index + 2));
+    attr('aria-selected', selected ? 'true' : 'false');
+    attr('data-state', torrent.state);
+    attr('data-focused', store.get().focused === torrent.id ? '' : null);
+    attr('tabindex', torrent.id === activeId ? '0' : '-1');
+    const top = `${index * rowHeight()}px`;
+    if (entry.top !== top) {
+      node.style.setProperty('top', top);
+      entry.top = top;
+    }
+    if (checkbox.checked !== selected) checkbox.checked = selected;
+    const label = t('main.table.selectRow', { name: torrent.name });
+    if (entry.label !== label) {
+      checkbox.setAttribute('aria-label', label);
+      entry.label = label;
+    }
+    const shape = rowShape();
+    if (entry.torrent !== torrent || entry.shape !== shape) {
+      while (node.children.length > 1) node.children[node.children.length - 1].remove();
+      node.append(...dataCells(torrent));
+      entry.torrent = torrent;
+      entry.shape = shape;
+    }
   }
 
   function windowBounds() {
@@ -343,17 +393,31 @@ export function mount(root, ctx) {
     frame = 0;
     const { first, last } = windowBounds();
     const rendered = [];
+    const present = new Set();
     let activeRendered = false;
     for (let i = first; i < last; i += 1) {
-      const row = renderRow(rows[i], i);
-      if (rows[i].id === activeId) activeRendered = true;
-      rendered.push(row);
+      const torrent = rows[i];
+      let entry = rowEntries.get(torrent.id);
+      if (!entry) {
+        entry = createRow(torrent);
+        rowEntries.set(torrent.id, entry);
+      }
+      present.add(torrent.id);
+      if (torrent.id === activeId) activeRendered = true;
+      syncRow(entry, torrent, i);
+      rendered.push(entry.node);
     }
+    for (const id of rowEntries.keys()) if (!present.has(id)) rowEntries.delete(id);
     if (!activeRendered && rendered.length > 0) rendered[0].setAttribute('tabindex', '0');
     body.style.setProperty('height', `${rows.length * rowHeight()}px`);
     grid.setAttribute('aria-rowcount', String(rows.length + 1));
     grid.setAttribute('tabindex', rows.length === 0 ? '0' : '-1');
-    clear(body, ...rendered);
+    // Re-attach only when membership or order changed; a poll that leaves the
+    // window alone touches no child, so hover, focus and a press in progress stay.
+    if (rendered.length !== renderedNodes.length || rendered.some((node, i) => node !== renderedNodes[i])) {
+      clear(body, ...rendered);
+      renderedNodes = rendered;
+    }
     const { torrents } = store.get();
     empty.hidden = rows.length > 0;
     empty.textContent = rows.length > 0 ? '' : t(torrents.size === 0 ? 'main.table.noTorrents' : 'main.table.noMatches');
@@ -448,16 +512,20 @@ export function mount(root, ctx) {
     if (id === null) return;
     const onCheckbox = Boolean(e.target.closest('.cell-check'));
     const modifier = e.ctrlKey || e.metaKey;
+    const plain = !e.shiftKey && !onCheckbox && !modifier;
     if (e.shiftKey) select(id, { range: true, additive: modifier });
     else if (onCheckbox || modifier) select(id, { toggle: true });
     else select(id);
     activeId = id;
     renderWindow();
+    // A plain click also shows the torrent. Docked, the table keeps the focus
+    // so the arrow keys keep working; as a sheet the details take it.
+    if (plain) showDetails(id, { focus: sheetLayout() });
   }
 
   /** Open the details drawer on a torrent; `focused` is set even before the drawer mounts. */
-  function showDetails(id) {
-    openDetails(id);
+  function showDetails(id, opts = {}) {
+    openDetails(id, opts);
     if (store.get().focused !== id) store.set({ focused: id });
   }
 
