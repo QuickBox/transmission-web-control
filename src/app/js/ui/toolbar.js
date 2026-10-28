@@ -11,13 +11,10 @@
 
 import { preference, setVariant, VARIANTS } from '../core/theme.js?v=__QBV__';
 import { setSession } from '../rpc/session.js?v=__QBV__';
-import { openAbout, openAdd, openLabels, openLimits, openLocation, openRemove } from './dialogs/index.js?v=__QBV__';
+import {
+  openAbout, openAdd, openAutoMatch, openLabels, openLimits, openLocation, openRemove, openReplaceTrackers, openSettings,
+} from './dialogs/index.js?v=__QBV__';
 import { createSearch } from './search.js?v=__QBV__';
-
-/** Requests for dialogs the registry has no opener for yet; dispatched on `#app`. */
-export const REQUESTS = Object.freeze({
-  settings: 'settings-request',
-});
 
 /** Dialog openers by action, each taking the selected ids. */
 const DIALOGS = Object.freeze({
@@ -25,14 +22,18 @@ const DIALOGS = Object.freeze({
   location: openLocation,
   limits: openLimits,
   labels: openLabels,
+  replaceTrackers: openReplaceTrackers,
+  autoMatch: openAutoMatch,
 });
 
 /**
  * Selection actions. `method` is the legacy RPC spelling sent with `{ ids }`;
- * `dialog` names the registry opener called with the ids instead.
- * `group` places the control in the toolbar; `bulk` marks the bulk-bar set.
+ * `dialog` names the registry opener called with the ids instead. `group`
+ * places the control: toolbar groups, `queue` (Queue menu) or `tools` (More
+ * menu only); `bulk` marks the bulk-bar set; `allowEmpty` lets the action run
+ * with nothing selected (the dialog then covers every torrent).
  * @type {readonly { id: string, icon: string, method?: string, dialog?: keyof typeof DIALOGS,
- *   group: 'transfer'|'remove'|'manage'|'queue', bulk?: boolean, destructive?: boolean }[]}
+ *   group: 'transfer'|'remove'|'manage'|'queue'|'tools', bulk?: boolean, destructive?: boolean, allowEmpty?: boolean }[]}
  */
 export const ACTIONS = Object.freeze([
   { id: 'start', icon: 'toolbar-start', method: 'torrent-start', group: 'transfer', bulk: true },
@@ -48,15 +49,11 @@ export const ACTIONS = Object.freeze([
   { id: 'queueUp', icon: 'toolbar-move-up', method: 'queue-move-up', group: 'queue' },
   { id: 'queueDown', icon: 'toolbar-move-down', method: 'queue-move-down', group: 'queue' },
   { id: 'queueBottom', icon: 'toolbar-move-down', method: 'queue-move-bottom', group: 'queue' },
+  { id: 'replaceTrackers', icon: 'tab-trackers', dialog: 'replaceTrackers', group: 'tools', allowEmpty: true },
+  { id: 'findData', icon: 'file-folder', dialog: 'autoMatch', group: 'tools' },
 ]);
 
 const ACTION_BY_ID = new Map(ACTIONS.map((a) => [a.id, a]));
-
-/** Dispatch a dialog request on the app root (falls back to `document.body`). */
-export function requestDialog(from, type, detail) {
-  const app = (from && typeof from.closest === 'function' && from.closest('#app')) || document.body;
-  app.dispatchEvent(new CustomEvent(type, { bubbles: true, detail: detail || {} }));
-}
 
 /**
  * Run one action on `ids`. RPC actions resolve after the next poll tick so the
@@ -64,12 +61,11 @@ export function requestDialog(from, type, detail) {
  * @param {import('../main.js').AppContext} ctx
  * @param {string} actionId
  * @param {number[]} ids
- * @param {Element} [from] element the request event is dispatched from
  * @returns {Promise<boolean>} whether the action ran
  */
-export async function runAction(ctx, actionId, ids, from) {
+export async function runAction(ctx, actionId, ids) {
   const action = ACTION_BY_ID.get(actionId);
-  if (!action || !Array.isArray(ids) || ids.length === 0) return false;
+  if (!action || !Array.isArray(ids) || (ids.length === 0 && !action.allowEmpty)) return false;
   if (action.dialog) {
     DIALOGS[action.dialog](ids);
     return true;
@@ -87,14 +83,14 @@ export async function runAction(ctx, actionId, ids, from) {
   }
 }
 
-/** Menu items for `actions`, each enabled only while something is selected. */
-export function actionMenuItems(ctx, actions, ids, from) {
+/** Menu items for `actions`, each enabled only while something is selected (unless `allowEmpty`). */
+export function actionMenuItems(ctx, actions, ids) {
   return actions.map((action) => ({
     label: ctx.i18n(`main.actions.${action.id}`),
     icon: action.icon,
     destructive: Boolean(action.destructive),
-    disabled: ids.length === 0,
-    onSelect: () => runAction(ctx, action.id, ids, from),
+    disabled: ids.length === 0 && !action.allowEmpty,
+    onSelect: () => runAction(ctx, action.id, ids),
   }));
 }
 
@@ -142,7 +138,7 @@ export function mount(root, ctx) {
 
   const actionButtons = new Map();
   function actionButton(action) {
-    const button = iconButton(t(`main.actions.${action.id}`), action.icon, (e) => runAction(ctx, action.id, selected(), e.target), {
+    const button = iconButton(t(`main.actions.${action.id}`), action.icon, () => runAction(ctx, action.id, selected()), {
       class: action.destructive && 'tb-destructive',
       attrs: { 'data-action': action.id },
     });
@@ -151,7 +147,7 @@ export function mount(root, ctx) {
   }
 
   const queueButton = iconButton(t('main.actions.queue'), 'toolbar-move-up', () => {
-    menu(queueButton, actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'queue'), selected(), queueButton), { label: t('main.actions.queue') });
+    menu(queueButton, actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'queue'), selected()), { label: t('main.actions.queue') });
   }, { attrs: { 'aria-haspopup': 'menu', 'data-action': 'queue' } });
   actionButtons.set('queue', queueButton);
 
@@ -214,20 +210,22 @@ export function mount(root, ctx) {
     })), { label: t('core.theme.label') });
   }, { class: 'tb-secondary', attrs: { 'aria-haspopup': 'menu' } });
 
-  const settingsButton = iconButton(t('main.actions.settings'), 'toolbar-settings', (e) => requestDialog(e.target, REQUESTS.settings), { class: 'tb-secondary' });
+  const settingsButton = iconButton(t('main.actions.settings'), 'toolbar-settings', () => openSettings(), { class: 'tb-secondary' });
   const aboutButton = iconButton(t('main.actions.about'), 'toolbar-help', () => openAbout(), { class: 'tb-secondary' });
 
   const moreButton = iconButton(t('core.actions.more'), 'more', () => {
     const ids = selected();
     const session = store.get().session;
     const items = [
-      ...actionMenuItems(ctx, ACTIONS.filter((a) => a.group !== 'remove' && a.group !== 'queue'), ids, moreButton),
-      { label: t('main.actions.queue'), icon: 'toolbar-move-up', items: actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'queue'), ids, moreButton) },
+      ...actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'transfer' || a.group === 'manage'), ids),
+      { label: t('main.actions.queue'), icon: 'toolbar-move-up', items: actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'queue'), ids) },
+      'separator',
+      ...actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'tools'), ids),
       'separator',
       { label: t('main.toolbar.altSpeed'), checked: Boolean(session.altSpeedEnabled), onSelect: () => altSpeed.click() },
       { label: t('core.theme.label'), icon: 'palette-switch', items: THEME_CHOICES.map((choice) => ({ label: t(`core.theme.${choice}`), checked: preference() === choice, onSelect: () => setVariant(choice) })) },
       'separator',
-      { label: t('main.actions.settings'), icon: 'toolbar-settings', onSelect: () => requestDialog(moreButton, REQUESTS.settings) },
+      { label: t('main.actions.settings'), icon: 'toolbar-settings', onSelect: () => openSettings() },
       { label: t('main.actions.about'), icon: 'toolbar-help', onSelect: () => openAbout() },
     ];
     menu(moreButton, items, { label: t('core.actions.more') });

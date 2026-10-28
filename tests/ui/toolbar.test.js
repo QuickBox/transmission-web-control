@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import { installChromeDom, chromeCtx, shell, click, byLabel, byAction, flush } from './chrome-dom.js';
 
 const env = installChromeDom();
-const { ACTIONS, REQUESTS, mount, runAction } = await import('../../src/app/js/ui/toolbar.js');
+const { ACTIONS, mount, runAction } = await import('../../src/app/js/ui/toolbar.js');
 
 async function setup(opts = {}) {
   const made = await chromeCtx(opts);
   const { app, regions } = shell(env);
   const requests = [];
-  for (const type of Object.values(REQUESTS)) app.addEventListener(type, (e) => requests.push({ type, detail: e.detail }));
+  app.addEventListener('settings-request', (e) => requests.push({ type: 'settings-request', detail: e.detail }));
   const teardown = mount(regions.toolbar, made.ctx);
   return { ...made, app, root: regions.toolbar, requests, teardown };
 }
@@ -20,8 +20,8 @@ test('action table: every entry has an icon and exactly one of method/dialog', (
     assert.equal([a.method, a.dialog].filter(Boolean).length, 1, a.id);
     if (a.method) assert.match(a.method, /^(torrent-|queue-move-)/, 'legacy spelling');
   }
-  assert.deepEqual(ACTIONS.filter((a) => a.dialog).map((a) => `${a.id}:${a.dialog}`), ['remove:remove', 'move:location', 'limits:limits', 'labels:labels']);
-  assert.deepEqual(Object.keys(REQUESTS), ['settings'], 'only Settings still goes through an event');
+  assert.deepEqual(ACTIONS.filter((a) => a.dialog).map((a) => `${a.id}:${a.dialog}`), ['remove:remove', 'move:location', 'limits:limits', 'labels:labels', 'replaceTrackers:replaceTrackers', 'findData:autoMatch']);
+  assert.deepEqual(ACTIONS.filter((a) => a.allowEmpty).map((a) => a.id), ['replaceTrackers'], 'only Replace trackers runs on an empty selection');
   assert.deepEqual(ACTIONS.filter((a) => a.bulk).map((a) => a.id), ['start', 'pause', 'remove']);
 });
 
@@ -74,19 +74,20 @@ test('a failing action surfaces an error toast and resolves false', async () => 
   teardown();
 });
 
-test('Move, Speed limits, Remove and About go to the dialog registry; Settings dispatches its request', async () => {
+test('Move, Speed limits, Remove, Settings and About go to the dialog registry, never events or RPC', async () => {
   const { ctx, root, requests, calls, teardown } = await setup();
   ctx.store.set({ selection: new Set([7]) });
   click(byAction(root, 'move'));
   click(byAction(root, 'limits'));
   click(byLabel(root, 'About'));
-  assert.deepEqual(requests, [], 'registry openers, not events (the registry is not mounted here, so they are no-ops)');
   click(byLabel(root, 'Settings'));
-  assert.deepEqual(requests, [{ type: REQUESTS.settings, detail: {} }]);
+  assert.deepEqual(requests, [], 'no request events: the registry openers are called (no-ops while it is not mounted)');
   assert.equal(calls.length, 0, 'dialog actions make no RPC');
-  for (const id of ['remove', 'move', 'limits', 'labels']) {
+  for (const id of ['remove', 'move', 'limits', 'labels', 'findData']) {
     assert.equal(await runAction(ctx, id, [7]), true, `${id} resolves through the registry`);
+    assert.equal(await runAction(ctx, id, []), false, `${id} needs a selection`);
   }
+  assert.equal(await runAction(ctx, 'replaceTrackers', []), true, 'Replace trackers runs on every torrent when nothing is selected');
   assert.equal(calls.length, 0);
   teardown();
 });
@@ -103,7 +104,15 @@ test('the Queue button and More button open menus built from the action table', 
   assert.ok(more.some((i) => i.label === 'Queue' && Array.isArray(i.items)));
   assert.ok(more.some((i) => i.label === 'Theme' && i.items.length === 5));
   assert.ok(more.some((i) => i.label === 'Settings'));
+  assert.ok(more.some((i) => i.label === 'Replace trackers' && !i.disabled));
+  assert.ok(more.some((i) => i.label === 'Find data' && !i.disabled));
   assert.ok(!more.some((i) => i.label === 'Remove'), 'Remove stays a visible button');
+  ctx.store.set({ selection: new Set() });
+  click(root.querySelector('.tb-more'));
+  const empty = menus[2].items;
+  assert.equal(empty.find((i) => i.label === 'Find data').disabled, true, 'Find data needs a selection');
+  assert.equal(empty.find((i) => i.label === 'Replace trackers').disabled, false, 'Replace trackers works on all torrents');
+  assert.equal(empty.find((i) => i.label === 'Start').disabled, true);
   teardown();
 });
 

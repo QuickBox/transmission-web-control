@@ -47,7 +47,9 @@
     "queueDown": "Move down",
     "queueBottom": "Move to bottom",
     "settings": "Settings",
-    "about": "About"
+    "about": "About",
+    "replaceTrackers": "Replace trackers",
+    "findData": "Find data"
   },
   "search": {
     "placeholder": "Search torrents",

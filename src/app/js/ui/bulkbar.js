@@ -39,14 +39,14 @@ export function mount(root, ctx) {
         'data-action': id,
       }, icon(action.icon, { size: 20 }));
       tooltip(button, () => t(`main.actions.${id}`));
-      button.addEventListener('click', (e) => runAction(ctx, id, [...store.get().selection], e.target));
+      button.addEventListener('click', () => runAction(ctx, id, [...store.get().selection]));
       return button;
     });
     const more = el('button', { type: 'button', class: 'btn-icon', 'aria-label': t('core.actions.more'), 'aria-haspopup': 'menu' }, icon('more', { size: 20 }));
     tooltip(more, () => t('core.actions.more'));
     more.addEventListener('click', () => {
       const current = [...store.get().selection];
-      menu(more, actionMenuItems(ctx, ACTIONS.filter((a) => !a.bulk), current, more), { label: t('core.actions.more') });
+      menu(more, actionMenuItems(ctx, ACTIONS.filter((a) => !a.bulk), current), { label: t('core.actions.more') });
     });
     const clearButton = el('button', { type: 'button', class: 'btn-icon btn-icon-md bulk-clear', 'aria-label': t('main.bulkbar.clear') }, icon('menu-close', { size: 16 }));
     tooltip(clearButton, () => t('main.bulkbar.clear'));
