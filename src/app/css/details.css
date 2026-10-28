@@ -173,7 +173,21 @@
 	margin-bottom: -1px;
 }
 
+/* A scrolling strip fades out on each side that still hides a tab. */
+.details-tabs[data-more-end] {
+	mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
+}
+
+.details-tabs[data-more-start] {
+	mask-image: linear-gradient(to left, black calc(100% - 32px), transparent);
+}
+
+.details-tabs[data-more-start][data-more-end] {
+	mask-image: linear-gradient(to right, transparent, black 32px, black calc(100% - 32px), transparent);
+}
+
 .details-tab {
+	flex: none;
 	height: 40px;
 	padding: 0 12px;
 	border: 0;
@@ -871,6 +885,9 @@
 
 .option-card {
 	display: grid;
+	/* One column the card's own width, so a long translated select or label
+	   wraps inside the card instead of widening it past a phone screen. */
+	grid-template-columns: minmax(0, 1fr);
 	gap: 2px;
 	padding: 12px 14px;
 	border: 1px solid color-mix(in srgb, var(--qb-border) 70%, transparent);

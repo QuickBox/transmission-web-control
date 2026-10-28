@@ -131,6 +131,19 @@ export function mount(root, ctx) {
     return button;
   }));
 
+  // When the tabs outrun a narrow sheet the strip scrolls, and a fade marks
+  // each side that still hides a tab.
+  function syncTabEdges() {
+    const max = (tablist.scrollWidth || 0) - (tablist.clientWidth || 0);
+    const left = tablist.scrollLeft || 0;
+    const mark = (name, on) => (on ? tablist.setAttribute(name, '') : tablist.removeAttribute(name));
+    mark('data-more-start', max > 1 && left > 1);
+    mark('data-more-end', max > 1 && left < max - 1);
+  }
+  tablist.addEventListener('scroll', syncTabEdges, { passive: true });
+  const edgeObserver = typeof globalThis.ResizeObserver === 'function' ? new globalThis.ResizeObserver(syncTabEdges) : null;
+  if (edgeObserver) edgeObserver.observe(tablist);
+
   const panel = el('div', {
     class: 'details-panel', id: `${uid}-panel`, role: 'tabpanel', tabindex: '0',
   });
@@ -279,7 +292,9 @@ export function mount(root, ctx) {
       renderView();
       fetchDetail(false);
     }
-    if (focusTab) tabButtons.get(tabId).focus();
+    const button = tabButtons.get(tabId);
+    if (focusTab) button.focus();
+    if (typeof button.scrollIntoView === 'function') button.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
   function onTabKey(e) {
@@ -389,6 +404,7 @@ export function mount(root, ctx) {
     offTorrents();
     offPrefs();
     if (sheetQuery) sheetQuery.removeEventListener('change', onFull);
+    if (edgeObserver) edgeObserver.disconnect();
     for (const view of views.values()) if (view.destroy) view.destroy();
     if (instance && instance.open === open) instance = null;
   };
