@@ -1,5 +1,8 @@
 {
   "en": ["core", "details", "main", "dialogs"],
+  "da": ["core", "details", "main", "dialogs"],
+  "de": ["core", "details", "main", "dialogs"],
+  "es": ["core", "details", "main", "dialogs"],
   "hu": ["core", "details", "main", "dialogs"],
   "zh-TW": ["core", "details", "main", "dialogs"],
   "nl": ["core", "details", "main", "dialogs"],

@@ -1,0 +1,315 @@
+{
+  "add": {
+    "title": "Tilføj torrents",
+    "browse": "Gennemse…",
+    "dropHint": "Træk .torrent-filer hertil, eller",
+    "selectedFiles": "Valgte filer",
+    "removeFile": "Fjern {name}",
+    "notTorrent": "Kun .torrent-filer kan tilføjes på denne måde.",
+    "links": "Magnetlinks eller URL'er",
+    "linksPlaceholder": "Ét pr. linje",
+    "invalidLink": "Ikke et magnetlink eller en URL: {line}",
+    "directory": "Download til",
+    "free": "{free} ledig",
+    "freeOf": "{free} ledig af {total}",
+    "freeChecking": "Kontrollerer ledig plads…",
+    "freeUnknown": "Ledig plads ukendt",
+    "labels": "Etiketter",
+    "labelsPlaceholder": "Adskilt af komma",
+    "labelsFailed": "Tilføjet, men etiketterne blev ikke gemt: {message}",
+    "start": "Start, når den er tilføjet",
+    "submit": "Tilføj",
+    "noAnswer": "Transmission bekræftede ikke torrenten",
+    "added": {
+      "one": "{total} torrent tilføjet",
+      "other": "{total} torrents tilføjet"
+    },
+    "duplicates": {
+      "one": "{total} torrent var allerede på listen",
+      "other": "{total} torrents var allerede på listen"
+    },
+    "someFailed": {
+      "one": "{total} kunne ikke tilføjes",
+      "other": "{total} kunne ikke tilføjes"
+    },
+    "failedOne": "Kunne ikke tilføje {name}: {message}",
+    "failedAll": {
+      "one": "{total} torrent kunne ikke tilføjes",
+      "other": "Ingen af de {total} torrents kunne tilføjes"
+    }
+  },
+  "drop": {
+    "title": "Slip for at tilføje torrents",
+    "hint": "Kun .torrent-filer"
+  },
+  "remove": {
+    "titleOne": "Fjern denne torrent?",
+    "titleMany": {
+      "one": "Fjern {total} torrent?",
+      "other": "Fjern {total} torrents?"
+    },
+    "message": {
+      "one": "Den forsvinder fra listen. Downloadede data bliver liggende på disken, medmindre du sletter dem nedenfor.",
+      "other": "De forsvinder fra listen. Downloadede data bliver liggende på disken, medmindre du sletter dem nedenfor."
+    },
+    "andMore": {
+      "one": "og {total} mere",
+      "other": "og {total} mere"
+    },
+    "deleteData": "Slet også de downloadede data",
+    "dataWarning": "Filerne slettes fra disken. Det kan ikke fortrydes.",
+    "confirm": "Fjern",
+    "confirmDelete": "Fjern og slet data",
+    "done": {
+      "one": "{total} torrent fjernet",
+      "other": "{total} torrents fjernet"
+    },
+    "failed": "Kunne ikke fjerne: {message}"
+  },
+  "failed": "Noget gik galt",
+  "rename": {
+    "title": "Omdøb torrent",
+    "label": "Nyt navn",
+    "empty": "Angiv et navn.",
+    "slash": "Et navn må ikke indeholde en skråstreg.",
+    "dots": "Et navn må ikke være . eller ..",
+    "done": "Omdøbt til {name}"
+  },
+  "location": {
+    "titleOne": "Angiv dataplacering",
+    "titleMany": {
+      "one": "Angiv placeringen for {total} torrent",
+      "other": "Angiv placeringen for {total} torrents"
+    },
+    "folder": "Mappe",
+    "differ": "De valgte torrents ligger i forskellige mapper; den første torrents mappe vises.",
+    "mode": "Data",
+    "move": "Flyt dataene til denne mappe",
+    "find": "Dataene ligger allerede i denne mappe",
+    "submit": "Angiv placering",
+    "empty": "Angiv en mappe.",
+    "moving": {
+      "one": "Flytter {total} torrent",
+      "other": "Flytter {total} torrents"
+    },
+    "pointed": {
+      "one": "Placering angivet for {total} torrent",
+      "other": "Placering angivet for {total} torrents"
+    },
+    "failed": "Kunne ikke angive placeringen: {message}"
+  },
+  "labels": {
+    "titleOne": "Etiketter",
+    "titleMany": {
+      "one": "Etiketter for {total} torrent",
+      "other": "Etiketter for {total} torrents"
+    },
+    "existing": "Etiketter i brug",
+    "add": "Tilføj etiketter",
+    "browserOnly": "Denne Transmission-version har ingen egne etiketter, så de gemmes kun i denne browser.",
+    "importOffer": {
+      "one": "Etiketter for {total} torrent er gemt i denne browser. Kopiér dem til Transmission, så alle enheder kan se dem; browserkopien bevares.",
+      "other": "Etiketter for {total} torrents er gemt i denne browser. Kopiér dem til Transmission, så alle enheder kan se dem; browserkopien bevares."
+    },
+    "importAction": "Kopiér til Transmission",
+    "imported": {
+      "one": "Etiketter kopieret for {total} torrent",
+      "other": "Etiketter kopieret for {total} torrents"
+    },
+    "importFailed": "Kunne ikke kopiere etiketterne: {message}",
+    "tooLong": "En etiket må højst være på 128 tegn.",
+    "saved": "Etiketter gemt",
+    "failed": "Kunne ikke gemme etiketterne: {message}"
+  },
+  "limits": {
+    "title": "Hastighedsgrænser",
+    "torrents": {
+      "one": "Valgt torrent",
+      "other": "{total} valgte torrents"
+    },
+    "alt": "Alternativ hastighed",
+    "altHelp": "Bruges i stedet for de globale grænser, mens alternativ hastighed er slået til.",
+    "altEnabled": "Alternativ hastighed til",
+    "altDown": "Downloadgrænse",
+    "altUp": "Uploadgrænse",
+    "mixed": "De valgte torrents har forskellige værdier; kun de felter, du ændrer, gemmes.",
+    "readFailed": "Kunne ikke læse de aktuelle grænser.",
+    "invalid": "Angiv hele tal i kB/s.",
+    "saved": "Hastighedsgrænser gemt",
+    "failed": "Kunne ikke gemme grænserne: {message}"
+  },
+  "about": {
+    "title": "Om",
+    "product": "Transmission-webgrænseflade",
+    "uiVersion": "Version {version}",
+    "transmission": "Transmission",
+    "rpc": "RPC",
+    "rpcSemver": "RPC {semver}",
+    "rpcVersion": "version {rpc}",
+    "jsonrpc": "JSON-RPC",
+    "legacy": "ældre protokol",
+    "unknown": "Ukendt",
+    "credit": "Baseret på Transmission Web Control af ronggang (MIT)",
+    "original": "Den oprindelige webgrænseflade"
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "saved": "Indstillinger gemt",
+    "failed": "Kunne ikke gemme: {message}",
+    "loadFailed": "Kunne ikke indlæse indstillingerne: {message}",
+    "invalid": "Ret de markerede værdier først.",
+    "pages": {
+      "downloading": "Download",
+      "speed": "Hastighed",
+      "network": "Netværk",
+      "queue": "Kø",
+      "seeding": "Seeding",
+      "blocklist": "Blokeringsliste",
+      "interface": "Grænseflade"
+    },
+    "rows": {
+      "downloadDir": "Downloadmappe",
+      "startAddedTorrents": "Start torrents, når de tilføjes",
+      "trashOriginalTorrentFiles": "Slet .torrent-filer efter tilføjelse",
+      "renamePartialFiles": "Føj .part til ufuldstændige filer",
+      "incompleteDirEnabled": "Gem ufuldstændige filer i en separat mappe",
+      "incompleteDir": "Mappe til ufuldstændige filer",
+      "sequentialDownload": "Download nye torrents i rækkefølge",
+      "scriptTorrentAddedEnabled": "Kør et script, når en torrent tilføjes",
+      "scriptTorrentAddedFilename": "Script ved tilføjelse",
+      "scriptTorrentDoneEnabled": "Kør et script, når en torrent er færdig",
+      "scriptTorrentDoneFilename": "Script ved færdig torrent",
+      "scriptTorrentDoneSeedingEnabled": "Kør et script, når seeding slutter",
+      "scriptTorrentDoneSeedingFilename": "Script ved afsluttet seeding",
+      "defaultTrackers": "Standardtrackers",
+      "speedLimitDownEnabled": "Begræns downloadhastigheden",
+      "speedLimitDown": "Downloadgrænse",
+      "speedLimitUpEnabled": "Begræns uploadhastigheden",
+      "speedLimitUp": "Uploadgrænse",
+      "altSpeedDown": "Alternativ downloadgrænse",
+      "altSpeedUp": "Alternativ uploadgrænse",
+      "altSpeedTimeEnabled": "Brug alternativ hastighed efter en tidsplan",
+      "altSpeedTimeBegin": "Fra",
+      "altSpeedTimeEnd": "Til",
+      "altSpeedTimeDay": "Dage",
+      "peerPort": "Peer-port",
+      "peerPortRandomOnStart": "Vælg en tilfældig port ved start",
+      "portForwardingEnabled": "Videresend porten med UPnP eller NAT-PMP",
+      "encryption": "Kryptering",
+      "peerLimitGlobal": "Maks. antal peers i alt",
+      "peerLimitPerTorrent": "Maks. antal peers pr. torrent",
+      "dhtEnabled": "Brug DHT",
+      "pexEnabled": "Brug peer-udveksling (PEX)",
+      "lpdEnabled": "Brug lokal peer-opdagelse",
+      "utpEnabled": "Brug µTP",
+      "tcpEnabled": "Brug TCP",
+      "preferredTransports": "Transporter",
+      "downloadQueueEnabled": "Begræns aktive downloads",
+      "downloadQueueSize": "Aktive downloads",
+      "seedQueueEnabled": "Begræns aktive seeds",
+      "seedQueueSize": "Aktive seeds",
+      "queueStalledEnabled": "Behandl fastlåste torrents som inaktive",
+      "queueStalledMinutes": "Fastlåst efter",
+      "seedRatioLimited": "Stop seeding ved en ratio",
+      "seedRatioLimit": "Ratio",
+      "idleSeedingLimitEnabled": "Stop seeding ved inaktivitet",
+      "idleSeedingLimit": "Inaktiv i",
+      "blocklistEnabled": "Brug en blokeringsliste",
+      "blocklistUrl": "URL til blokeringsliste"
+    },
+    "scriptHelp": "Transmission kører dette program og sender torrentens oplysninger videre i miljøvariabler som TR_TORRENT_NAME, TR_TORRENT_DIR og TR_TORRENT_HASH.",
+    "defaultTrackersHelp": "Føjes til hver offentlig torrent. Én URL pr. linje; en tom linje starter et nyt niveau.",
+    "transportsHelp": "Denne Transmission-version angiver transporterne i sin indstillingsfil; de vises her til orientering.",
+    "languageHelp": "Siden genindlæses, når du skifter sprog.",
+    "encryption": {
+      "required": "Kræv kryptering",
+      "preferred": "Foretræk kryptering",
+      "tolerated": "Tillad ukrypteret"
+    },
+    "custom": "Brugerdefineret ({value})",
+    "kbps": "kB/s",
+    "minutes": "minutter",
+    "seconds": "sekunder",
+    "days": {
+      "0": "Søn",
+      "1": "Man",
+      "2": "Tir",
+      "3": "Ons",
+      "4": "Tor",
+      "5": "Fre",
+      "6": "Lør"
+    },
+    "portStatus": "Port",
+    "testPort": "Test porten",
+    "testing": "Tester…",
+    "port": {
+      "ipv4": "IPv4 {state}",
+      "ipv6": "IPv6 {state}",
+      "any": "Port {state}",
+      "open": "åben",
+      "closed": "lukket",
+      "unknown": "ukendt"
+    },
+    "portFailed": "Kunne ikke teste porten: {message}",
+    "blocklistSize": {
+      "one": "{total} regel",
+      "other": "{total} regler"
+    },
+    "blocklistUpdate": "Opdater nu",
+    "blocklistUpdated": "Blokeringslisten er opdateret",
+    "blocklistFailed": "Kunne ikke opdatere blokeringslisten: {message}",
+    "pollInterval": "Opdater hvert",
+    "backup": "Indstillingsfil",
+    "export": "Eksportér",
+    "import": "Importér",
+    "importInvalid": "Dette er ikke en indstillingsfil fra denne grænseflade.",
+    "imported": "Indstillinger importeret",
+    "importFailed": "Kunne ikke importere: {message}",
+    "list": "Torrentliste",
+    "listHelp": "Ændringerne træder i kraft med det samme.",
+    "compactRows": "Kompakte rækker",
+    "columns": "Kolonner",
+    "columnsReset": "Nulstil til standard"
+  },
+  "replace": {
+    "title": "Erstat trackers",
+    "submit": "Erstat",
+    "find": "Announce-URL, der skal erstattes",
+    "with": "Erstat med",
+    "matches": {
+      "one": "{total} torrent bruger den",
+      "other": "{total} torrents bruger den"
+    },
+    "same": "De to URL'er er ens.",
+    "none": "Ingen torrent i omfanget bruger denne URL.",
+    "done": {
+      "one": "{total} torrent opdateret",
+      "other": "{total} torrents opdateret"
+    },
+    "failed": "Stoppet efter {done} af {total}: {message}",
+    "scopeSelected": {
+      "one": "Søger i den valgte torrent.",
+      "other": "Søger i de {total} valgte torrents."
+    },
+    "scopeAll": "Søger i alle torrents."
+  },
+  "match": {
+    "title": "Find data",
+    "submit": "Start",
+    "description": {
+      "one": "Peg {total} torrent på en mappe, der allerede indeholder dens data. Intet flyttes.",
+      "other": "Peg {total} torrents på en mappe, der allerede indeholder deres data. Intet flyttes."
+    },
+    "folders": "Mapper, der skal prøves",
+    "help": "Én mappe pr. linje, prøvet i rækkefølge. En torrent beholder den første mappe, hvor en kontrol finder dens data.",
+    "noFolders": "Angiv mindst én mappe.",
+    "trying": "{name} ({n} af {of}): kontrollerer {folder} ({i} af {folders})",
+    "notFound": "Ingen mappe passede",
+    "hasData": "Har allerede data",
+    "stop": "Stop",
+    "stopping": "Stopper efter denne kontrol…",
+    "stopped": "Stoppet",
+    "finished": "Fandt data til {found} af {total}",
+    "failed": "Stoppet: {message}"
+  }
+}

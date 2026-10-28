@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "Transmission",
+    "brand": "QuickBox"
+  },
+  "actions": {
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "save": "Speichern",
+    "apply": "Anwenden",
+    "retry": "Erneut versuchen",
+    "back": "Zurück",
+    "more": "Mehr",
+    "copy": "Kopieren",
+    "copied": "Kopiert"
+  },
+  "connection": {
+    "connecting": "Verbindung zu Transmission wird hergestellt…",
+    "online": "Verbunden",
+    "offline": "Transmission ist nicht erreichbar. Neuer Versuch folgt.",
+    "unauthorized": "Transmission hat die Anmeldung abgelehnt. Prüfen Sie RPC-Benutzername und Passwort.",
+    "restored": "Verbindung wiederhergestellt"
+  },
+  "status": {
+    "stopped": "Gestoppt",
+    "queued": "In Warteschlange",
+    "checking": "Wird geprüft",
+    "downloading": "Wird heruntergeladen",
+    "seeding": "Wird verteilt",
+    "finished": "Fertig",
+    "error": "Fehler"
+  },
+  "count": {
+    "torrents": {
+      "one": "{count} Torrent",
+      "other": "{count} Torrents"
+    },
+    "selected": {
+      "one": "{count} ausgewählt",
+      "other": "{count} ausgewählt"
+    }
+  },
+  "units": {
+    "size1000": "B kB MB GB TB PB",
+    "size1024": "B KiB MiB GiB TiB PiB",
+    "perSecond": "{size}/s",
+    "day": "{n} d",
+    "hour": "{n} h",
+    "minute": "{n} min",
+    "second": "{n} s"
+  },
+  "theme": {
+    "label": "Design",
+    "auto": "Automatisch (Dashboard)",
+    "spectre": "Spectre",
+    "smoked": "Smoked",
+    "reel": "Reel",
+    "defaulted": "Hell"
+  },
+  "language": {
+    "label": "Sprache",
+    "auto": "Automatisch (Dashboard)"
+  },
+  "a11y": {
+    "skipToList": "Zur Torrent-Liste springen",
+    "loading": "Wird geladen",
+    "notifications": "Benachrichtigungen"
+  },
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen: {message}"
+  },
+  "regions": {
+    "toolbar": "Symbolleiste",
+    "sidebar": "Filter",
+    "table": "Torrents",
+    "details": "Torrent-Details",
+    "statusbar": "Status"
+  },
+  "dialog": {
+    "close": "Dialog schließen"
+  },
+  "toast": {
+    "dismiss": "Benachrichtigung schließen"
+  },
+  "tone": {
+    "info": "Information",
+    "success": "Erfolg",
+    "warning": "Warnung",
+    "error": "Fehler"
+  }
+}

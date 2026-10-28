@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "Transmission",
+    "brand": "QuickBox"
+  },
+  "actions": {
+    "ok": "OK",
+    "cancel": "Annuller",
+    "close": "Luk",
+    "save": "Gem",
+    "apply": "Anvend",
+    "retry": "Prøv igen",
+    "back": "Tilbage",
+    "more": "Mere",
+    "copy": "Kopier",
+    "copied": "Kopieret"
+  },
+  "connection": {
+    "connecting": "Opretter forbindelse til Transmission…",
+    "online": "Forbundet",
+    "offline": "Kan ikke nå Transmission. Prøver igen.",
+    "unauthorized": "Transmission afviste login. Kontroller RPC-brugernavn og adgangskode.",
+    "restored": "Forbindelsen er genoprettet"
+  },
+  "status": {
+    "stopped": "Stoppet",
+    "queued": "I kø",
+    "checking": "Kontrollerer",
+    "downloading": "Downloader",
+    "seeding": "Seeder",
+    "finished": "Færdig",
+    "error": "Fejl"
+  },
+  "count": {
+    "torrents": {
+      "one": "{count} torrent",
+      "other": "{count} torrents"
+    },
+    "selected": {
+      "one": "{count} valgt",
+      "other": "{count} valgt"
+    }
+  },
+  "units": {
+    "size1000": "B kB MB GB TB PB",
+    "size1024": "B KiB MiB GiB TiB PiB",
+    "perSecond": "{size}/s",
+    "day": "{n} d",
+    "hour": "{n} t",
+    "minute": "{n} min",
+    "second": "{n} s"
+  },
+  "theme": {
+    "label": "Tema",
+    "auto": "Automatisk (dashboard)",
+    "spectre": "Spectre",
+    "smoked": "Smoked",
+    "reel": "Reel",
+    "defaulted": "Lyst"
+  },
+  "language": {
+    "label": "Sprog",
+    "auto": "Automatisk (dashboard)"
+  },
+  "a11y": {
+    "skipToList": "Gå til torrentlisten",
+    "loading": "Indlæser",
+    "notifications": "Notifikationer"
+  },
+  "errors": {
+    "generic": "Noget gik galt: {message}"
+  },
+  "regions": {
+    "toolbar": "Værktøjslinje",
+    "sidebar": "Filtre",
+    "table": "Torrents",
+    "details": "Torrentdetaljer",
+    "statusbar": "Status"
+  },
+  "dialog": {
+    "close": "Luk dialogen"
+  },
+  "toast": {
+    "dismiss": "Luk notifikationen"
+  },
+  "tone": {
+    "info": "Information",
+    "success": "Gennemført",
+    "warning": "Advarsel",
+    "error": "Fejl"
+  }
+}

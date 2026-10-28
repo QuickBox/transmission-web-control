@@ -1,0 +1,101 @@
+{
+  "columns": {
+    "name": "Name",
+    "status": "Status",
+    "percentDone": "Fortschritt",
+    "totalSize": "Größe",
+    "rateDownload": "Download",
+    "rateUpload": "Upload",
+    "eta": "Restzeit",
+    "uploadRatio": "Ratio",
+    "seederCount": "Seeder",
+    "leecherCount": "Leecher",
+    "uploadedEver": "Hochgeladen",
+    "addedDate": "Hinzugefügt",
+    "doneDate": "Abgeschlossen",
+    "activityDate": "Zuletzt aktiv",
+    "queuePosition": "Warteschlange",
+    "downloadDir": "Speicherort",
+    "labels": "Labels",
+    "trackers": "Tracker",
+    "id": "ID"
+  },
+  "table": {
+    "selectAll": "Alle Torrents in der Liste auswählen",
+    "selectRow": "{name} auswählen",
+    "sortAscending": "Nach {column} aufsteigend sortieren",
+    "sortDescending": "Nach {column} absteigend sortieren",
+    "trackerWarning": "Tracker-Warnung",
+    "noTorrents": "Noch keine Torrents. Fügen Sie über die Schaltfläche oben einen hinzu oder ziehen Sie eine Datei an eine beliebige Stelle.",
+    "noMatches": "Keine Torrents entsprechen dem aktuellen Filter."
+  },
+  "actions": {
+    "menu": "Filter",
+    "add": "Torrent hinzufügen",
+    "start": "Starten",
+    "pause": "Pausieren",
+    "verify": "Lokale Daten prüfen",
+    "reannounce": "Tracker nach weiteren Peers fragen",
+    "forceStart": "Start erzwingen",
+    "remove": "Entfernen",
+    "move": "Speicherort festlegen",
+    "limits": "Geschwindigkeitslimits",
+    "labels": "Labels",
+    "queue": "Warteschlange",
+    "queueTop": "An den Anfang",
+    "queueUp": "Nach oben",
+    "queueDown": "Nach unten",
+    "queueBottom": "An das Ende",
+    "settings": "Einstellungen",
+    "about": "Info",
+    "replaceTrackers": "Tracker ersetzen",
+    "findData": "Daten suchen"
+  },
+  "search": {
+    "placeholder": "Torrents durchsuchen",
+    "clear": "Suche löschen",
+    "open": "Suchen"
+  },
+  "toolbar": {
+    "transferGroup": "Übertragung",
+    "manageGroup": "Verwalten",
+    "rates": "Download {down}, Upload {up}",
+    "altSpeed": "Temporäre Geschwindigkeitslimits",
+    "collapse": "Seitenleiste einklappen",
+    "expand": "Seitenleiste ausklappen"
+  },
+  "sidebar": {
+    "status": "Status",
+    "labels": "Labels",
+    "trackers": "Tracker",
+    "folders": "Ordner",
+    "all": "Alle",
+    "active": "Aktiv",
+    "stopped": "Pausiert",
+    "warning": "Warnung",
+    "noLabels": "Noch keine Labels",
+    "noTrackers": "Keine Tracker",
+    "noFolders": "Keine Ordner"
+  },
+  "statusbar": {
+    "down": "Download-Rate",
+    "up": "Upload-Rate",
+    "limit": "{rate} von {limit}",
+    "altSpeed": "Temporäre Geschwindigkeitslimits",
+    "altSpeedOn": "Limits aktiv",
+    "free": "Freier Speicherplatz im Download-Ordner",
+    "freeValue": "{free} frei",
+    "port": "Peer-Port",
+    "portOpen": "Port {protocol} offen",
+    "portClosed": "Port {protocol} geschlossen",
+    "portUnknown": "Port {protocol} unbekannt",
+    "version": "Transmission {version}",
+    "rpc": "RPC {rpc}"
+  },
+  "bulkbar": {
+    "clear": "Auswahl aufheben"
+  },
+  "feedback": {
+    "actionFailed": "{action} fehlgeschlagen: {message}"
+  }
+}

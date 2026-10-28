@@ -1,0 +1,101 @@
+{
+  "columns": {
+    "name": "Navn",
+    "status": "Status",
+    "percentDone": "Fremdrift",
+    "totalSize": "Størrelse",
+    "rateDownload": "Ned",
+    "rateUpload": "Op",
+    "eta": "ETA",
+    "uploadRatio": "Ratio",
+    "seederCount": "Seedere",
+    "leecherCount": "Leechere",
+    "uploadedEver": "Uploadet",
+    "addedDate": "Tilføjet",
+    "doneDate": "Gennemført",
+    "activityDate": "Sidst aktiv",
+    "queuePosition": "Kø",
+    "downloadDir": "Placering",
+    "labels": "Etiketter",
+    "trackers": "Trackers",
+    "id": "ID"
+  },
+  "table": {
+    "selectAll": "Markér alle torrents på listen",
+    "selectRow": "Markér {name}",
+    "sortAscending": "Sortér efter {column}, stigende",
+    "sortDescending": "Sortér efter {column}, faldende",
+    "trackerWarning": "Tracker-advarsel",
+    "noTorrents": "Ingen torrents endnu. Tilføj en med knappen ovenfor, eller slip en fil et vilkårligt sted.",
+    "noMatches": "Ingen torrents matcher det aktuelle filter."
+  },
+  "actions": {
+    "menu": "Filtre",
+    "add": "Tilføj torrent",
+    "start": "Start",
+    "pause": "Sæt på pause",
+    "verify": "Kontrollér lokale data",
+    "reannounce": "Bed trackeren om flere peers",
+    "forceStart": "Gennemtving start",
+    "remove": "Fjern",
+    "move": "Angiv placering",
+    "limits": "Hastighedsgrænser",
+    "labels": "Etiketter",
+    "queue": "Kø",
+    "queueTop": "Flyt til toppen",
+    "queueUp": "Flyt op",
+    "queueDown": "Flyt ned",
+    "queueBottom": "Flyt til bunden",
+    "settings": "Indstillinger",
+    "about": "Om",
+    "replaceTrackers": "Erstat trackers",
+    "findData": "Find data"
+  },
+  "search": {
+    "placeholder": "Søg i torrents",
+    "clear": "Ryd søgning",
+    "open": "Søg"
+  },
+  "toolbar": {
+    "transferGroup": "Overførsel",
+    "manageGroup": "Administrer",
+    "rates": "Download {down}, upload {up}",
+    "altSpeed": "Midlertidige hastighedsgrænser",
+    "collapse": "Skjul sidepanelet",
+    "expand": "Vis sidepanelet"
+  },
+  "sidebar": {
+    "status": "Status",
+    "labels": "Etiketter",
+    "trackers": "Trackers",
+    "folders": "Mapper",
+    "all": "Alle",
+    "active": "Aktive",
+    "stopped": "På pause",
+    "warning": "Advarsel",
+    "noLabels": "Ingen etiketter endnu",
+    "noTrackers": "Ingen trackers",
+    "noFolders": "Ingen mapper"
+  },
+  "statusbar": {
+    "down": "Downloadhastighed",
+    "up": "Uploadhastighed",
+    "limit": "{rate} af {limit}",
+    "altSpeed": "Midlertidige hastighedsgrænser",
+    "altSpeedOn": "Grænser aktive",
+    "free": "Ledig plads i downloadmappen",
+    "freeValue": "{free} ledig",
+    "port": "Peer-port",
+    "portOpen": "Port {protocol} åben",
+    "portClosed": "Port {protocol} lukket",
+    "portUnknown": "Port {protocol} ukendt",
+    "version": "Transmission {version}",
+    "rpc": "RPC {rpc}"
+  },
+  "bulkbar": {
+    "clear": "Ryd markering"
+  },
+  "feedback": {
+    "actionFailed": "{action} mislykkedes: {message}"
+  }
+}

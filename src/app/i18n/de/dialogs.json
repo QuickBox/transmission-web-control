@@ -1,0 +1,315 @@
+{
+  "add": {
+    "title": "Torrents hinzufügen",
+    "browse": "Durchsuchen…",
+    "dropHint": "Ziehen Sie .torrent-Dateien hierher oder",
+    "selectedFiles": "Ausgewählte Dateien",
+    "removeFile": "{name} entfernen",
+    "notTorrent": "Auf diese Weise können nur .torrent-Dateien hinzugefügt werden.",
+    "links": "Magnet-Links oder URLs",
+    "linksPlaceholder": "Eine pro Zeile",
+    "invalidLink": "Kein Magnet-Link und keine URL: {line}",
+    "directory": "Herunterladen nach",
+    "free": "{free} frei",
+    "freeOf": "{free} frei von {total}",
+    "freeChecking": "Freier Speicherplatz wird geprüft…",
+    "freeUnknown": "Freier Speicherplatz unbekannt",
+    "labels": "Labels",
+    "labelsPlaceholder": "Durch Kommas getrennt",
+    "labelsFailed": "Hinzugefügt, aber die Labels wurden nicht gespeichert: {message}",
+    "start": "Nach dem Hinzufügen starten",
+    "submit": "Hinzufügen",
+    "noAnswer": "Transmission hat den Torrent nicht bestätigt",
+    "added": {
+      "one": "{total} Torrent hinzugefügt",
+      "other": "{total} Torrents hinzugefügt"
+    },
+    "duplicates": {
+      "one": "{total} Torrent war bereits in der Liste",
+      "other": "{total} Torrents waren bereits in der Liste"
+    },
+    "someFailed": {
+      "one": "{total} konnte nicht hinzugefügt werden",
+      "other": "{total} konnten nicht hinzugefügt werden"
+    },
+    "failedOne": "{name} konnte nicht hinzugefügt werden: {message}",
+    "failedAll": {
+      "one": "{total} Torrent konnte nicht hinzugefügt werden",
+      "other": "Keiner der {total} Torrents konnte hinzugefügt werden"
+    }
+  },
+  "drop": {
+    "title": "Zum Hinzufügen von Torrents ablegen",
+    "hint": "Nur .torrent-Dateien"
+  },
+  "remove": {
+    "titleOne": "Diesen Torrent entfernen?",
+    "titleMany": {
+      "one": "{total} Torrent entfernen?",
+      "other": "{total} Torrents entfernen?"
+    },
+    "message": {
+      "one": "Er verschwindet aus der Liste. Heruntergeladene Daten bleiben auf der Festplatte, sofern Sie sie nicht unten löschen.",
+      "other": "Sie verschwinden aus der Liste. Heruntergeladene Daten bleiben auf der Festplatte, sofern Sie sie nicht unten löschen."
+    },
+    "andMore": {
+      "one": "und {total} weitere",
+      "other": "und {total} weitere"
+    },
+    "deleteData": "Auch die heruntergeladenen Daten löschen",
+    "dataWarning": "Die Dateien werden von der Festplatte gelöscht. Das lässt sich nicht rückgängig machen.",
+    "confirm": "Entfernen",
+    "confirmDelete": "Entfernen und Daten löschen",
+    "done": {
+      "one": "{total} Torrent entfernt",
+      "other": "{total} Torrents entfernt"
+    },
+    "failed": "Entfernen fehlgeschlagen: {message}"
+  },
+  "failed": "Etwas ist schiefgelaufen",
+  "rename": {
+    "title": "Torrent umbenennen",
+    "label": "Neuer Name",
+    "empty": "Geben Sie einen Namen ein.",
+    "slash": "Ein Name darf keinen Schrägstrich enthalten.",
+    "dots": "Ein Name darf nicht . oder .. lauten.",
+    "done": "Umbenannt in {name}"
+  },
+  "location": {
+    "titleOne": "Speicherort der Daten festlegen",
+    "titleMany": {
+      "one": "Speicherort für {total} Torrent festlegen",
+      "other": "Speicherort für {total} Torrents festlegen"
+    },
+    "folder": "Ordner",
+    "differ": "Die ausgewählten Torrents liegen in verschiedenen Ordnern; angezeigt wird der Ordner des ersten.",
+    "mode": "Daten",
+    "move": "Daten in diesen Ordner verschieben",
+    "find": "Die Daten liegen bereits in diesem Ordner",
+    "submit": "Speicherort festlegen",
+    "empty": "Geben Sie einen Ordner ein.",
+    "moving": {
+      "one": "{total} Torrent wird verschoben",
+      "other": "{total} Torrents werden verschoben"
+    },
+    "pointed": {
+      "one": "Speicherort für {total} Torrent festgelegt",
+      "other": "Speicherort für {total} Torrents festgelegt"
+    },
+    "failed": "Der Speicherort konnte nicht festgelegt werden: {message}"
+  },
+  "labels": {
+    "titleOne": "Labels",
+    "titleMany": {
+      "one": "Labels für {total} Torrent",
+      "other": "Labels für {total} Torrents"
+    },
+    "existing": "Verwendete Labels",
+    "add": "Labels hinzufügen",
+    "browserOnly": "Diese Transmission-Version hat keine eigenen Labels, daher werden sie nur in diesem Browser gespeichert.",
+    "importOffer": {
+      "one": "Die Labels für {total} Torrent sind in diesem Browser gespeichert. Kopieren Sie sie nach Transmission, damit jedes Gerät sie sieht; die Kopie im Browser bleibt erhalten.",
+      "other": "Die Labels für {total} Torrents sind in diesem Browser gespeichert. Kopieren Sie sie nach Transmission, damit jedes Gerät sie sieht; die Kopie im Browser bleibt erhalten."
+    },
+    "importAction": "Nach Transmission kopieren",
+    "imported": {
+      "one": "Labels für {total} Torrent kopiert",
+      "other": "Labels für {total} Torrents kopiert"
+    },
+    "importFailed": "Die Labels konnten nicht kopiert werden: {message}",
+    "tooLong": "Ein Label darf höchstens 128 Zeichen lang sein.",
+    "saved": "Labels gespeichert",
+    "failed": "Die Labels konnten nicht gespeichert werden: {message}"
+  },
+  "limits": {
+    "title": "Geschwindigkeitslimits",
+    "torrents": {
+      "one": "Ausgewählter Torrent",
+      "other": "{total} ausgewählte Torrents"
+    },
+    "alt": "Alternative Geschwindigkeit",
+    "altHelp": "Wird anstelle der globalen Limits verwendet, solange die alternative Geschwindigkeit aktiv ist.",
+    "altEnabled": "Alternative Geschwindigkeit aktiv",
+    "altDown": "Download-Limit",
+    "altUp": "Upload-Limit",
+    "mixed": "Die ausgewählten Torrents haben unterschiedliche Werte; nur die Felder, die Sie ändern, werden gespeichert.",
+    "readFailed": "Die aktuellen Limits konnten nicht gelesen werden.",
+    "invalid": "Geben Sie ganze Zahlen in kB/s ein.",
+    "saved": "Geschwindigkeitslimits gespeichert",
+    "failed": "Die Limits konnten nicht gespeichert werden: {message}"
+  },
+  "about": {
+    "title": "Info",
+    "product": "Transmission-Weboberfläche",
+    "uiVersion": "Version {version}",
+    "transmission": "Transmission",
+    "rpc": "RPC",
+    "rpcSemver": "RPC {semver}",
+    "rpcVersion": "Version {rpc}",
+    "jsonrpc": "JSON-RPC",
+    "legacy": "älteres Protokoll",
+    "unknown": "Unbekannt",
+    "credit": "Basiert auf Transmission Web Control von ronggang (MIT)",
+    "original": "Ursprüngliche Weboberfläche"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "saved": "Einstellungen gespeichert",
+    "failed": "Speichern fehlgeschlagen: {message}",
+    "loadFailed": "Die Einstellungen konnten nicht geladen werden: {message}",
+    "invalid": "Korrigieren Sie zuerst die markierten Werte.",
+    "pages": {
+      "downloading": "Downloads",
+      "speed": "Geschwindigkeit",
+      "network": "Netzwerk",
+      "queue": "Warteschlange",
+      "seeding": "Seeding",
+      "blocklist": "Sperrliste",
+      "interface": "Oberfläche"
+    },
+    "rows": {
+      "downloadDir": "Download-Ordner",
+      "startAddedTorrents": "Torrents beim Hinzufügen starten",
+      "trashOriginalTorrentFiles": ".torrent-Dateien nach dem Hinzufügen löschen",
+      "renamePartialFiles": "Unvollständigen Dateien .part anhängen",
+      "incompleteDirEnabled": "Unvollständige Dateien in einem separaten Ordner ablegen",
+      "incompleteDir": "Ordner für unvollständige Dateien",
+      "sequentialDownload": "Neue Torrents der Reihe nach herunterladen",
+      "scriptTorrentAddedEnabled": "Skript ausführen, wenn ein Torrent hinzugefügt wird",
+      "scriptTorrentAddedFilename": "Skript beim Hinzufügen",
+      "scriptTorrentDoneEnabled": "Skript ausführen, wenn ein Torrent fertig ist",
+      "scriptTorrentDoneFilename": "Skript bei Fertigstellung",
+      "scriptTorrentDoneSeedingEnabled": "Skript ausführen, wenn das Seeding endet",
+      "scriptTorrentDoneSeedingFilename": "Skript bei Ende des Seedings",
+      "defaultTrackers": "Standard-Tracker",
+      "speedLimitDownEnabled": "Downloadgeschwindigkeit begrenzen",
+      "speedLimitDown": "Download-Limit",
+      "speedLimitUpEnabled": "Uploadgeschwindigkeit begrenzen",
+      "speedLimitUp": "Upload-Limit",
+      "altSpeedDown": "Alternatives Download-Limit",
+      "altSpeedUp": "Alternatives Upload-Limit",
+      "altSpeedTimeEnabled": "Alternative Geschwindigkeit nach Zeitplan verwenden",
+      "altSpeedTimeBegin": "Von",
+      "altSpeedTimeEnd": "Bis",
+      "altSpeedTimeDay": "Tage",
+      "peerPort": "Peer-Port",
+      "peerPortRandomOnStart": "Beim Start einen zufälligen Port wählen",
+      "portForwardingEnabled": "Port per UPnP oder NAT-PMP weiterleiten",
+      "encryption": "Verschlüsselung",
+      "peerLimitGlobal": "Maximale Peers insgesamt",
+      "peerLimitPerTorrent": "Maximale Peers pro Torrent",
+      "dhtEnabled": "DHT verwenden",
+      "pexEnabled": "Peer-Austausch (PEX) verwenden",
+      "lpdEnabled": "Lokale Peer-Erkennung verwenden",
+      "utpEnabled": "µTP verwenden",
+      "tcpEnabled": "TCP verwenden",
+      "preferredTransports": "Transportprotokolle",
+      "downloadQueueEnabled": "Aktive Downloads begrenzen",
+      "downloadQueueSize": "Aktive Downloads",
+      "seedQueueEnabled": "Aktive Seeds begrenzen",
+      "seedQueueSize": "Aktive Seeds",
+      "queueStalledEnabled": "Festgefahrene Torrents als inaktiv zählen",
+      "queueStalledMinutes": "Festgefahren nach",
+      "seedRatioLimited": "Seeding bei einer Ratio beenden",
+      "seedRatioLimit": "Ratio",
+      "idleSeedingLimitEnabled": "Seeding bei Inaktivität beenden",
+      "idleSeedingLimit": "Inaktiv für",
+      "blocklistEnabled": "Sperrliste verwenden",
+      "blocklistUrl": "URL der Sperrliste"
+    },
+    "scriptHelp": "Transmission führt dieses Programm aus und übergibt die Details des Torrents in Umgebungsvariablen wie TR_TORRENT_NAME, TR_TORRENT_DIR und TR_TORRENT_HASH.",
+    "defaultTrackersHelp": "Wird jedem öffentlichen Torrent hinzugefügt. Eine URL pro Zeile; eine Leerzeile beginnt eine neue Ebene.",
+    "transportsHelp": "Diese Transmission-Version legt die Transportprotokolle in ihrer Einstellungsdatei fest; sie werden hier nur zur Information angezeigt.",
+    "languageHelp": "Beim Ändern der Sprache wird die Seite neu geladen.",
+    "encryption": {
+      "required": "Verschlüsselung verlangen",
+      "preferred": "Verschlüsselung bevorzugen",
+      "tolerated": "Unverschlüsselt zulassen"
+    },
+    "custom": "Benutzerdefiniert ({value})",
+    "kbps": "kB/s",
+    "minutes": "Minuten",
+    "seconds": "Sekunden",
+    "days": {
+      "0": "So",
+      "1": "Mo",
+      "2": "Di",
+      "3": "Mi",
+      "4": "Do",
+      "5": "Fr",
+      "6": "Sa"
+    },
+    "portStatus": "Port",
+    "testPort": "Port testen",
+    "testing": "Wird getestet…",
+    "port": {
+      "ipv4": "IPv4 {state}",
+      "ipv6": "IPv6 {state}",
+      "any": "Port {state}",
+      "open": "offen",
+      "closed": "geschlossen",
+      "unknown": "unbekannt"
+    },
+    "portFailed": "Der Port konnte nicht getestet werden: {message}",
+    "blocklistSize": {
+      "one": "{total} Regel",
+      "other": "{total} Regeln"
+    },
+    "blocklistUpdate": "Jetzt aktualisieren",
+    "blocklistUpdated": "Sperrliste aktualisiert",
+    "blocklistFailed": "Die Sperrliste konnte nicht aktualisiert werden: {message}",
+    "pollInterval": "Aktualisieren alle",
+    "backup": "Einstellungsdatei",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "importInvalid": "Dies ist keine Einstellungsdatei dieser Oberfläche.",
+    "imported": "Einstellungen importiert",
+    "importFailed": "Import fehlgeschlagen: {message}",
+    "list": "Torrent-Liste",
+    "listHelp": "Diese Einstellungen gelten sofort.",
+    "compactRows": "Kompakte Zeilen",
+    "columns": "Spalten",
+    "columnsReset": "Auf Standard zurücksetzen"
+  },
+  "replace": {
+    "title": "Tracker ersetzen",
+    "submit": "Ersetzen",
+    "find": "Zu ersetzende Announce-URL",
+    "with": "Ersetzen durch",
+    "matches": {
+      "one": "{total} Torrent verwendet sie",
+      "other": "{total} Torrents verwenden sie"
+    },
+    "same": "Die beiden URLs sind identisch.",
+    "none": "Kein Torrent im Suchbereich verwendet diese URL.",
+    "done": {
+      "one": "{total} Torrent aktualisiert",
+      "other": "{total} Torrents aktualisiert"
+    },
+    "failed": "Nach {done} von {total} abgebrochen: {message}",
+    "scopeSelected": {
+      "one": "Durchsucht den ausgewählten Torrent.",
+      "other": "Durchsucht die {total} ausgewählten Torrents."
+    },
+    "scopeAll": "Durchsucht alle Torrents."
+  },
+  "match": {
+    "title": "Daten suchen",
+    "submit": "Starten",
+    "description": {
+      "one": "{total} Torrent auf einen Ordner richten, der seine Daten bereits enthält. Es wird nichts verschoben.",
+      "other": "{total} Torrents auf einen Ordner richten, der ihre Daten bereits enthält. Es wird nichts verschoben."
+    },
+    "folders": "Zu prüfende Ordner",
+    "help": "Ein Ordner pro Zeile, in dieser Reihenfolge geprüft. Ein Torrent behält den ersten Ordner, in dem eine Prüfung seine Daten findet.",
+    "noFolders": "Geben Sie mindestens einen Ordner ein.",
+    "trying": "{name} ({n} von {of}): {folder} wird geprüft ({i} von {folders})",
+    "notFound": "Kein Ordner passte",
+    "hasData": "Hat bereits Daten",
+    "stop": "Anhalten",
+    "stopping": "Wird nach dieser Prüfung angehalten…",
+    "stopped": "Angehalten",
+    "finished": "Daten für {found} von {total} gefunden",
+    "failed": "Angehalten: {message}"
+  }
+}

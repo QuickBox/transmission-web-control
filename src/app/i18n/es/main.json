@@ -1,0 +1,101 @@
+{
+  "columns": {
+    "name": "Nombre",
+    "status": "Estado",
+    "percentDone": "Progreso",
+    "totalSize": "Tamaño",
+    "rateDownload": "Descarga",
+    "rateUpload": "Subida",
+    "eta": "Restante",
+    "uploadRatio": "Ratio",
+    "seederCount": "Semillas",
+    "leecherCount": "Descargadores",
+    "uploadedEver": "Subido",
+    "addedDate": "Añadido",
+    "doneDate": "Completado",
+    "activityDate": "Última actividad",
+    "queuePosition": "Cola",
+    "downloadDir": "Ubicación",
+    "labels": "Etiquetas",
+    "trackers": "Trackers",
+    "id": "ID"
+  },
+  "table": {
+    "selectAll": "Seleccionar todos los torrents de la lista",
+    "selectRow": "Seleccionar {name}",
+    "sortAscending": "Ordenar por {column}, ascendente",
+    "sortDescending": "Ordenar por {column}, descendente",
+    "trackerWarning": "Advertencia del tracker",
+    "noTorrents": "Aún no hay torrents. Añade uno con el botón de arriba o suelta un archivo en cualquier lugar.",
+    "noMatches": "Ningún torrent coincide con el filtro actual."
+  },
+  "actions": {
+    "menu": "Filtros",
+    "add": "Añadir torrent",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "verify": "Verificar datos locales",
+    "reannounce": "Pedir más pares al tracker",
+    "forceStart": "Forzar inicio",
+    "remove": "Quitar",
+    "move": "Establecer ubicación",
+    "limits": "Límites de velocidad",
+    "labels": "Etiquetas",
+    "queue": "Cola",
+    "queueTop": "Mover al principio",
+    "queueUp": "Subir",
+    "queueDown": "Bajar",
+    "queueBottom": "Mover al final",
+    "settings": "Ajustes",
+    "about": "Acerca de",
+    "replaceTrackers": "Reemplazar trackers",
+    "findData": "Buscar datos"
+  },
+  "search": {
+    "placeholder": "Buscar torrents",
+    "clear": "Borrar búsqueda",
+    "open": "Buscar"
+  },
+  "toolbar": {
+    "transferGroup": "Transferencia",
+    "manageGroup": "Gestionar",
+    "rates": "Descarga {down}, subida {up}",
+    "altSpeed": "Límites de velocidad temporales",
+    "collapse": "Contraer la barra lateral",
+    "expand": "Expandir la barra lateral"
+  },
+  "sidebar": {
+    "status": "Estado",
+    "labels": "Etiquetas",
+    "trackers": "Trackers",
+    "folders": "Carpetas",
+    "all": "Todos",
+    "active": "Activos",
+    "stopped": "En pausa",
+    "warning": "Advertencia",
+    "noLabels": "Aún no hay etiquetas",
+    "noTrackers": "Sin trackers",
+    "noFolders": "Sin carpetas"
+  },
+  "statusbar": {
+    "down": "Velocidad de descarga",
+    "up": "Velocidad de subida",
+    "limit": "{rate} de {limit}",
+    "altSpeed": "Límites de velocidad temporales",
+    "altSpeedOn": "Límites activados",
+    "free": "Espacio libre en la carpeta de descargas",
+    "freeValue": "{free} libres",
+    "port": "Puerto de pares",
+    "portOpen": "Puerto {protocol} abierto",
+    "portClosed": "Puerto {protocol} cerrado",
+    "portUnknown": "Puerto {protocol} desconocido",
+    "version": "Transmission {version}",
+    "rpc": "RPC {rpc}"
+  },
+  "bulkbar": {
+    "clear": "Borrar selección"
+  },
+  "feedback": {
+    "actionFailed": "Error en «{action}»: {message}"
+  }
+}
