@@ -25,7 +25,6 @@
     "uploadSpeed": "上传速度",
     "eta": "剩余时间",
     "peers": "对等节点",
-    "peersValue": "已连接 {connected} · 上传 {sending} · 下载 {getting}",
     "seeders": "做种者",
     "leechers": "下载者",
     "size": "大小",
@@ -48,7 +47,8 @@
     "created": "创建时间",
     "creator": "创建者",
     "comment": "注释",
-    "trackerWarning": "追踪器：{message}"
+    "trackerWarning": "追踪器：{message}",
+    "peersDetail": "上传 {sending} · 下载 {getting}"
   },
   "files": {
     "label": "文件",
@@ -96,10 +96,15 @@
     }
   },
   "trackers": {
-    "summary": {
-      "one": "{total} 个追踪器，共 {tiers} 层",
-      "other": "{total} 个追踪器，共 {tiers} 层"
+    "count": {
+      "one": "{total} 个追踪器",
+      "other": "{total} 个追踪器"
     },
+    "tiers": {
+      "one": "{total} 层",
+      "other": "{total} 层"
+    },
+    "countInTiers": "{trackers}，共 {tiers}",
     "none": "此种子没有追踪器。",
     "tier": "第 {n} 层",
     "edit": "编辑追踪器",

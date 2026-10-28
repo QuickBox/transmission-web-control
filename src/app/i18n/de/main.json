@@ -85,17 +85,63 @@
     "altSpeedOn": "Limits aktiv",
     "free": "Freier Speicherplatz im Download-Ordner",
     "freeValue": "{free} frei",
+    "freeChecking": "Freier Speicherplatz wird geprüft",
     "port": "Peer-Port",
-    "portOpen": "Port {protocol} offen",
-    "portClosed": "Port {protocol} geschlossen",
-    "portUnknown": "Port {protocol} unbekannt",
+    "portLine": "Port {port}: {states}",
+    "portProtocol": "{protocol} {state}",
+    "portStateOpen": "offen",
+    "portStateClosed": "geschlossen",
+    "portStateUnknown": "unbekannt",
+    "portStateUnavailable": "nicht verfügbar",
+    "portStateChecking": "wird geprüft",
     "version": "Transmission {version}",
-    "rpc": "RPC {rpc}"
+    "versionTip": "Versionen von Transmission und RPC",
+    "countsOf": "{shown} von {total}",
+    "rpc": "RPC {rpc}",
+    "rpcSemver": "RPC semver {semver}"
   },
   "bulkbar": {
     "clear": "Auswahl aufheben"
   },
   "feedback": {
-    "actionFailed": "{action} fehlgeschlagen: {message}"
+    "actionFailed": "{action} fehlgeschlagen: {message}",
+    "done": {
+      "start": {
+        "one": "{total} Torrent gestartet",
+        "other": "{total} Torrents gestartet"
+      },
+      "pause": {
+        "one": "{total} Torrent pausiert",
+        "other": "{total} Torrents pausiert"
+      },
+      "verify": {
+        "one": "{total} Torrent wird geprüft",
+        "other": "{total} Torrents werden geprüft"
+      },
+      "reannounce": {
+        "one": "Tracker zu {total} Torrent befragt",
+        "other": "Tracker zu {total} Torrents befragt"
+      },
+      "forceStart": {
+        "one": "Start von {total} Torrent erzwungen",
+        "other": "Start von {total} Torrents erzwungen"
+      },
+      "queueTop": {
+        "one": "{total} Torrent an den Anfang der Warteschlange verschoben",
+        "other": "{total} Torrents an den Anfang der Warteschlange verschoben"
+      },
+      "queueUp": {
+        "one": "{total} Torrent in der Warteschlange nach oben verschoben",
+        "other": "{total} Torrents in der Warteschlange nach oben verschoben"
+      },
+      "queueDown": {
+        "one": "{total} Torrent in der Warteschlange nach unten verschoben",
+        "other": "{total} Torrents in der Warteschlange nach unten verschoben"
+      },
+      "queueBottom": {
+        "one": "{total} Torrent an das Ende der Warteschlange verschoben",
+        "other": "{total} Torrents an das Ende der Warteschlange verschoben"
+      }
+    }
   }
 }

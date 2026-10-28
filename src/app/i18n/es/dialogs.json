@@ -248,7 +248,8 @@
       "any": "Puerto {state}",
       "open": "abierto",
       "closed": "cerrado",
-      "unknown": "desconocido"
+      "unknown": "desconocido",
+      "unavailable": "no disponible"
     },
     "portFailed": "No se pudo probar el puerto: {message}",
     "blocklistSize": {

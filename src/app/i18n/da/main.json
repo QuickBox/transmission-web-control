@@ -85,17 +85,63 @@
     "altSpeedOn": "Grænser aktive",
     "free": "Ledig plads i downloadmappen",
     "freeValue": "{free} ledig",
+    "freeChecking": "Kontrollerer ledig plads",
     "port": "Peer-port",
-    "portOpen": "Port {protocol} åben",
-    "portClosed": "Port {protocol} lukket",
-    "portUnknown": "Port {protocol} ukendt",
+    "portLine": "Port {port}: {states}",
+    "portProtocol": "{protocol} {state}",
+    "portStateOpen": "åben",
+    "portStateClosed": "lukket",
+    "portStateUnknown": "ukendt",
+    "portStateUnavailable": "utilgængelig",
+    "portStateChecking": "kontrollerer",
     "version": "Transmission {version}",
-    "rpc": "RPC {rpc}"
+    "versionTip": "Versioner af Transmission og RPC",
+    "countsOf": "{shown} af {total}",
+    "rpc": "RPC {rpc}",
+    "rpcSemver": "RPC semver {semver}"
   },
   "bulkbar": {
     "clear": "Ryd markering"
   },
   "feedback": {
-    "actionFailed": "{action} mislykkedes: {message}"
+    "actionFailed": "{action} mislykkedes: {message}",
+    "done": {
+      "start": {
+        "one": "{total} torrent startet",
+        "other": "{total} torrents startet"
+      },
+      "pause": {
+        "one": "{total} torrent sat på pause",
+        "other": "{total} torrents sat på pause"
+      },
+      "verify": {
+        "one": "Kontrollerer {total} torrent",
+        "other": "Kontrollerer {total} torrents"
+      },
+      "reannounce": {
+        "one": "Spurgte trackerne om {total} torrent",
+        "other": "Spurgte trackerne om {total} torrents"
+      },
+      "forceStart": {
+        "one": "Gennemtvang start af {total} torrent",
+        "other": "Gennemtvang start af {total} torrents"
+      },
+      "queueTop": {
+        "one": "Flyttede {total} torrent til toppen af køen",
+        "other": "Flyttede {total} torrents til toppen af køen"
+      },
+      "queueUp": {
+        "one": "Flyttede {total} torrent op i køen",
+        "other": "Flyttede {total} torrents op i køen"
+      },
+      "queueDown": {
+        "one": "Flyttede {total} torrent ned i køen",
+        "other": "Flyttede {total} torrents ned i køen"
+      },
+      "queueBottom": {
+        "one": "Flyttede {total} torrent til bunden af køen",
+        "other": "Flyttede {total} torrents til bunden af køen"
+      }
+    }
   }
 }

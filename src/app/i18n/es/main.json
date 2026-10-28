@@ -85,17 +85,63 @@
     "altSpeedOn": "Límites activados",
     "free": "Espacio libre en la carpeta de descargas",
     "freeValue": "{free} libres",
+    "freeChecking": "Comprobando el espacio libre",
     "port": "Puerto de pares",
-    "portOpen": "Puerto {protocol} abierto",
-    "portClosed": "Puerto {protocol} cerrado",
-    "portUnknown": "Puerto {protocol} desconocido",
+    "portLine": "Puerto {port}: {states}",
+    "portProtocol": "{protocol} {state}",
+    "portStateOpen": "abierto",
+    "portStateClosed": "cerrado",
+    "portStateUnknown": "desconocido",
+    "portStateUnavailable": "no disponible",
+    "portStateChecking": "comprobando",
     "version": "Transmission {version}",
-    "rpc": "RPC {rpc}"
+    "versionTip": "Versiones de Transmission y de RPC",
+    "countsOf": "{shown} de {total}",
+    "rpc": "RPC {rpc}",
+    "rpcSemver": "RPC semver {semver}"
   },
   "bulkbar": {
     "clear": "Borrar selección"
   },
   "feedback": {
-    "actionFailed": "Error en «{action}»: {message}"
+    "actionFailed": "Error en «{action}»: {message}",
+    "done": {
+      "start": {
+        "one": "{total} torrent iniciado",
+        "other": "{total} torrents iniciados"
+      },
+      "pause": {
+        "one": "{total} torrent pausado",
+        "other": "{total} torrents pausados"
+      },
+      "verify": {
+        "one": "Verificando {total} torrent",
+        "other": "Verificando {total} torrents"
+      },
+      "reannounce": {
+        "one": "Se consultó a los trackers sobre {total} torrent",
+        "other": "Se consultó a los trackers sobre {total} torrents"
+      },
+      "forceStart": {
+        "one": "Inicio forzado de {total} torrent",
+        "other": "Inicio forzado de {total} torrents"
+      },
+      "queueTop": {
+        "one": "{total} torrent movido al principio de la cola",
+        "other": "{total} torrents movidos al principio de la cola"
+      },
+      "queueUp": {
+        "one": "{total} torrent subido en la cola",
+        "other": "{total} torrents subidos en la cola"
+      },
+      "queueDown": {
+        "one": "{total} torrent bajado en la cola",
+        "other": "{total} torrents bajados en la cola"
+      },
+      "queueBottom": {
+        "one": "{total} torrent movido al final de la cola",
+        "other": "{total} torrents movidos al final de la cola"
+      }
+    }
   }
 }

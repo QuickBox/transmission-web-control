@@ -25,7 +25,6 @@
     "uploadSpeed": "Velocidad de subida",
     "eta": "Tiempo restante",
     "peers": "Pares",
-    "peersValue": "{connected} conectados · {sending} enviando · {getting} recibiendo",
     "seeders": "Semillas",
     "leechers": "Descargadores",
     "size": "Tamaño",
@@ -48,7 +47,8 @@
     "created": "Creado",
     "creator": "Creado por",
     "comment": "Comentario",
-    "trackerWarning": "Tracker: {message}"
+    "trackerWarning": "Tracker: {message}",
+    "peersDetail": "{sending} enviando · {getting} recibiendo"
   },
   "files": {
     "label": "Archivos",
@@ -96,10 +96,15 @@
     }
   },
   "trackers": {
-    "summary": {
-      "one": "{total} tracker en {tiers} nivel",
-      "other": "{total} trackers en {tiers} niveles"
+    "count": {
+      "one": "{total} tracker",
+      "other": "{total} trackers"
     },
+    "tiers": {
+      "one": "{total} nivel",
+      "other": "{total} niveles"
+    },
+    "countInTiers": "{trackers} en {tiers}",
     "none": "Este torrent no tiene trackers.",
     "tier": "Nivel {n}",
     "edit": "Editar trackers",

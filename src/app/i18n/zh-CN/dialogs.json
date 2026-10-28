@@ -248,7 +248,8 @@
       "any": "端口{state}",
       "open": "已开放",
       "closed": "已关闭",
-      "unknown": "状态未知"
+      "unknown": "状态未知",
+      "unavailable": "不可用"
     },
     "portFailed": "无法测试端口：{message}",
     "blocklistSize": {

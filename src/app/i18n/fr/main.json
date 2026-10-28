@@ -85,17 +85,63 @@
     "altSpeedOn": "Limites actives",
     "free": "Espace libre dans le dossier de téléchargement",
     "freeValue": "{free} libres",
+    "freeChecking": "Vérification de l’espace libre",
     "port": "Port d’écoute des pairs",
-    "portOpen": "Port {protocol} ouvert",
-    "portClosed": "Port {protocol} fermé",
-    "portUnknown": "Port {protocol} : état inconnu",
+    "portLine": "Port {port} : {states}",
+    "portProtocol": "{protocol} {state}",
+    "portStateOpen": "ouvert",
+    "portStateClosed": "fermé",
+    "portStateUnknown": "inconnu",
+    "portStateUnavailable": "indisponible",
+    "portStateChecking": "vérification",
     "version": "Transmission {version}",
-    "rpc": "RPC {rpc}"
+    "versionTip": "Versions de Transmission et de RPC",
+    "countsOf": "{shown} sur {total}",
+    "rpc": "RPC {rpc}",
+    "rpcSemver": "RPC semver {semver}"
   },
   "bulkbar": {
     "clear": "Annuler la sélection"
   },
   "feedback": {
-    "actionFailed": "Échec de l’action {action} : {message}"
+    "actionFailed": "Échec de « {action} » : {message}",
+    "done": {
+      "start": {
+        "one": "{total} torrent démarré",
+        "other": "{total} torrents démarrés"
+      },
+      "pause": {
+        "one": "{total} torrent mis en pause",
+        "other": "{total} torrents mis en pause"
+      },
+      "verify": {
+        "one": "Vérification de {total} torrent",
+        "other": "Vérification de {total} torrents"
+      },
+      "reannounce": {
+        "one": "Trackers interrogés pour {total} torrent",
+        "other": "Trackers interrogés pour {total} torrents"
+      },
+      "forceStart": {
+        "one": "Démarrage forcé de {total} torrent",
+        "other": "Démarrage forcé de {total} torrents"
+      },
+      "queueTop": {
+        "one": "{total} torrent placé en tête de la file",
+        "other": "{total} torrents placés en tête de la file"
+      },
+      "queueUp": {
+        "one": "{total} torrent monté dans la file",
+        "other": "{total} torrents montés dans la file"
+      },
+      "queueDown": {
+        "one": "{total} torrent descendu dans la file",
+        "other": "{total} torrents descendus dans la file"
+      },
+      "queueBottom": {
+        "one": "{total} torrent placé en queue de file",
+        "other": "{total} torrents placés en queue de file"
+      }
+    }
   }
 }

@@ -25,7 +25,6 @@
     "uploadSpeed": "Velocidade de upload",
     "eta": "Tempo restante",
     "peers": "Pares",
-    "peersValue": "{connected} conectados · {sending} enviando · {getting} recebendo",
     "seeders": "Semeadores",
     "leechers": "Sanguessugas",
     "size": "Tamanho",
@@ -48,7 +47,8 @@
     "created": "Criado em",
     "creator": "Criado por",
     "comment": "Comentário",
-    "trackerWarning": "Rastreador: {message}"
+    "trackerWarning": "Rastreador: {message}",
+    "peersDetail": "{sending} enviando · {getting} recebendo"
   },
   "files": {
     "label": "Arquivos",
@@ -96,10 +96,15 @@
     }
   },
   "trackers": {
-    "summary": {
-      "one": "{total} rastreador em {tiers} nível",
-      "other": "{total} rastreadores em {tiers} níveis"
+    "count": {
+      "one": "{total} rastreador",
+      "other": "{total} rastreadores"
     },
+    "tiers": {
+      "one": "{total} nível",
+      "other": "{total} níveis"
+    },
+    "countInTiers": "{trackers} em {tiers}",
     "none": "Este torrent não tem rastreadores.",
     "tier": "Nível {n}",
     "edit": "Editar rastreadores",

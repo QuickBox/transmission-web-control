@@ -248,7 +248,8 @@
       "any": "Porta {state}",
       "open": "aberta",
       "closed": "fechada",
-      "unknown": "desconhecida"
+      "unknown": "desconhecida",
+      "unavailable": "indisponível"
     },
     "portFailed": "Não foi possível testar a porta: {message}",
     "blocklistSize": {

@@ -248,7 +248,8 @@
       "any": "Port {state}",
       "open": "åben",
       "closed": "lukket",
-      "unknown": "ukendt"
+      "unknown": "ukendt",
+      "unavailable": "utilgængelig"
     },
     "portFailed": "Kunne ikke teste porten: {message}",
     "blocklistSize": {

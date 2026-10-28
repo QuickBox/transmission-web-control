@@ -85,17 +85,63 @@
     "altSpeedOn": "限制已启用",
     "free": "下载文件夹的可用空间",
     "freeValue": "可用 {free}",
+    "freeChecking": "正在检查可用空间",
     "port": "对等节点端口",
-    "portOpen": "{protocol} 端口已开放",
-    "portClosed": "{protocol} 端口已关闭",
-    "portUnknown": "{protocol} 端口状态未知",
+    "portLine": "端口 {port}：{states}",
+    "portProtocol": "{protocol} {state}",
+    "portStateOpen": "已开放",
+    "portStateClosed": "已关闭",
+    "portStateUnknown": "状态未知",
+    "portStateUnavailable": "不可用",
+    "portStateChecking": "检查中",
     "version": "Transmission {version}",
-    "rpc": "RPC {rpc}"
+    "versionTip": "Transmission 和 RPC 版本",
+    "countsOf": "{shown} / {total}",
+    "rpc": "RPC {rpc}",
+    "rpcSemver": "RPC semver {semver}"
   },
   "bulkbar": {
     "clear": "取消选择"
   },
   "feedback": {
-    "actionFailed": "操作失败（{action}）：{message}"
+    "actionFailed": "操作失败（{action}）：{message}",
+    "done": {
+      "start": {
+        "one": "已开始 {total} 个种子",
+        "other": "已开始 {total} 个种子"
+      },
+      "pause": {
+        "one": "已暂停 {total} 个种子",
+        "other": "已暂停 {total} 个种子"
+      },
+      "verify": {
+        "one": "正在校验 {total} 个种子",
+        "other": "正在校验 {total} 个种子"
+      },
+      "reannounce": {
+        "one": "已就 {total} 个种子询问追踪器",
+        "other": "已就 {total} 个种子询问追踪器"
+      },
+      "forceStart": {
+        "one": "已强制开始 {total} 个种子",
+        "other": "已强制开始 {total} 个种子"
+      },
+      "queueTop": {
+        "one": "已将 {total} 个种子移到队列顶部",
+        "other": "已将 {total} 个种子移到队列顶部"
+      },
+      "queueUp": {
+        "one": "已将 {total} 个种子在队列中上移",
+        "other": "已将 {total} 个种子在队列中上移"
+      },
+      "queueDown": {
+        "one": "已将 {total} 个种子在队列中下移",
+        "other": "已将 {total} 个种子在队列中下移"
+      },
+      "queueBottom": {
+        "one": "已将 {total} 个种子移到队列底部",
+        "other": "已将 {total} 个种子移到队列底部"
+      }
+    }
   }
 }

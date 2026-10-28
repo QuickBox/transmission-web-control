@@ -25,7 +25,6 @@
     "uploadSpeed": "Uploadhastighed",
     "eta": "Tid tilbage",
     "peers": "Peers",
-    "peersValue": "{connected} forbundet · {sending} sender · {getting} modtager",
     "seeders": "Seedere",
     "leechers": "Leechere",
     "size": "Størrelse",
@@ -48,7 +47,8 @@
     "created": "Oprettet",
     "creator": "Oprettet af",
     "comment": "Kommentar",
-    "trackerWarning": "Tracker: {message}"
+    "trackerWarning": "Tracker: {message}",
+    "peersDetail": "{sending} sender · {getting} modtager"
   },
   "files": {
     "label": "Filer",
@@ -96,10 +96,15 @@
     }
   },
   "trackers": {
-    "summary": {
-      "one": "{total} tracker i {tiers} niveau",
-      "other": "{total} trackers i {tiers} niveauer"
+    "count": {
+      "one": "{total} tracker",
+      "other": "{total} trackers"
     },
+    "tiers": {
+      "one": "{total} niveau",
+      "other": "{total} niveauer"
+    },
+    "countInTiers": "{trackers} i {tiers}",
     "none": "Denne torrent har ingen trackers.",
     "tier": "Niveau {n}",
     "edit": "Rediger trackers",

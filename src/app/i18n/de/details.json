@@ -25,7 +25,6 @@
     "uploadSpeed": "Uploadgeschwindigkeit",
     "eta": "Verbleibende Zeit",
     "peers": "Peers",
-    "peersValue": "{connected} verbunden · {sending} senden · {getting} empfangen",
     "seeders": "Seeder",
     "leechers": "Leecher",
     "size": "Größe",
@@ -48,7 +47,8 @@
     "created": "Erstellt",
     "creator": "Erstellt von",
     "comment": "Kommentar",
-    "trackerWarning": "Tracker: {message}"
+    "trackerWarning": "Tracker: {message}",
+    "peersDetail": "{sending} senden · {getting} empfangen"
   },
   "files": {
     "label": "Dateien",
@@ -88,7 +88,7 @@
     "progress": "Hat",
     "down": "Download",
     "up": "Upload",
-    "flags": "Flags",
+    "flags": "Kennzeichen",
     "none": "Keine Peers verbunden.",
     "count": {
       "one": "{total} Peer",
@@ -96,10 +96,15 @@
     }
   },
   "trackers": {
-    "summary": {
-      "one": "{total} Tracker in {tiers} Ebene",
-      "other": "{total} Tracker in {tiers} Ebenen"
+    "count": {
+      "one": "{total} Tracker",
+      "other": "{total} Tracker"
     },
+    "tiers": {
+      "one": "{total} Ebene",
+      "other": "{total} Ebenen"
+    },
+    "countInTiers": "{trackers} in {tiers}",
     "none": "Dieser Torrent hat keine Tracker.",
     "tier": "Ebene {n}",
     "edit": "Tracker bearbeiten",
