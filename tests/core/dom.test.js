@@ -94,12 +94,20 @@ test('markup, handler strings, native tooltips and unknown props are refused', (
   assert.throws(() => el('div', { on: { click: 'alert(1)' } }), /not a function/);
 });
 
-test('href refuses schemes except blob:', () => {
-  assert.equal(el('a', { href: 'index.original.html' }).attributes.get('href'), 'index.original.html');
-  assert.equal(el('a', { href: '#settings' }).attributes.get('href'), '#settings');
-  assert.equal(el('a', { href: 'blob:abc' }).attributes.get('href'), 'blob:abc');
-  for (const href of ['javascript:alert(1)', ' JavaScript:x', 'data:text/html,x', 'mailto:a@b', 'ftp:x']) {
-    assert.throws(() => el('a', { href }), /refused href/, href);
+test('href allows fragments, same-origin relative paths and blob: only', () => {
+  for (const href of [
+    'index.original.html', './index.original.html', '../web/index.html', 'a/b-c_d.html?x=1&y=2#top',
+    'folder/', '#settings', '#', 'blob:abc', 'blob:http:%2F%2Fhost/1f2e-3d',
+  ]) {
+    assert.equal(el('a', { href }).attributes.get('href'), href, href);
+  }
+  for (const href of [
+    'javascript:alert(1)', ' JavaScript:x', 'java\tscript:alert(1)', 'java\nscript:alert(1)', '\u0001javascript:x',
+    'data:text/html,x', 'mailto:a@b', 'ftp:x', 'vbscript:x',
+    '//evil.example/x', '/\\evil.example', '\\\\evil.example', '/index.html', 'a b.html', 'a/../:b',
+    '', ' ', 'index.html?q=<x>', 'blob: x',
+  ]) {
+    assert.throws(() => el('a', { href }), /refused href/, JSON.stringify(href));
   }
 });
 

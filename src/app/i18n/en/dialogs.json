@@ -20,11 +20,23 @@
     "start": "Start when added",
     "submit": "Add",
     "noAnswer": "Transmission did not confirm the torrent",
-    "added": { "one": "Added {total} torrent", "other": "Added {total} torrents" },
-    "duplicates": { "one": "{total} torrent was already in the list", "other": "{total} torrents were already in the list" },
-    "someFailed": { "one": "{total} could not be added", "other": "{total} could not be added" },
+    "added": {
+      "one": "Added {total} torrent",
+      "other": "Added {total} torrents"
+    },
+    "duplicates": {
+      "one": "{total} torrent was already in the list",
+      "other": "{total} torrents were already in the list"
+    },
+    "someFailed": {
+      "one": "{total} could not be added",
+      "other": "{total} could not be added"
+    },
     "failedOne": "Could not add {name}: {message}",
-    "failedAll": { "one": "{total} torrent could not be added", "other": "None of the {total} torrents could be added" }
+    "failedAll": {
+      "one": "{total} torrent could not be added",
+      "other": "None of the {total} torrents could be added"
+    }
   },
   "drop": {
     "title": "Drop to add torrents",
@@ -32,14 +44,112 @@
   },
   "remove": {
     "titleOne": "Remove this torrent?",
-    "titleMany": { "one": "Remove {total} torrent?", "other": "Remove {total} torrents?" },
-    "message": { "one": "It leaves the list. Downloaded data stays on disk unless you delete it below.", "other": "They leave the list. Downloaded data stays on disk unless you delete it below." },
-    "andMore": { "one": "and {total} more", "other": "and {total} more" },
+    "titleMany": {
+      "one": "Remove {total} torrent?",
+      "other": "Remove {total} torrents?"
+    },
+    "message": {
+      "one": "It leaves the list. Downloaded data stays on disk unless you delete it below.",
+      "other": "They leave the list. Downloaded data stays on disk unless you delete it below."
+    },
+    "andMore": {
+      "one": "and {total} more",
+      "other": "and {total} more"
+    },
     "deleteData": "Also delete the downloaded data",
     "dataWarning": "The files are deleted from disk. This cannot be undone.",
     "confirm": "Remove",
     "confirmDelete": "Remove and delete data",
-    "done": { "one": "Removed {total} torrent", "other": "Removed {total} torrents" },
+    "done": {
+      "one": "Removed {total} torrent",
+      "other": "Removed {total} torrents"
+    },
     "failed": "Could not remove: {message}"
+  },
+  "failed": "Something went wrong",
+  "rename": {
+    "title": "Rename torrent",
+    "label": "New name",
+    "empty": "Enter a name.",
+    "slash": "A name cannot contain a slash.",
+    "dots": "A name cannot be . or ..",
+    "done": "Renamed to {name}"
+  },
+  "location": {
+    "titleOne": "Set data location",
+    "titleMany": {
+      "one": "Set the location of {total} torrent",
+      "other": "Set the location of {total} torrents"
+    },
+    "folder": "Folder",
+    "differ": "The selected torrents are in different folders; the first one's folder is shown.",
+    "mode": "Data",
+    "move": "Move the data to this folder",
+    "find": "The data is already in this folder",
+    "submit": "Set location",
+    "empty": "Enter a folder.",
+    "moving": {
+      "one": "Moving {total} torrent",
+      "other": "Moving {total} torrents"
+    },
+    "pointed": {
+      "one": "Location set for {total} torrent",
+      "other": "Location set for {total} torrents"
+    },
+    "failed": "Could not set the location: {message}"
+  },
+  "labels": {
+    "titleOne": "Labels",
+    "titleMany": {
+      "one": "Labels for {total} torrent",
+      "other": "Labels for {total} torrents"
+    },
+    "existing": "Labels in use",
+    "add": "Add labels",
+    "browserOnly": "This Transmission version has no labels of its own, so they are saved in this browser only.",
+    "importOffer": {
+      "one": "Labels for {total} torrent are saved in this browser. Copy them to Transmission so every device sees them; the browser copy is kept.",
+      "other": "Labels for {total} torrents are saved in this browser. Copy them to Transmission so every device sees them; the browser copy is kept."
+    },
+    "importAction": "Copy to Transmission",
+    "imported": {
+      "one": "Copied labels for {total} torrent",
+      "other": "Copied labels for {total} torrents"
+    },
+    "importFailed": "Could not copy the labels: {message}",
+    "tooLong": "A label can be at most 128 characters.",
+    "saved": "Labels saved",
+    "failed": "Could not save the labels: {message}"
+  },
+  "limits": {
+    "title": "Speed limits",
+    "torrents": {
+      "one": "Selected torrent",
+      "other": "{total} selected torrents"
+    },
+    "alt": "Alternative speed",
+    "altHelp": "Used instead of the global limits while alternative speed is on.",
+    "altEnabled": "Alternative speed on",
+    "altDown": "Download limit",
+    "altUp": "Upload limit",
+    "mixed": "The selected torrents have different values; only the fields you change are saved.",
+    "readFailed": "Could not read the current limits.",
+    "invalid": "Enter whole numbers of kB/s.",
+    "saved": "Speed limits saved",
+    "failed": "Could not save the limits: {message}"
+  },
+  "about": {
+    "title": "About",
+    "product": "Transmission web interface",
+    "uiVersion": "Version {version}",
+    "transmission": "Transmission",
+    "rpc": "RPC",
+    "rpcSemver": "RPC {semver}",
+    "rpcVersion": "version {rpc}",
+    "jsonrpc": "JSON-RPC",
+    "legacy": "legacy protocol",
+    "unknown": "Unknown",
+    "credit": "Based on Transmission Web Control by ronggang (MIT)",
+    "original": "Original web interface"
   }
 }

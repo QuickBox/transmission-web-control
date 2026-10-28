@@ -1,19 +1,27 @@
 /**
- * Dialog registry. Owns the Add torrent and Remove dialogs, the window-wide
- * drop overlay for `.torrent` files, and the requests other modules send:
+ * Dialog registry. Owns the Add torrent, Remove, Location, Rename, Labels,
+ * Speed limits and About dialogs, the window-wide drop overlay for `.torrent`
+ * files, and the requests other modules send:
  *
  * - `remove-request` (bubbling CustomEvent from the list, `detail: { ids }`)
  *   opens the Remove confirm for those ids.
  * - `add-request` (`detail: { files?, links? }`) opens Add torrent.
- * - `openAdd(opts)` and `openRemove(ids)` do the same as direct calls; import
- *   this module with the same specifier `main.js` uses so they reach the
- *   mounted instance.
+ * - `openAdd(opts)`, `openRemove(ids)`, `openLocation(ids)`, `openRename(id)`,
+ *   `openLabels(ids)`, `openLimits(ids)` and `openAbout()` are direct calls;
+ *   import this module with the same specifier `main.js` uses so they reach
+ *   the mounted instance. Each returns nothing when the module is not mounted
+ *   or none of the ids is a known torrent.
  *
  * Mounted into `[data-region="dialogs"]`.
  */
 
 import { createAddDialog, isTorrentFile } from './add.js?v=__QBV__';
 import { createRemoveDialog } from './remove.js?v=__QBV__';
+import { createLocationDialog } from './location.js?v=__QBV__';
+import { createRenameDialog } from './rename.js?v=__QBV__';
+import { createLabelsDialog } from './labels.js?v=__QBV__';
+import { createLimitsDialog } from './limits.js?v=__QBV__';
+import { createAboutDialog } from './about.js?v=__QBV__';
 
 export const ADD_REQUEST = 'add-request';
 export const REMOVE_REQUEST = 'remove-request';
@@ -33,6 +41,30 @@ export function openRemove(ids) {
   if (instance) instance.remove.open(ids);
 }
 
+/** @param {number[]} ids */
+export function openLocation(ids) {
+  if (instance) instance.location.open(ids);
+}
+
+/** @param {number} id */
+export function openRename(id) {
+  if (instance) instance.rename.open(id);
+}
+
+/** @param {number[]} ids */
+export function openLabels(ids) {
+  if (instance) instance.labels.open(ids);
+}
+
+/** @param {number[]} [ids] the selection; without it only the alternative speeds show */
+export function openLimits(ids) {
+  if (instance) instance.limits.open(ids);
+}
+
+export function openAbout() {
+  if (instance) instance.about.open();
+}
+
 function hasFiles(e) {
   const types = e.dataTransfer && e.dataTransfer.types;
   return Boolean(types && [...types].includes('Files'));
@@ -50,6 +82,13 @@ export function mount(root, ctx) {
   const app = root.closest('#app') || document.body;
   const add = createAddDialog(ctx);
   const remove = createRemoveDialog(ctx);
+  const dialogs = {
+    location: createLocationDialog(ctx),
+    rename: createRenameDialog(ctx),
+    labels: createLabelsDialog(ctx),
+    limits: createLimitsDialog(ctx),
+    about: createAboutDialog(ctx),
+  };
 
   const overlay = el('div', { class: 'drop-overlay', hidden: true, 'aria-hidden': 'true' }, [
     el('div', { class: 'drop-overlay-card' }, [
@@ -106,7 +145,7 @@ export function mount(root, ctx) {
   app.addEventListener(REMOVE_REQUEST, onRemoveRequest);
   app.addEventListener(ADD_REQUEST, onAddRequest);
 
-  instance = { add, remove };
+  instance = { add, remove, ...dialogs };
   return () => {
     document.removeEventListener('dragenter', onEnter);
     document.removeEventListener('dragover', onOver);

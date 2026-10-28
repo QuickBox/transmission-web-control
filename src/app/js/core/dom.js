@@ -39,13 +39,22 @@ const PROPS = new Set([
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-/** A scheme in an `href` is refused unless it is a same-origin `blob:` URL. */
+const FRAGMENT_HREF = /^#[\w.~-]*$/;
+const RELATIVE_HREF = /^(?:\.{1,2}\/)*[\w-][\w.~-]*(?:\/[\w.~-]+)*\/?(?:\?[\w.~=&%+-]*)?(?:#[\w.~-]*)?$/;
+const BLOB_HREF = /^blob:[\w.:/%-]+$/;
+
+/**
+ * Only three shapes of `href` pass: a `#fragment`, a same-origin relative
+ * path built from plain URL characters (`index.original.html`,
+ * `../a/b.html?x=1`), or a `blob:` URL. Nothing with a colon outside `blob:`,
+ * a backslash, whitespace, a control character or a leading slash gets
+ * through, so no scheme (including one split by characters a browser
+ * strips) and no other-origin `//host` link can be built.
+ */
 function safeHref(value) {
   const v = String(value);
-  if (/^\s*[a-z][a-z0-9+.-]*:/i.test(v) && !/^blob:/i.test(v)) {
-    throw new TypeError(`el: refused href scheme in "${v.slice(0, 40)}"`);
-  }
-  return v;
+  if (FRAGMENT_HREF.test(v) || RELATIVE_HREF.test(v) || BLOB_HREF.test(v)) return v;
+  throw new TypeError(`el: refused href "${v.slice(0, 40)}"`);
 }
 
 function classString(value) {
