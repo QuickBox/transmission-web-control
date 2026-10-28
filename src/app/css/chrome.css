@@ -52,7 +52,7 @@
 }
 
 .tb-destructive:not(:disabled):hover {
-	color: var(--qb-danger, var(--tr-st-error));
+	color: var(--qb-destructive-text);
 }
 
 .tb-rates {
@@ -259,7 +259,7 @@
 	font: inherit;
 	font-size: 13px;
 	text-align: start;
-	color: var(--qb-fg);
+	color: var(--qb-foreground);
 	background: transparent;
 	cursor: pointer;
 	transition: background-color 0.15s ease-out, color 0.15s ease-out;
@@ -466,7 +466,7 @@
 .bulk-count {
 	font-size: 13px;
 	font-weight: 500;
-	color: var(--qb-fg);
+	color: var(--qb-foreground);
 	white-space: nowrap;
 }
 
@@ -475,7 +475,7 @@
 }
 
 .bulk-destructive:not(:disabled):hover {
-	color: var(--qb-danger, var(--tr-st-error));
+	color: var(--qb-destructive-text);
 }
 
 .shell-bulkbar .btn-icon {

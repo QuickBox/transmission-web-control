@@ -533,7 +533,7 @@ export function mount(root, ctx) {
     if (plain) showDetails(id, { focus: sheetLayout() });
   }
 
-  /** Open the details drawer on a torrent; `focused` is set even before the drawer mounts. */
+  /** Open the details drawer on a torrent; `focused` is set even before the drawer mounts. `focus: true` moves keyboard focus into it. */
   function showDetails(id, opts = {}) {
     openDetails(id, opts);
     if (store.get().focused !== id) store.set({ focused: id });
@@ -596,7 +596,7 @@ export function mount(root, ctx) {
       case 'Enter':
         if (activeId == null) return;
         e.preventDefault();
-        showDetails(activeId);
+        showDetails(activeId, { focus: true });
         break;
       case 'Delete':
       case 'Backspace':
