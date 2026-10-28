@@ -17,12 +17,15 @@
 # a BREAKING CHANGE body -> major; docs/chore/test/style/ci only -> nothing to
 # release (refused unless --version). The changelog range is that same tag, or
 # --since when the reachable tag predates the line being released. Bot release
-# commits and merges never drive a bump or reach a changelog.
+# commits and merges never drive a bump or reach a changelog, and neither does a
+# commit that changes none of the paths the asset is built from (ASSET_PATHS):
+# README, docs and tooling changes never cut a release.
 #
 # The asset is transmission-web-control-vX.Y.Z.tar.gz: the src/ tree of <ref>
 # with every __QBV__ cache key replaced by the version that tree's package.json
-# holds, plus a SHA256SUMS file beside it. The build is reproducible: the same
-# ref always yields the same bytes.
+# holds, and LICENSE beside index.html so an install serves it with the app,
+# plus a SHA256SUMS file beside the tarball. The build is reproducible: the
+# same ref always yields the same bytes.
 set -Eeuo pipefail
 
 self_dir=$(cd -- "$(dirname -- "$0")" >/dev/null 2>&1 && pwd)
@@ -49,6 +52,10 @@ while [ $# -gt 0 ]; do
 done
 
 die() { echo "release.sh: $*" >&2; exit 1; }
+
+# The paths of a ref the release asset is built from. src/ is the app; every
+# other entry is placed at the top of it, beside index.html.
+ASSET_PATHS=(src LICENSE)
 is_semver() { printf '%s' "$1" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; }
 
 # Bot release commits and merges never drive a version bump and never appear
@@ -64,28 +71,11 @@ highest_reachable_tag() { # <repo>
 	done | sort -t. -k1,1n -k2,2n -k3,3n | tail -1
 }
 
-# A commit ships when it changes at least one path the release archive carries:
-# a path that neither .gitattributes export-ignores nor sits under an
-# export-ignored directory. check-attr does not carry a directory's attribute
-# down to the files inside it, so every leading directory is asked as well,
-# which is how git archive applies it. A tooling-only commit never ships.
+# A commit ships when it changes at least one path the release asset is built
+# from. README, docs, CI and tooling commits never ship.
 commit_ships() { # <repo> <sha>
-	local r=$1 sha=$2 files f d out
-	local -A ignored=()
-	files=$(git -C "$r" show --name-only --format= "$sha" 2>/dev/null | grep -v '^$' || true)
-	[ -n "$files" ] || return 1
-	out=$(printf '%s\n' "$files" | while IFS= read -r f; do
-		printf '%s\n' "$f"; d=$f
-		while [ "${d%/*}" != "$d" ]; do d=${d%/*}; printf '%s/\n' "$d"; done
-	done | git -C "$r" check-attr --stdin export-ignore | sed -nE 's/: export-ignore: set$//p')
-	while IFS= read -r f; do [ -n "$f" ] && ignored["$f"]=1; done <<<"$out"
-	while IFS= read -r f; do
-		[ -n "${ignored[$f]:-}" ] && continue
-		d=$f
-		while [ "${d%/*}" != "$d" ]; do d=${d%/*}; [ -n "${ignored[$d/]:-}" ] && continue 2; done
-		return 0
-	done <<<"$files"
-	return 1
+	local r=$1 sha=$2
+	[ -n "$(git -C "$r" diff-tree --no-commit-id --name-only -r --root "$sha" -- "${ASSET_PATHS[@]}" 2>/dev/null)" ]
 }
 
 # Bump kind across the shipping commits in a range. Prints major|minor|patch|none.
@@ -219,7 +209,7 @@ write_js_version() { # <repo> <ver>
 	sed -i -E "s/^(export const VERSION = ')[^']*(';)/\1$ver\2/" "$f"
 }
 
-# Build the release tarball and SHA256SUMS into <outdir> from the src/ tree of <ref>.
+# Build the release tarball and SHA256SUMS into <outdir> from ASSET_PATHS of <ref>.
 build_asset() { # <outdir> <ref>
 	local out=$1 ref=$2 ver ts name stage
 	[ -n "$out" ] || die "--asset needs an output directory"
@@ -233,8 +223,17 @@ build_asset() { # <outdir> <ref>
 	stage=$(mktemp -d)
 	# shellcheck disable=SC2064  # expand now: $stage is local, and a die exits the script
 	trap "rm -rf '$stage'" EXIT
-	git -C "$repo" archive --format=tar "$ref" src | tar -x -C "$stage"
+	local p
+	for p in "${ASSET_PATHS[@]}"; do
+		git -C "$repo" cat-file -e "$ref:$p" 2>/dev/null || die "no $p at $ref"
+	done
+	git -C "$repo" archive --format=tar "$ref" "${ASSET_PATHS[@]}" | tar -x -C "$stage"
 	[ -f "$stage/src/index.html" ] || die "no src/index.html at $ref"
+	for p in "${ASSET_PATHS[@]}"; do
+		[ "$p" = src ] && continue
+		[ ! -e "$stage/src/$p" ] || die "src/$p at $ref would be overwritten by $p"
+		mv "$stage/$p" "$stage/src/$p"
+	done
 	grep -rlIZF '__QBV__' "$stage/src" | xargs -0 -r sed -i "s/__QBV__/$ver/g"
 	if grep -rqF '__QBV__' "$stage/src"; then die "a __QBV__ cache key survived the stamp"; fi
 	ts=$(git -C "$repo" log -1 --format=%ct "$ref")
@@ -264,7 +263,7 @@ run_release() {
 		kind=$(bump_kind "$repo" "$range")
 		if [ "$kind" = none ]; then
 			if [ "$ci" = 1 ]; then echo "nothing to release: no shipping feat/fix/perf/refactor commits since v$base_ver"; exit 3; fi
-			die "nothing to release: only docs/chore/test/style/ci or tooling-only commits since v$base_ver (pass --version to override)"
+			die "nothing to release: no feat/fix/perf/refactor commit since v$base_ver changes a path the asset ships (pass --version to override)"
 		fi
 		new_ver=$(apply_bump "$base_ver" "$kind")
 	fi
@@ -311,6 +310,7 @@ selftest() {
 		mkdir -p "$1/src/app/js" "$1/bin"
 		printf '{\n  "private": true,\n  "version": "%s",\n  "type": "module"\n}\n' "$2" > "$1/package.json"
 		printf "export const VERSION = '%s';\n" "$2" > "$1/src/app/js/version.js"
+		printf 'MIT License\n' > "$1/LICENSE"
 	}
 	mk() { # <dir> then subjects via stdin
 		d="$tmp/$1"; mkdir -p "$d"; git -C "$d" init -q
@@ -319,10 +319,10 @@ selftest() {
 		echo seed > "$d/f"; git -C "$d" add -A; git -C "$d" commit -qm 'chore: seed'
 		git -C "$d" tag v1.0.0
 		local s n=0
-		while IFS= read -r s; do [ -n "$s" ] || continue; n=$((n+1)); echo "$n" > "$d/f$n"; git -C "$d" add -A; git -C "$d" commit -qm "$s"; done
+		while IFS= read -r s; do [ -n "$s" ] || continue; n=$((n+1)); echo "$n" > "$d/src/f$n"; git -C "$d" add -A; git -C "$d" commit -qm "$s"; done
 	}
 	expect() { # <dir> <expected-version> <label>
-		local got; got=$(TWC_REPO="$tmp/$1" bash "$self" --dry-run 2>/dev/null | sed -nE 's/^next version:  //p')
+		local got; got=$(TWC_REPO="$tmp/$1" bash "$self" --dry-run 2>/dev/null | sed -nE 's/^next version:  //p') || true
 		if [ "$got" = "$2" ]; then echo "selftest $3: PASS ($got)"; else echo "selftest $3: FAIL (got '$got', want '$2')"; fail=1; fi
 	}
 	expect_refuse() { # <dir> <label>
@@ -358,7 +358,7 @@ selftest() {
 	expect fixonly 1.0.1 "fix-only-patch"
 	expect breaking 2.0.0 "breaking-major"
 	# both breaking forms carry a visible marker in the notes; ordinary entries do not
-	d="$tmp/breaking"; printf '1' > "$d/g"; git -C "$d" add -A; git -C "$d" commit -qm 'fix(core): guard the loader' -m 'BREAKING CHANGE: the old option is gone'
+	d="$tmp/breaking"; printf '1' > "$d/src/g"; git -C "$d" add -A; git -C "$d" commit -qm 'fix(core): guard the loader' -m 'BREAKING CHANGE: the old option is gone'
 	notes=$(TWC_REPO="$d" bash "$self" --dry-run 2>/dev/null)
 	if printf '%s\n' "$notes" | grep -qxF -- '- **Breaking:** Drop the legacy dialect' \
 		&& printf '%s\n' "$notes" | grep -qxF -- '- **Breaking:** Guard the loader' \
@@ -391,6 +391,23 @@ selftest() {
 	# a commit touching a shipped path and a tooling path still ships
 	echo 5 >> "$d/bin/tool.sh"; tc src/app/js/app.js 5 'feat(ui): a feature with its tool change'
 	expect tool 1.1.0 "mixed-commit-ships"
+	# only paths the asset is built from ship: README, docs, CONTRIBUTING and
+	# TRANSLATING never cut a release, whatever their commit type; LICENSE and src do
+	d="$tmp/paths"; mkdir -p "$d"; git -C "$d" init -q
+	git -C "$d" config user.email t@t; git -C "$d" config user.name t
+	seed_tree "$d" 1.0.0
+	git -C "$d" add -A; git -C "$d" commit -qm 'chore: seed'; git -C "$d" tag v1.0.0
+	pc() { mkdir -p "$(dirname "$d/$1")"; echo "$2" >> "$d/$1"; git -C "$d" add -A; git -C "$d" commit -qm "$3"; }
+	pc README.md 1 'feat(readme): add screenshots'
+	pc docs/shot.png 2 'feat(docs): screenshot set'
+	pc CONTRIBUTING.md 3 'feat!: contributing guide'
+	pc TRANSLATING.md 4 'fix: translating guide'
+	ci_expect_nothing paths "readme-docs-guides-only-exit3"
+	pc LICENSE 5 'fix(license): name the fork'
+	expect paths 1.0.1 "license-change-bumps"
+	pc src/app/js/version.js "// x" 'feat(ui): a shipped feature'
+	expect paths 1.1.0 "src-change-bumps"
+
 	# --version override on a docs-only history still releases
 	ver=$(TWC_REPO="$tmp/docsonly" bash "$self" --dry-run --version 9.9.9 2>/dev/null | sed -nE 's/^next version:  //p')
 	if [ "$ver" = 9.9.9 ]; then echo "selftest version-override: PASS (9.9.9)"; else echo "selftest version-override: FAIL ($ver)"; fail=1; fi
@@ -399,9 +416,9 @@ selftest() {
 	d="$tmp/seed"; mkdir -p "$d"; git -C "$d" init -q
 	git -C "$d" config user.email t@t; git -C "$d" config user.name t
 	seed_tree "$d" 0.0.0
-	echo a > "$d/a"; git -C "$d" add -A; git -C "$d" commit -qm 'feat: upstream era'
+	echo a > "$d/src/a"; git -C "$d" add -A; git -C "$d" commit -qm 'feat: upstream era'
 	since=$(git -C "$d" rev-parse HEAD)
-	echo b > "$d/b"; git -C "$d" add -A; git -C "$d" commit -qm 'feat(webui): the rewrite'
+	echo b > "$d/src/b"; git -C "$d" add -A; git -C "$d" commit -qm 'feat(webui): the rewrite'
 	expect_refuse seed "untagged-unseeded-refused"
 	TWC_REPO="$d" bash "$self" --ci --version 2.0.0 --since "$since" >/dev/null 2>&1 || true
 	if grep -q 'The rewrite' "$d/changelogs/v2.0.0.md" 2>/dev/null && ! grep -q 'Upstream era' "$d/changelogs/v2.0.0.md"; then
@@ -421,10 +438,10 @@ selftest() {
 	seed_tree "$d" 1.0.0
 	echo seed > "$d/f"; git -C "$d" add -A; git -C "$d" commit -qm 'chore: seed'
 	git -C "$d" tag v1.0.0; base=$(git -C "$d" branch --show-current)
-	echo a > "$d/a"; git -C "$d" add -A; git -C "$d" commit -qm 'feat(ui): add a real feature'
-	git -C "$d" checkout -q -b side; echo b > "$d/b"; git -C "$d" add -A; git -C "$d" commit -qm 'fix(side): a side fix'
+	echo a > "$d/src/a"; git -C "$d" add -A; git -C "$d" commit -qm 'feat(ui): add a real feature'
+	git -C "$d" checkout -q -b side; echo b > "$d/src/b"; git -C "$d" add -A; git -C "$d" commit -qm 'fix(side): a side fix'
 	git -C "$d" checkout -q "$base"; git -C "$d" merge -q --no-ff side -m 'Merge branch side'
-	echo c > "$d/c"; git -C "$d" add -A; git -C "$d" commit -qm 'chore(release): v0.0.0'
+	echo c > "$d/src/c"; git -C "$d" add -A; git -C "$d" commit -qm 'chore(release): v0.0.0'
 	mkdir -p "$d/src/app/i18n/de"; echo '{}' > "$d/src/app/i18n/de/main.json"
 	git -C "$d" add -A; git -C "$d" commit -qm 'feat: German strings'
 	ci_expect excl 1.1.0 "ci-excludes-noise-version"
@@ -460,6 +477,9 @@ selftest() {
 		echo "selftest asset-src-only: PASS"; else echo "selftest asset-src-only: FAIL"; fail=1; fi
 	if [ -f "$x/src/app/js/main.js" ] && ! grep -rqF '__QBV__' "$x" && grep -qF 'main.js?v=1.2.3' "$x/src/index.html"; then
 		echo "selftest asset-stamped: PASS"; else echo "selftest asset-stamped: FAIL"; fail=1; fi
+	if [ -f "$x/src/LICENSE" ] && cmp -s "$x/src/LICENSE" "$d/LICENSE" && [ ! -e "$x/LICENSE" ] \
+		&& [ "$(tar -tzf "$o1/$tgz" | grep -c 'LICENSE')" = 1 ]; then
+		echo "selftest asset-license-beside-index: PASS"; else echo "selftest asset-license-beside-index: FAIL"; fail=1; fi
 	if ( cd "$o1" && sha256sum -c --quiet SHA256SUMS ) >/dev/null 2>&1; then
 		echo "selftest asset-checksum: PASS"; else echo "selftest asset-checksum: FAIL"; fail=1; fi
 	TWC_REPO="$d" bash "$self" --asset "$o2" --ref v1.2.3 >/dev/null 2>&1 || true
@@ -469,6 +489,11 @@ selftest() {
 	local ec=0; TWC_REPO="$d" bash "$self" --asset "$tmp/out3" --ref v9.9.9 >/dev/null 2>&1 || ec=$?
 	if [ "$ec" != 0 ] && [ ! -e "$tmp/out3/transmission-web-control-v9.9.9.tar.gz" ]; then
 		echo "selftest asset-tag-mismatch-refused: PASS"; else echo "selftest asset-tag-mismatch-refused: FAIL"; fail=1; fi
+	# no LICENSE at the ref: refused, an asset never ships without its licence
+	git -C "$d" rm -q LICENSE; git -C "$d" commit -qm 'chore: drop licence'
+	ec=0; TWC_REPO="$d" bash "$self" --asset "$tmp/out5" >/dev/null 2>&1 || ec=$?
+	if [ "$ec" != 0 ] && [ ! -e "$tmp/out5/SHA256SUMS" ]; then
+		echo "selftest asset-license-required: PASS"; else echo "selftest asset-license-required: FAIL"; fail=1; fi
 	# a binary that still carries the placeholder is refused, never shipped half-stamped
 	git -C "$d" checkout -q v1.2.3~1
 	ec=0; TWC_REPO="$d" bash "$self" --asset "$tmp/out4" >/dev/null 2>&1 || ec=$?
