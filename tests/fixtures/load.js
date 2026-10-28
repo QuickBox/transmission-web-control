@@ -189,3 +189,69 @@ export function makeTransport(handshake, responses) {
 export function fixtureTransport(fixture) {
   return makeTransport(fixture.handshake, { [fixture.method]: fixture.response });
 }
+
+/** Request-shape signature used to pick among several recordings of one method. */
+function argShape(args) {
+  const a = args ?? {};
+  return {
+    ids: a.ids !== undefined,
+    recent: a.ids === "recently-active" || a.ids === "recently_active",
+    format: a.format !== undefined,
+    fields: Array.isArray(a.fields),
+  };
+}
+
+function shapeScore(want, have) {
+  let score = 0;
+  if (want.recent === have.recent) score += 4;
+  if (want.ids === have.ids) score += 2;
+  if (want.format === have.format) score += 2;
+  if (want.fields === have.fields) score += 1;
+  return score;
+}
+
+/**
+ * Transport that answers from every recorded capture of one version: a call
+ * is routed to the recording of the same method whose request shape (fields /
+ * ids / recently-active / format) is closest. `extra` adds or overrides
+ * methods (synthetic `torrent-set`, `session-set`, `port-test` answers).
+ *
+ * @param {string} version fixture directory, e.g. `rpc-16`
+ * @param {Record<string, object|((body: object, call: object) => unknown)>} [extra]
+ * @returns {{ transport: Function, dialect: string, handshake: object, fixtures: object[] }}
+ */
+export function recordedTransport(version, extra = {}) {
+  const fixtures = loadFixtures({ version, recorded: true });
+  if (fixtures.length === 0) throw new Error(`no recorded fixtures for ${version}`);
+  const { dialect, handshake } = fixtures[0].data;
+  const byMethod = new Map();
+  for (const fx of fixtures) {
+    if (!byMethod.has(fx.data.method)) byMethod.set(fx.data.method, []);
+    byMethod.get(fx.data.method).push(fx);
+  }
+  const responses = {};
+  for (const [method, list] of byMethod) {
+    responses[method] = (body) => {
+      const want = argShape(dialect === "jsonrpc" ? body.params : body.arguments);
+      let best = list[0];
+      let bestScore = -1;
+      for (const fx of list) {
+        const score = shapeScore(want, argShape(requestArgs(fx.data)));
+        if (score > bestScore) {
+          best = fx;
+          bestScore = score;
+        }
+      }
+      return best.data.response;
+    };
+  }
+  Object.assign(responses, extra);
+  return { transport: makeTransport(handshake, responses), dialect, handshake, fixtures };
+}
+
+/** Synthetic legacy/JSON-RPC success body for a write method, in the given dialect. */
+export function okResponse(dialect, body, args = {}) {
+  return dialect === "jsonrpc"
+    ? { jsonrpc: "2.0", result: args, id: body.id }
+    : { result: "success", arguments: args, tag: body.tag };
+}

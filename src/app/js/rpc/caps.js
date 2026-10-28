@@ -16,6 +16,13 @@
 
 import { DIALECT, toCamelKey } from "./client.js?v=__QBV__";
 
+/**
+ * The session keys that carry the daemon version, in the upstream spelling.
+ * Other modules import this list to exclude them (they are read-only and never
+ * polled); only this file reads their values.
+ */
+export const VERSION_SESSION_KEYS = Object.freeze(["rpc-version", "rpc-version-minimum", "rpc-version-semver"]);
+
 function parseInt10(value) {
   if (typeof value === "number") return Number.isInteger(value) ? value : null;
   if (typeof value !== "string" || value.trim() === "") return null;
