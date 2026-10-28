@@ -290,6 +290,26 @@ test('virtual window: 5,000 rows render only the visible slice and keep aria ind
   teardown();
 });
 
+test('an idle rate shows a muted dash and a live rate shows its speed', async () => {
+  const made = await tableCtx();
+  const root = new FakeElement('div');
+  root.clientHeight = 300;
+  env.body.replaceChildren(root);
+  const idle = { id: 1, name: 'idle', state: 'stopped', status: 0, error: 0, rateDownload: 0, rateUpload: 0 };
+  const busy = { id: 2, name: 'busy', state: 'downloading', status: 4, error: 0, rateDownload: 2048, rateUpload: 0 };
+  made.ctx.store.set({ torrents: new Map([[1, idle], [2, busy]]), prefs: { columns: COLUMNS.map((c) => c.id) } });
+  const teardown = mount(root, made.ctx);
+  const idleDown = rowFor(root, 1).querySelector('.cell-rateDownload');
+  assert.equal(idleDown.textContent, '—');
+  assert.equal(idleDown.hasAttribute('data-empty'), true, 'the dash is flagged so CSS can mute it');
+  assert.equal(rowFor(root, 1).querySelector('.cell-rateUpload').textContent, '—');
+  const busyDown = rowFor(root, 2).querySelector('.cell-rateDownload');
+  assert.match(busyDown.textContent, /KB\/s|kB\/s/);
+  assert.equal(busyDown.hasAttribute('data-empty'), false);
+  assert.equal(rowFor(root, 2).querySelector('.cell-rateUpload').hasAttribute('data-empty'), true);
+  teardown();
+});
+
 test('a row missing optional fields renders without throwing', async () => {
   const made = await tableCtx();
   const root = new FakeElement('div');

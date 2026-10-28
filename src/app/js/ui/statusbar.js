@@ -11,6 +11,11 @@ import { getFreeSpace, testPort } from '../rpc/session.js?v=__QBV__';
 /** Free space is re-read at most this often while polling continues. */
 export const FREE_SPACE_INTERVAL_MS = 60_000;
 
+/** A port test that failed outright is not repeated sooner than this. */
+export const PORT_RETRY_MS = 60_000;
+
+const PROTOCOL_LABEL = Object.freeze({ ipv4: 'IPv4', ipv6: 'IPv6' });
+
 /**
  * @param {HTMLElement} root The region element this module owns. It may replace
  *   the children of `root` and nothing outside it.
@@ -49,7 +54,7 @@ export function mount(root, ctx, options = {}) {
   tooltip(alt.node, () => t('main.statusbar.altSpeed'));
   tooltip(free.node, () => t('main.statusbar.free'));
   tooltip(port.node, () => t('main.statusbar.port'));
-  tooltip(version.node, () => t('main.statusbar.version'));
+  tooltip(version.node, () => t('main.statusbar.versionTip'));
 
   clear(root, down.node, up.node, alt.node, free.node, port.node, el('span', { class: 'chip-spacer' }), connection, version.node, counts.node);
 
@@ -77,10 +82,12 @@ export function mount(root, ctx, options = {}) {
     const { session } = store.get();
     const caps = ctx.caps;
     const daemon = typeof session.version === 'string' ? session.version.replace(/\s*\(.*\)\s*$/, '') : null;
-    const rpc = caps && (caps.semver || (caps.rpc > 0 ? String(caps.rpc) : null));
+    let rpc = null;
+    if (caps && caps.dialect === 'legacy' && caps.rpc > 0) rpc = t('main.statusbar.rpc', { rpc: String(caps.rpc) });
+    else if (caps && caps.semver) rpc = t('main.statusbar.rpcSemver', { semver: caps.semver });
     const parts = [];
     if (daemon) parts.push(t('main.statusbar.version', { version: daemon }));
-    if (rpc) parts.push(t('main.statusbar.rpc', { rpc }));
+    if (rpc) parts.push(rpc);
     version.value.textContent = parts.join(' · ');
     version.node.hidden = parts.length === 0;
   }
@@ -118,24 +125,50 @@ export function mount(root, ctx, options = {}) {
 
   let portFor = null;
   let portInFlight = false;
+  let portRetry = { key: null, at: 0 };
+
+  function portLine(port, states) {
+    return t('main.statusbar.portLine', { port: String(port), states });
+  }
+
+  function portState(r) {
+    if (r.unavailable) return t('main.statusbar.portStateUnavailable');
+    if (r.open === null) return t('main.statusbar.portStateUnknown');
+    return t(r.open ? 'main.statusbar.portStateOpen' : 'main.statusbar.portStateClosed');
+  }
+
+  function portStates(results) {
+    return results
+      .map((r) => (r.protocol === 'any' ? portState(r) : t('main.statusbar.portProtocol', { protocol: PROTOCOL_LABEL[r.protocol] || r.protocol, state: portState(r) })))
+      .join(' · ');
+  }
+
+  /** Only probes that produced a verdict colour the chip; an unavailable one is neither open nor closed. */
+  function portOpenness(results) {
+    const known = results.filter((r) => r.open !== null);
+    if (known.length === 0) return 'unknown';
+    if (known.every((r) => r.open)) return 'true';
+    return known.some((r) => r.open) ? 'partial' : 'false';
+  }
+
   async function refreshPort() {
     const { session, connection: c } = store.get();
-    const key = `${session.peerPort}|${ctx.caps && ctx.caps.portTestByProtocol}`;
-    if (c.state !== 'online' || portInFlight || key === portFor || session.peerPort === undefined) return;
+    const peerPort = session.peerPort;
+    const key = `${peerPort}|${ctx.caps && ctx.caps.portTestByProtocol}`;
+    if (c.state !== 'online' || portInFlight || key === portFor || peerPort === undefined) return;
+    if (portRetry.key === key && now() < portRetry.at) return;
     portInFlight = true;
+    port.value.textContent = portLine(peerPort, t('main.statusbar.portStateChecking'));
+    port.node.setAttribute('data-open', 'unknown');
     try {
       const results = await testPort(ctx.rpc, ctx.caps);
       portFor = key;
-      const labelFor = (r) => {
-        const protocol = r.protocol === 'any' ? '' : r.protocol.toUpperCase();
-        if (r.open === null) return t('main.statusbar.portUnknown', { protocol });
-        return t(r.open ? 'main.statusbar.portOpen' : 'main.statusbar.portClosed', { protocol });
-      };
-      port.value.textContent = results.map(labelFor).join(' · ').replace(/\s{2,}/g, ' ').trim();
-      port.node.setAttribute('data-open', results.every((r) => r.open === true) ? 'true' : results.some((r) => r.open === true) ? 'partial' : 'false');
+      port.value.textContent = portLine(peerPort, portStates(results));
+      port.node.setAttribute('data-open', portOpenness(results));
     } catch {
-      port.value.textContent = t('main.statusbar.portUnknown', { protocol: '' }).trim();
-      port.node.setAttribute('data-open', 'false');
+      portRetry = { key, at: now() + PORT_RETRY_MS };
+      port.value.textContent = portLine(peerPort, t('main.statusbar.portStateUnavailable'));
+      port.node.setAttribute('data-open', 'unknown');
     } finally {
       portInFlight = false;
     }

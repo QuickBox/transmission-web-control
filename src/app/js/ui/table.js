@@ -12,6 +12,7 @@
  * safer than diffing.
  */
 
+import { EMPTY } from '../core/format.js?v=__QBV__';
 import { STATES, searchTorrents } from '../rpc/torrents.js?v=__QBV__';
 import { openDetails } from './details/index.js?v=__QBV__';
 
@@ -44,8 +45,8 @@ export const COLUMNS = Object.freeze([
   { id: 'status', width: 'minmax(128px, max-content)', sortable: true, narrow: 0, value: (t) => STATES.indexOf(t.state) },
   { id: 'percentDone', width: '132px', sortable: true, narrow: 0, value: (t) => t.percentDone },
   { id: 'totalSize', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.totalSize, text: (t, ctx) => ctx.fmt.bytes(t.totalSize) },
-  { id: 'rateDownload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateDownload, text: (t, ctx) => (t.rateDownload > 0 ? ctx.fmt.speed(t.rateDownload) : '') },
-  { id: 'rateUpload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateUpload, text: (t, ctx) => (t.rateUpload > 0 ? ctx.fmt.speed(t.rateUpload) : '') },
+  { id: 'rateDownload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateDownload, text: (t, ctx) => (t.rateDownload > 0 ? ctx.fmt.speed(t.rateDownload) : EMPTY) },
+  { id: 'rateUpload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateUpload, text: (t, ctx) => (t.rateUpload > 0 ? ctx.fmt.speed(t.rateUpload) : EMPTY) },
   { id: 'eta', width: '84px', align: 'end', sortable: true, narrow: 1, value: (t) => (t.eta < 0 ? null : t.eta), text: (t, ctx) => ctx.fmt.eta(t.eta) },
   { id: 'uploadRatio', width: '72px', align: 'end', sortable: true, narrow: 2, value: (t) => t.uploadRatio, text: (t, ctx) => ctx.fmt.ratio(t.uploadRatio) },
   { id: 'seederCount', width: '76px', align: 'end', sortable: true, narrow: 2, value: (t) => t.seederCount, text: (t, ctx) => countOrEmpty(ctx, t.seederCount) },
@@ -290,7 +291,9 @@ export function mount(root, ctx) {
         el('span', { class: 'progress-text', text: ctx.fmt.percent(fraction || 0) }),
       ]));
     } else {
-      cell.textContent = column.text(torrent, ctx);
+      const text = column.text(torrent, ctx);
+      cell.textContent = text;
+      if (text === EMPTY) cell.setAttribute('data-empty', '');
     }
     return cell;
   }

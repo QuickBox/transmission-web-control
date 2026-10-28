@@ -210,6 +210,11 @@
 	color: var(--qb-fg-muted);
 }
 
+/* A cell with nothing to show (idle rate, unknown ETA) renders a dash. */
+.cell[data-empty] {
+	color: var(--qb-fg-muted);
+}
+
 /* ---- Empty state ----------------------------------------------------- */
 
 .torrents-empty {

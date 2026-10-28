@@ -145,8 +145,9 @@ export async function getFreeSpace(client, path) {
 }
 
 /**
- * @typedef {{ protocol: "ipv4"|"ipv6"|"any", open: boolean|null }} PortTestResult
- *   `open: null` when the daemon answered without a verdict
+ * @typedef {{ protocol: "ipv4"|"ipv6"|"any", open: boolean|null, unavailable: boolean }} PortTestResult
+ *   `open: null` when the daemon answered without a verdict; `unavailable`
+ *   when the probe itself failed (a daemon without IPv6 refuses the IPv6 test)
  */
 
 function portVerdict(result) {
@@ -157,20 +158,24 @@ function portVerdict(result) {
 /**
  * Probe the peer port. Daemons with `portTestByProtocol` are asked once per
  * protocol (two chips); older daemons answer once for whatever they listen on.
+ * The protocols are judged on their own: one failing probe is reported as
+ * `unavailable` and never hides the other's verdict. When every probe fails
+ * the first error is thrown.
  *
  * @returns {Promise<PortTestResult[]>}
  */
 export async function testPort(client, caps) {
   if (caps && caps.portTestByProtocol) {
-    const [v4, v6] = await Promise.all([
-      client.call("port-test", { ip_protocol: "ipv4" }),
-      client.call("port-test", { ip_protocol: "ipv6" }),
-    ]);
-    return [
-      { protocol: "ipv4", open: portVerdict(v4) },
-      { protocol: "ipv6", open: portVerdict(v6) },
-    ];
+    const protocols = ["ipv4", "ipv6"];
+    const settled = await Promise.allSettled(protocols.map((ip_protocol) => client.call("port-test", { ip_protocol })));
+    const failed = settled.find((r) => r.status === "rejected");
+    if (failed && settled.every((r) => r.status === "rejected")) throw failed.reason;
+    return settled.map((r, i) => ({
+      protocol: protocols[i],
+      open: r.status === "fulfilled" ? portVerdict(r.value) : null,
+      unavailable: r.status === "rejected",
+    }));
   }
   const result = await client.call("port-test");
-  return [{ protocol: "any", open: portVerdict(result) }];
+  return [{ protocol: "any", open: portVerdict(result), unavailable: false }];
 }

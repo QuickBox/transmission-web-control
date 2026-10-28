@@ -38,6 +38,23 @@ test('shortcut label follows the platform', () => {
   assert.ok(label === 'Ctrl K' || label === '⌘ K');
 });
 
+test('every locale placeholder fits the field the stylesheet sizes for it', async () => {
+  const { readdirSync, readFileSync } = await import('node:fs');
+  const i18n = new URL('../../src/app/i18n/', import.meta.url);
+  const css = readFileSync(new URL('../../src/app/css/chrome.css', import.meta.url), 'utf8');
+  const width = Number(/\.search \{[^}]*?width: (\d+)px/.exec(css)?.[1]);
+  const longest = { lang: '', text: '' };
+  for (const lang of readdirSync(i18n, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name)) {
+    const main = JSON.parse(readFileSync(new URL(`${lang}/main.json`, i18n), 'utf8'));
+    const text = main.search && main.search.placeholder;
+    if (text && text.length > longest.text.length) Object.assign(longest, { lang, text });
+  }
+  // 34px icon padding + 62px chip padding leave `width - 96px`; the widest
+  // Latin fallback font sets 14px text at about 7.5px per character.
+  assert.ok(width >= 272, `search field width ${width}px`);
+  assert.ok(longest.text.length * 7.5 <= width - 96, `${longest.lang} placeholder "${longest.text}" is too long for ${width}px`);
+});
+
 test('typing debounces into filter.search; Enter commits at once; the clear button empties it', async () => {
   const { ctx, timers, search } = await setup();
   assert.equal(search.root.getAttribute('role'), 'search');

@@ -147,16 +147,39 @@ for (const version of RECORDED_VERSIONS) {
       assert.equal(probes.length, 2);
       assert.deepEqual(probes.map((b) => args(b).ip_protocol).sort(), ["ipv4", "ipv6"]);
       assert.deepEqual(out, [
-        { protocol: "ipv4", open: true },
-        { protocol: "ipv6", open: true },
+        { protocol: "ipv4", open: true, unavailable: false },
+        { protocol: "ipv6", open: true, unavailable: false },
       ]);
     } else {
       assert.equal(probes.length, 1);
       assert.equal(args(probes[0]).ip_protocol, undefined);
-      assert.deepEqual(out, [{ protocol: "any", open: true }]);
+      assert.deepEqual(out, [{ protocol: "any", open: true, unavailable: false }]);
     }
   });
 }
+
+test("port-test: one failing protocol is unavailable and keeps the other's verdict", async () => {
+  const caps = { portTestByProtocol: true };
+  const calls = [];
+  const client = {
+    async call(method, args) {
+      calls.push(args.ip_protocol);
+      if (args.ip_protocol === "ipv6") throw new Error("Couldn't test port: No Response (0)");
+      return { portIsOpen: false };
+    },
+  };
+  assert.deepEqual(await testPort(client, caps), [
+    { protocol: "ipv4", open: false, unavailable: false },
+    { protocol: "ipv6", open: null, unavailable: true },
+  ]);
+  assert.deepEqual(calls.sort(), ["ipv4", "ipv6"], "both probes were sent");
+});
+
+test("port-test: every probe failing rejects with the first error", async () => {
+  const failing = { async call() { throw new Error("daemon unreachable"); } };
+  await assert.rejects(testPort(failing, { portTestByProtocol: true }), /daemon unreachable/);
+  await assert.rejects(testPort(failing, { portTestByProtocol: false }), /daemon unreachable/);
+});
 
 test("sessionSetArgs tolerates a missing session and caps", () => {
   const caps = buildCaps({ speedLimitDown: 1, encryption: "preferred" }, { dialect: DIALECT.LEGACY });

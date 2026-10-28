@@ -86,11 +86,17 @@
     "free": "Free space in the download folder",
     "freeValue": "{free} free",
     "port": "Peer port",
-    "portOpen": "Port {protocol} open",
-    "portClosed": "Port {protocol} closed",
-    "portUnknown": "Port {protocol} unknown",
+    "portLine": "Port {port}: {states}",
+    "portProtocol": "{protocol} {state}",
+    "portStateOpen": "open",
+    "portStateClosed": "closed",
+    "portStateUnknown": "unknown",
+    "portStateUnavailable": "unavailable",
+    "portStateChecking": "checking",
     "version": "Transmission {version}",
-    "rpc": "RPC {rpc}"
+    "versionTip": "Transmission and RPC versions",
+    "rpc": "RPC {rpc}",
+    "rpcSemver": "RPC semver {semver}"
   },
   "bulkbar": {
     "clear": "Clear selection"
