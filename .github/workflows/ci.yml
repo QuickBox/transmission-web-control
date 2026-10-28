@@ -52,10 +52,13 @@ jobs:
           zero=0000000000000000000000000000000000000000
           if [ "$EVENT" = pull_request ]; then
             range="$PR_BASE..$SHA"
-          elif [ "$BEFORE" = "$zero" ]; then
-            if git fetch -q origin main 2>/dev/null; then range="FETCH_HEAD..$SHA"; else range="$SHA"; fi
-          else
+          elif [ "$BEFORE" != "$zero" ] && git rev-parse -q --verify "$BEFORE^{commit}" >/dev/null; then
             range="$BEFORE..$SHA"
+          elif git fetch -q origin main 2>/dev/null; then
+            # first push of a branch, or a before-commit this clone cannot see (force push)
+            range="FETCH_HEAD..$SHA"
+          else
+            range="$SHA"
           fi
           echo "checking $range"
           bash bin/check-version.sh messages "$range"

@@ -36,7 +36,14 @@ jobs:
 
       - name: Compute, write, tag and publish the release
         run: |
-          set -eu
+          set -Eeu
+          trap 'echo "::error::release step failed at line $LINENO: $BASH_COMMAND"' ERR
+          fail() { echo "::error::$*"; exit 1; }
+
+          # Every path below may commit or merge (release commit, back-merge), so
+          # the bot identity is set once up front.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           tarball() { printf 'transmission-web-control-v%s.tar.gz' "$1"; }
           tag_exists() { git ls-remote --tags origin "refs/tags/v$1" | grep -q .; }
@@ -46,6 +53,17 @@ jobs:
             printf '%s\n' "$names" | grep -qxF "$(tarball "$1")" && printf '%s\n' "$names" | grep -qxF SHA256SUMS
           }
           published() { tag_exists "$1" && release_exists "$1" && assets_complete "$1"; }
+          version_of() { # [<ref>] the package.json version of the work tree, or of <ref>
+            if [ -n "${1:-}" ]; then git show "$1:package.json"; else cat package.json; fi \
+              | sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' | head -1
+          }
+          # The commit that set <ver>: the bot's chore(release) commit or a prepared
+          # seed commit. A release is tagged there, never on the commit that triggered
+          # the run, which can carry later work that belongs to the next version.
+          version_commit() { # <ver>
+            c=$(git log -1 --format=%H -G '^[[:space:]]*"version"[[:space:]]*:' -- package.json)
+            [ -n "$c" ] && [ "$(version_of "$c")" = "$1" ] && printf '%s' "$c"
+          }
 
           # Publish a version idempotently from whatever a half-finished earlier
           # run left behind: tag the target, build the asset from the tagged tree,
@@ -53,30 +71,45 @@ jobs:
           # that is missing them.
           publish() { # <ver> <target-sha>
             ver="$1" target="$2"
-            bash bin/check-version.sh consistency || { echo "::error::version mismatch; refusing to tag v$ver"; exit 1; }
+            bash bin/check-version.sh consistency || fail "version mismatch; refusing to tag v$ver"
             if tag_exists "$ver"; then
-              git fetch -q origin "+refs/tags/v$ver:refs/tags/v$ver"
+              git fetch -q origin "+refs/tags/v$ver:refs/tags/v$ver" || fail "cannot fetch the existing tag v$ver"
             else
               git tag "v$ver" "$target"
-              git push origin "refs/tags/v$ver"
+              git push origin "refs/tags/v$ver" || fail "cannot push tag v$ver"
             fi
-            rel_sha=$(git rev-list -n1 "v$ver")
             out="$RUNNER_TEMP/assets-v$ver"
             rm -rf "$out"
-            bash bin/release.sh --asset "$out" --ref "v$ver" || { echo "::error::asset build failed for v$ver"; exit 1; }
-            ( cd "$out" && sha256sum -c SHA256SUMS ) || { echo "::error::asset checksum mismatch for v$ver"; exit 1; }
-            git show "v$ver:changelogs/v$ver.md" > "$out/notes.md" || { echo "::error::v$ver has no changelogs/v$ver.md"; exit 1; }
+            bash bin/release.sh --asset "$out" --ref "v$ver" || fail "asset build failed for v$ver"
+            ( cd "$out" && sha256sum -c SHA256SUMS ) || fail "asset checksum mismatch for v$ver"
+            git show "v$ver:changelogs/v$ver.md" > "$out/notes.md" || fail "v$ver has no changelogs/v$ver.md"
             if release_exists "$ver"; then
               assets_complete "$ver" && { echo "v$ver already released"; return 0; }
               echo "v$ver is released without its assets; uploading them"
-              gh release upload "v$ver" "$out/$(tarball "$ver")" "$out/SHA256SUMS" --clobber
+              gh release upload "v$ver" "$out/$(tarball "$ver")" "$out/SHA256SUMS" --clobber \
+                || fail "cannot upload the v$ver assets"
             else
               gh release create "v$ver" --verify-tag --title "transmission-web-control v$ver" \
-                --notes-file "$out/notes.md" "$out/$(tarball "$ver")" "$out/SHA256SUMS"
+                --notes-file "$out/notes.md" "$out/$(tarball "$ver")" "$out/SHA256SUMS" \
+                || fail "cannot create the v$ver release"
             fi
           }
 
-          V=$(sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' package.json | head -1)
+          # A rerun checks out the commit that first triggered it. When main has
+          # since gained only the bot's release commit, continue from there instead
+          # of generating that release a second time. Newer pushes own their release.
+          git fetch -q origin main || fail "cannot fetch main"
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+            others=$(git log --format='%an|%s' HEAD..FETCH_HEAD | grep -v '^github-actions\[bot\]|chore(release): ' || true)
+            if git merge-base --is-ancestor HEAD FETCH_HEAD && [ -z "$others" ]; then
+              git merge -q --ff-only FETCH_HEAD
+            else
+              echo "::warning::main moved past this run's commit; the run for the newer push releases it"
+              exit 0
+            fi
+          fi
+
+          V=$(version_of)
 
           # Skip only when this is the bot's own release commit AND the version is
           # fully published. A stranded commit (no tag, no release, or a release
@@ -88,50 +121,49 @@ jobs:
             exit 0
           fi
 
+          ver=""
           if [ -n "$V" ] && [ -f "changelogs/v$V.md" ] && ! published "$V"; then
-            # Prepared or recovery: a staged version that is not fully published.
-            publish "$V" "$GITHUB_SHA"
-            ver="$V"; sha="$rel_sha"
+            # Prepared or recovery: publish the staged version at the commit that set
+            # it. Commits after that one are the next version, generated below.
+            target=$(version_commit "$V") || fail "cannot find the commit that set version $V"
+            publish "$V" "$target"
+            ver="$V"
+          fi
+
+          # Generated: derive the next version and changelog from the commits since
+          # the newest tag.
+          if [ -z "$(git tag --merged HEAD --list 'v[0-9]*.[0-9]*.[0-9]*')" ]; then
+            fail "no vX.Y.Z tag is reachable from main; seed the first release on devop with bin/release.sh --version X.Y.Z --since <ref> and commit it as chore(release): vX.Y.Z"
+          fi
+          hl=""
+          [ -f release-notes/next.md ] && hl="--highlights release-notes/next.md"
+          rc=0
+          # shellcheck disable=SC2086
+          bash bin/release.sh --ci $hl || rc=$?
+          if [ "$rc" = 3 ]; then
+            echo "nothing further to release"
+            [ -n "$ver" ] || exit 0
+          elif [ "$rc" != 0 ]; then
+            fail "release generation failed (rc=$rc)"
           else
-            # Generated: derive the version and changelog from the commits.
-            if [ -z "$(git tag --merged HEAD --list 'v[0-9]*.[0-9]*.[0-9]*')" ]; then
-              echo "::error::no vX.Y.Z tag is reachable from main; seed the first release on devop with bin/release.sh --version X.Y.Z --since <ref> and commit it as chore(release): vX.Y.Z"
-              exit 1
-            fi
-            hl=""
-            [ -f release-notes/next.md ] && hl="--highlights release-notes/next.md"
-            set +e
-            # shellcheck disable=SC2086
-            bash bin/release.sh --ci $hl
-            rc=$?
-            set -e
-            if [ "$rc" = 3 ]; then
-              echo "nothing to release"
-              exit 0
-            fi
-            [ "$rc" = 0 ] || { echo "::error::release generation failed (rc=$rc)"; exit 1; }
-            ver=$(sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' package.json | head -1)
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            ver=$(version_of)
             [ -f release-notes/next.md ] && git rm -q release-notes/next.md
             git add package.json src/app/js/version.js changelogs CHANGELOG.md
             git commit -q -m "chore(release): v$ver"
-            git push origin "HEAD:main"
+            git push origin "HEAD:main" || fail "cannot push the v$ver release commit to main"
             publish "$ver" "$(git rev-parse HEAD)"
-            sha="$rel_sha"
           fi
+          sha=$(git rev-parse HEAD)
 
           # Carry the released state back to the working branch.
           if ! git ls-remote --exit-code --heads origin devop >/dev/null 2>&1; then
             echo "::warning::no devop branch on origin; v$ver shipped, nothing to back-merge"
             exit 0
           fi
-          git fetch -q origin devop
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch -q origin devop || fail "cannot fetch devop"
           git checkout -q -B devop origin/devop
           if git merge --no-ff -m "Merge branch 'main' into devop" "$sha"; then
-            git push origin devop
+            git push origin devop || fail "v$ver shipped, but the back-merge push to devop failed"
             echo "back-merged v$ver into devop"
           else
             conflicts=$(git diff --name-only --diff-filter=U | tr '\n' ' ')
