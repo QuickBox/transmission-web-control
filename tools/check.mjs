@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Static gates over the shipped app tree (`src/app`).
+ * Static gates over the shipped tree (`src/`): the app directory, the entry
+ * pages beside it and anything else that ships.
  *
  *   node tools/check.mjs            scan, exit 1 on any hit or on zero files
  *   node tools/check.mjs --selftest prove every gate fires and every exemption holds
@@ -17,8 +18,8 @@
  *   i18n-manifest  `i18n/manifest.json` disagrees with the catalog files on
  *               disk, or names an unknown language or namespace
  *
- * The entry pages beside the app directory (`src/index*.html`) are scanned
- * with the same line gates.
+ * Paths in hits are relative to the app directory, so the entry pages show as
+ * `../index.html`.
  */
 
 import { existsSync, readdirSync, readFileSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
@@ -85,21 +86,6 @@ function walk(dir, out = []) {
   return out;
 }
 
-/**
- * @param {string} appDir the directory to scan (normally `src/app`)
- * @returns {{ files: number, hits: string[] }}
- */
-function entryPages(appDir) {
-  const parent = dirname(appDir);
-  let names = [];
-  try {
-    names = readdirSync(parent);
-  } catch {
-    return [];
-  }
-  return names.filter((n) => /^index[\w.-]*\.html$/.test(n)).map((n) => join(parent, n));
-}
-
 function listed(manifest, lang) {
   return Array.isArray(manifest[lang]) ? manifest[lang] : [];
 }
@@ -137,8 +123,13 @@ function manifestHits(appDir) {
   return hits;
 }
 
+/**
+ * @param {string} appDir the app directory (normally `src/app`); every file
+ *   under its parent is scanned, so the whole shipped tree is covered
+ * @returns {{ files: number, hits: string[] }}
+ */
 export function scan(appDir) {
-  const files = [...walk(appDir), ...entryPages(appDir)];
+  const files = walk(dirname(appDir));
   const hits = manifestHits(appDir);
   for (const file of files) {
     const rel = relative(appDir, file).split(sep).join('/');

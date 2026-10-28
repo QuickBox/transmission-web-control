@@ -8,10 +8,8 @@ const { ACTIONS, mount, runAction } = await import('../../src/app/js/ui/toolbar.
 async function setup(opts = {}) {
   const made = await chromeCtx(opts);
   const { app, regions } = shell(env);
-  const requests = [];
-  app.addEventListener('settings-request', (e) => requests.push({ type: 'settings-request', detail: e.detail }));
   const teardown = mount(regions.toolbar, made.ctx);
-  return { ...made, app, root: regions.toolbar, requests, teardown };
+  return { ...made, app, root: regions.toolbar, teardown };
 }
 
 test('action table: every entry has an icon and exactly one of method/dialog', () => {
@@ -75,14 +73,13 @@ test('a failing action surfaces an error toast and resolves false', async () => 
 });
 
 test('Move, Speed limits, Remove, Settings and About go to the dialog registry, never events or RPC', async () => {
-  const { ctx, root, requests, calls, teardown } = await setup();
+  const { ctx, root, calls, teardown } = await setup();
   ctx.store.set({ selection: new Set([7]) });
   click(byAction(root, 'move'));
   click(byAction(root, 'limits'));
   click(byLabel(root, 'About'));
   click(byLabel(root, 'Settings'));
-  assert.deepEqual(requests, [], 'no request events: the registry openers are called (no-ops while it is not mounted)');
-  assert.equal(calls.length, 0, 'dialog actions make no RPC');
+  assert.equal(calls.length, 0, 'dialog actions call the registry openers (no-ops while it is not mounted) and make no RPC');
   for (const id of ['remove', 'move', 'limits', 'labels', 'findData']) {
     assert.equal(await runAction(ctx, id, [7]), true, `${id} resolves through the registry`);
     assert.equal(await runAction(ctx, id, []), false, `${id} needs a selection`);

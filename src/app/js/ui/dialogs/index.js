@@ -7,7 +7,6 @@
  * - `remove-request` (bubbling CustomEvent from the list, `detail: { ids }`)
  *   opens the Remove confirm for those ids.
  * - `add-request` (`detail: { files?, links? }`) opens Add torrent.
- * - `settings-request` (`detail: { page? }`) opens Settings.
  * - `openAdd(opts)`, `openRemove(ids)`, `openLocation(ids)`, `openRename(id)`,
  *   `openLabels(ids)`, `openLimits(ids)`, `openSettings(opts)`,
  *   `openReplaceTrackers(ids)`, `openAutoMatch(ids)` and `openAbout()` are direct calls;
@@ -31,7 +30,6 @@ import { createAutoMatchDialog } from './auto-match.js?v=__QBV__';
 
 export const ADD_REQUEST = 'add-request';
 export const REMOVE_REQUEST = 'remove-request';
-export const SETTINGS_REQUEST = 'settings-request';
 
 let instance = null;
 
@@ -162,9 +160,6 @@ export function mount(root, ctx) {
   function onAddRequest(e) {
     add.open((e && e.detail) || {});
   }
-  function onSettingsRequest(e) {
-    dialogs.settings.open((e && e.detail) || {});
-  }
 
   document.addEventListener('dragenter', onEnter);
   document.addEventListener('dragover', onOver);
@@ -172,7 +167,6 @@ export function mount(root, ctx) {
   document.addEventListener('drop', onDrop);
   app.addEventListener(REMOVE_REQUEST, onRemoveRequest);
   app.addEventListener(ADD_REQUEST, onAddRequest);
-  app.addEventListener(SETTINGS_REQUEST, onSettingsRequest);
 
   instance = { add, remove, ...dialogs };
   return () => {
@@ -182,7 +176,6 @@ export function mount(root, ctx) {
     document.removeEventListener('drop', onDrop);
     app.removeEventListener(REMOVE_REQUEST, onRemoveRequest);
     app.removeEventListener(ADD_REQUEST, onAddRequest);
-    app.removeEventListener(SETTINGS_REQUEST, onSettingsRequest);
     if (instance && instance.add === add) instance = null;
   };
 }

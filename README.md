@@ -1,51 +1,59 @@
-## 注意：项目不再维护
-> 因项目时间久远，所涉及的技术已过于陈旧，加上本人已没有精力在本项目上进行更新，现决定归档本项目，大家可以使用其他替代项目。
->
-> 如您还需要继续使用本项目，目前最好的方式是在 Docker 里使用 2.94 版本，然后设定环境变量指定WebUI，具体可参考（https://www.cnblogs.com/ronggang/p/18788723 ）；或者使用其他已集成的项目。
->
-> 感谢大家长期以来的支持。
-> 
-> 2025.06.01 栽培者 
+# Transmission web interface for QuickBox
 
-----
+This is the web UI that QuickBox installs for Transmission. It replaces the stock interface with one that looks and behaves like the QuickBox dashboard: same themes, same density, same keyboard habits. It is a static app. It talks to the Transmission daemon over its RPC endpoint and nothing else.
 
-<p align="center">
-<img src="https://github.com/ronggang/transmission-web-control/raw/master/src/tr-web-control/logo.png"><br/>
-<a href="https://github.com/ronggang/transmission-web-control/releases" title="GitHub Releases"><img src="https://img.shields.io/github/release/ronggang/transmission-web-control.svg"></a>
-<img src="https://img.shields.io/badge/transmission-%3E=2.40%20(RPC%20%3E14)-green.svg" title="Support Transmission Version">
-<a href="https://github.com/ronggang/transmission-web-control/LICENSE" title="GitHub license"><img src="https://img.shields.io/github/license/ronggang/transmission-web-control.svg"></a>
-<a href="https://t.me/transmission_web_control"><img src="https://img.shields.io/badge/Telegram-Chat-blue.svg?logo=telegram" alt="Telegram"/></a>
-</p>
+## Supported Transmission versions
 
-----
-## [English Introduction](https://github.com/ronggang/transmission-web-control/wiki)
+| Transmission | RPC | What the UI does |
+|---|---|---|
+| 2.94 | 15 | Full control. Labels are kept in the browser. |
+| 3.00 | 16 | Native labels, shared with every other client. |
+| 4.0.x | 17 | Tracker lists edited as tiered text. |
+| 4.1.x | 19, semver 6.x | JSON-RPC 2.0 on the wire, sequential download, IPv4 and IPv6 port checks. |
 
-## 国内镜像源
-- https://gitee.com/culturist/transmission-web-control
+The UI detects the daemon once at startup and turns features on or off from that. Nothing is hard coded to a version number.
 
-## 关于
-本项目主要目的是想加强[Transmission](https://www.transmissionbt.com/) Web的操作能力，本项目原本在[Google Code](https://code.google.com/p/transmission-control/)托管，现迁移至GitHub。
-本项目设计之初仅针对PT站，因此增加了 Tracker 服务器分组及状态，但这不并适用于普通BT种子。
+## Features
 
-另外，本项目仅为一套自定义的WebUI，不能代替 Transmission 工作，用户需要自行安装 Transmission 后才可正常使，Transmission 安装方法请移步至官网：https://www.transmissionbt.com/
+- Torrent list that stays fast with thousands of torrents. Only the rows on screen are rendered. Sort by any column.
+- Sidebar filters for status, labels, trackers and folders, with live counts.
+- Search with `Ctrl K`. Multi-select with click, Shift and Ctrl, or the keyboard. Bulk start, pause, remove, move, speed limits, queue order.
+- Details for the selected torrent: general info, files with per-file priority, trackers, peers and per-torrent options.
+- Add torrents by file, magnet link or drag and drop. Remove with or without data. Set location, rename, labels, replace trackers across torrents, and point a torrent at data that already exists on disk.
+- Settings for the daemon: downloading, seeding, speed and schedule, peers, network and the peer port test.
+- Status bar with live rates and limits, temporary speed limits, free space, port status and the daemon version.
+- Four themes that follow the QuickBox dashboard: Spectre, Smoked, Reel and Light. Works from 375 px phones to 1920 px desktops. Screen reader friendly: the list is a real grid, every control has a name, and there are no native tooltips.
 
-## 界面预览
-![screenshots](https://user-images.githubusercontent.com/8065899/38598199-0d2e684c-3d8e-11e8-8b21-3cd1f3c7580a.png)
+Torrent names, tracker messages and peer client strings are always rendered as text. The app never builds HTML from data.
 
-## 安装方法及更多内容，请参考：[中文帮助](https://github.com/ronggang/transmission-web-control/wiki/Home-CN) 
-### DSM7.0
-在这个版本中，需要额外修改权限以实现自动更新的功能
-在 `root` 权限下执行以下命令，其中：
- - `YOUR_USERNAME` 替换为你登录和更新脚本时候选择的用户
- - `/var/packages/transmission/target/share/transmission/web/` 这串路径为 transmission 的安装路径（默认应该是这个）
-```shell
-sed -i '/sc-transmission/s/$/YOUR_USERNAME/' /etc/group
-chown sc-transmission:sc-transmission /var/packages/transmission/target/share/transmission/web/* -R
-chmod 774 /var/packages/transmission/target/share/transmission/web/* -R
+## Install
+
+The interface ships with QuickBox. `qb install transmission` puts it in place, and `qb update transmission` keeps it current. There is nothing to build and nothing to configure. Open Transmission from the QuickBox dashboard or at `/transmission/web/` on your server.
+
+To go back to the interface that comes with Transmission, open `index.original.html` in the same folder, or use the link in the About dialog.
+
+## Themes and language
+
+The UI reads the dashboard's `qb_theme` cookie and follows it. You can also pick a theme from the palette button in the toolbar; that pick is remembered in this browser and wins over the cookie.
+
+The language follows the dashboard's `Language` cookie, then the browser language. English ships today. The dashboard's other languages are added as their catalogs land in `src/app/i18n/`.
+
+## Development
+
+The app is plain ES modules, CSS and JSON. There is no build step and no dependency to install. Node 22 runs the checks:
+
+```sh
+bash bin/ci-local.sh
 ```
 
-## 更新日志 [查看](https://github.com/ronggang/transmission-web-control/blob/master/CHANGELOG.md)
+That runs the static gates (`node tools/check.mjs`), a syntax check of every module, the test suite, and the commit message and version checks, in the same order as CI. Tests run against recorded RPC captures from Transmission 2.94, 3.00, 4.0.6 and 4.1.3, so a change is checked against every supported daemon without one running.
 
-## 项目日常维护
-* 栽培者
-* DarkAlexWang
+## Releases
+
+Development happens on `devop`; `main` is the release branch. A push to `main` derives the next version from the commit subjects, writes the changelog, tags, and publishes a stamped tarball of `src/` with its checksum. QuickBox installs pull that tarball through the QuickBox release service.
+
+Release notes are in `CHANGELOG.md`. Notes from before the QuickBox version are in `CHANGELOG-EN.md`.
+
+## Credits and license
+
+Based on Transmission Web Control by ronggang (MIT). The QuickBox version is a rewrite of the interface under the same license; see `LICENSE`. Icon glyphs are from Material Design Icons; see `src/app/NOTICE`.
