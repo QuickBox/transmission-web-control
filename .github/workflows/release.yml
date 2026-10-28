@@ -25,6 +25,15 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Run the CI checks before anything is tagged or published
+        run: bash bin/ci-local.sh || { echo "::error::CI checks failed; nothing was tagged or published"; exit 1; }
+
       - name: Compute, write, tag and publish the release
         run: |
           set -eu
