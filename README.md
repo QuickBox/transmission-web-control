@@ -15,7 +15,7 @@ The UI detects the daemon once at startup and turns features on or off from that
 
 ## Features
 
-- Torrent list that stays fast with thousands of torrents. Only the rows on screen are rendered. Sort by any column.
+- Torrent list that stays fast with thousands of torrents. Only the rows on screen are rendered. Sort by any column, pick the columns you want, and switch to compact rows in Settings.
 - Sidebar filters for status, labels, trackers and folders, with live counts.
 - Search with `Ctrl K`. Multi-select with click, Shift and Ctrl, or the keyboard. Bulk start, pause, remove, move, speed limits, queue order.
 - Details for the selected torrent: general info, files with per-file priority, trackers, peers and per-torrent options.
@@ -36,7 +36,7 @@ To go back to the interface that comes with Transmission, open `index.original.h
 
 The UI reads the dashboard's `qb_theme` cookie and follows it. You can also pick a theme from the palette button in the toolbar; that pick is remembered in this browser and wins over the cookie.
 
-The language follows the dashboard's `Language` cookie, then the browser language. English ships today. The dashboard's other languages are added as their catalogs land in `src/app/i18n/`.
+The language follows the dashboard's `Language` cookie, then the browser language. The interface is fully translated into the dashboard's languages: English, Danish, German, Spanish, French, Brazilian Portuguese and Simplified Chinese. Ten more languages keep the strings the original project had translated and show English for the rest.
 
 ## Development
 
