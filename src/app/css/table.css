@@ -11,7 +11,7 @@
 	position: relative;
 	min-width: 100%;
 	font-size: 13px;
-	color: var(--qb-fg);
+	color: var(--qb-foreground);
 	outline: none;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .torrents-row:hover {
-	background: color-mix(in srgb, var(--qb-fg) 4%, transparent);
+	background: color-mix(in srgb, var(--qb-foreground) 4%, transparent);
 }
 
 .torrents-row.is-selected {
@@ -151,7 +151,7 @@
 
 .sort:hover,
 .sort.is-active {
-	color: var(--qb-fg);
+	color: var(--qb-foreground);
 }
 
 .sort:focus-visible {
