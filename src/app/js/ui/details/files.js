@@ -13,6 +13,8 @@
  * row's actions; F2 renames.
  */
 
+import { nameProblem, promptDialog } from '../dialogs/rename.js?v=__QBV__';
+
 export const id = 'files';
 export const labelKey = 'details.tabs.files';
 export const live = true;
@@ -160,7 +162,7 @@ export function windowRange(scrollTop, viewport, rowHeight, total, overscan = OV
  * @returns {import('./index.js').TabView}
  */
 export function create(ctx, host) {
-  const { el, icon, toast, menu, openDialog } = ctx.ui;
+  const { el, icon, toast, menu } = ctx.ui;
   const t = ctx.i18n;
   const fmt = ctx.fmt;
 
@@ -322,57 +324,25 @@ export function create(ctx, host) {
 
   function rename(node) {
     if (!node) return;
-    const field = el('input', {
-      class: 'input', id: `files-rename-${torrentId}`, value: node.name, autocomplete: 'off', spellcheck: 'false',
-    });
-    const error = el('p', { class: 'field-error', role: 'alert' });
-    const cancel = el('button', { type: 'button', class: 'btn btn-secondary', text: t('core.actions.cancel') });
-    const save = el('button', { type: 'button', class: 'btn btn-primary', text: t('core.actions.save') });
-    const form = el('form', {
-      class: 'form-stack',
-      on: {
-        submit: (e) => {
-          e.preventDefault();
-          const value = field.value.trim();
-          if (!value || value === '.' || value === '..' || value.includes('/')) {
-            field.setAttribute('aria-invalid', 'true');
-            error.textContent = t('details.files.renameInvalid');
-            return;
-          }
-          if (value === node.name) {
-            dialog.close('cancel');
-            return;
-          }
-          save.disabled = true;
-          Promise.resolve()
-            .then(() => ctx.rpc.call('torrent-rename-path', { ids: [torrentId], path: node.key, name: value }))
-            .then(() => {
-              dialog.close('saved');
-              toast(t('details.files.renamed', { name: value }), { tone: 'success' });
-              host.refresh();
-            }, (err) => {
-              save.disabled = false;
-              field.setAttribute('aria-invalid', 'true');
-              error.textContent = t('details.files.renameFailed', { message: (err && err.message) || '' });
-            });
-        },
-      },
-    }, [
-      el('label', { class: 'field-label', for: field.id, text: t('details.files.newName') }),
-      field,
-      error,
-    ]);
-    save.addEventListener('click', () => form.requestSubmit());
-    cancel.addEventListener('click', () => dialog.close('cancel'));
-    const dialog = openDialog({
+    promptDialog(ctx, {
       title: t(node.isDir ? 'details.files.renameFolder' : 'details.files.renameFile'),
       description: node.key,
       icon: 'header-rename',
-      body: form,
-      actions: [cancel, save],
-      initialFocus: field,
+      label: t('details.files.newName'),
+      value: node.name,
+      validate: (value) => (nameProblem(value) ? t('details.files.renameInvalid') : null),
+      onSave: (value) => {
+        if (value === node.name) return Promise.resolve();
+        return Promise.resolve()
+          .then(() => ctx.rpc.call('torrent-rename-path', { ids: [torrentId], path: node.key, name: value }))
+          .then(() => {
+            toast(t('details.files.renamed', { name: value }), { tone: 'success' });
+            host.refresh();
+          }, (err) => {
+            throw new Error(t('details.files.renameFailed', { message: (err && err.message) || '' }));
+          });
+      },
     });
-    field.select();
   }
 
   function openMenu(node, anchor) {

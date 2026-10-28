@@ -304,3 +304,178 @@
 	justify-self: start;
 	font-size: 14px;
 }
+
+/* ---- Settings --------------------------------------------------------- */
+
+.settings {
+	display: grid;
+	grid-template-columns: 180px minmax(0, 1fr);
+	grid-template-rows: auto auto auto;
+	gap: 0 20px;
+	min-height: 360px;
+}
+
+.settings-nav {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	grid-row: 1 / span 3;
+	align-self: start;
+	position: sticky;
+	top: 0;
+}
+
+.settings-tab {
+	display: flex;
+	align-items: center;
+	min-height: 34px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: var(--qb-radius);
+	font-size: 14px;
+	text-align: left;
+	color: var(--qb-fg-muted);
+	background: transparent;
+	cursor: pointer;
+}
+
+.settings-tab:hover {
+	color: var(--qb-foreground);
+	background: var(--qb-muted);
+}
+
+.settings-tab[aria-selected="true"] {
+	font-weight: 500;
+	color: var(--qb-primary-text);
+	background: color-mix(in srgb, var(--qb-primary) 12%, transparent);
+}
+
+.settings-panel:focus-visible {
+	outline-offset: 4px;
+}
+
+.settings-page[hidden] {
+	display: none;
+}
+
+.settings-page {
+	display: grid;
+	gap: 2px;
+}
+
+.settings-page-title {
+	margin: 0 0 6px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.settings-field {
+	display: grid;
+	gap: 2px;
+}
+
+.option-row-stack {
+	flex-wrap: wrap;
+}
+
+.settings-text {
+	flex: 1 1 260px;
+	max-width: 420px;
+}
+
+.option-row-stack .settings-text {
+	max-width: none;
+}
+
+.settings-help {
+	margin: -2px 0 6px;
+}
+
+.settings-readonly {
+	color: var(--qb-fg-muted);
+}
+
+.day-boxes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+}
+
+.day-box {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+}
+
+.port-chips {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.port-chip.is-open {
+	color: var(--tr-st-seeding);
+	border-color: color-mix(in srgb, var(--tr-st-seeding) 35%, transparent);
+}
+
+.port-chip.is-closed {
+	color: var(--qb-destructive-text);
+	border-color: color-mix(in srgb, var(--qb-destructive) 40%, transparent);
+}
+
+.settings-interface {
+	display: grid;
+	gap: 2px;
+}
+
+@media (max-width: 639px) {
+	.settings {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.settings-nav {
+		position: static;
+		flex-direction: row;
+		grid-row: auto;
+		overflow-x: auto;
+		margin-bottom: 12px;
+	}
+
+	.settings-tab {
+		flex: none;
+	}
+}
+
+/* ---- Find data -------------------------------------------------------- */
+
+.match-results {
+	display: grid;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.match-result {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 4px 12px;
+	font-size: 13px;
+}
+
+.match-name {
+	min-width: 0;
+	overflow-wrap: anywhere;
+	font-weight: 500;
+}
+
+.match-folder {
+	overflow-wrap: anywhere;
+	color: var(--qb-fg-muted);
+}
+
+.match-result.is-found .match-folder {
+	color: var(--tr-st-seeding);
+}

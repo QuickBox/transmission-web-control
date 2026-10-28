@@ -1,13 +1,16 @@
 /**
  * Dialog registry. Owns the Add torrent, Remove, Location, Rename, Labels,
- * Speed limits and About dialogs, the window-wide drop overlay for `.torrent`
- * files, and the requests other modules send:
+ * Speed limits, Settings, Replace trackers, Find data and About dialogs, the
+ * window-wide drop overlay for `.torrent` files, and the requests other
+ * modules send:
  *
  * - `remove-request` (bubbling CustomEvent from the list, `detail: { ids }`)
  *   opens the Remove confirm for those ids.
  * - `add-request` (`detail: { files?, links? }`) opens Add torrent.
+ * - `settings-request` (`detail: { page? }`) opens Settings.
  * - `openAdd(opts)`, `openRemove(ids)`, `openLocation(ids)`, `openRename(id)`,
- *   `openLabels(ids)`, `openLimits(ids)` and `openAbout()` are direct calls;
+ *   `openLabels(ids)`, `openLimits(ids)`, `openSettings(opts)`,
+ *   `openReplaceTrackers(ids)`, `openAutoMatch(ids)` and `openAbout()` are direct calls;
  *   import this module with the same specifier `main.js` uses so they reach
  *   the mounted instance. Each returns nothing when the module is not mounted
  *   or none of the ids is a known torrent.
@@ -22,9 +25,13 @@ import { createRenameDialog } from './rename.js?v=__QBV__';
 import { createLabelsDialog } from './labels.js?v=__QBV__';
 import { createLimitsDialog } from './limits.js?v=__QBV__';
 import { createAboutDialog } from './about.js?v=__QBV__';
+import { createSettingsDialog } from './settings.js?v=__QBV__';
+import { createReplaceTrackersDialog } from './replace-trackers.js?v=__QBV__';
+import { createAutoMatchDialog } from './auto-match.js?v=__QBV__';
 
 export const ADD_REQUEST = 'add-request';
 export const REMOVE_REQUEST = 'remove-request';
+export const SETTINGS_REQUEST = 'settings-request';
 
 let instance = null;
 
@@ -65,6 +72,21 @@ export function openAbout() {
   if (instance) instance.about.open();
 }
 
+/** @param {{ page?: string }} [opts] open on a page (`downloading`, `speed`, `network`, ...) */
+export function openSettings(opts) {
+  if (instance) instance.settings.open(opts || {});
+}
+
+/** @param {number[]} [ids] the selection; without it every torrent is searched */
+export function openReplaceTrackers(ids) {
+  if (instance) instance.replaceTrackers.open(ids);
+}
+
+/** @param {number[]} ids */
+export function openAutoMatch(ids) {
+  if (instance) instance.autoMatch.open(ids);
+}
+
 function hasFiles(e) {
   const types = e.dataTransfer && e.dataTransfer.types;
   return Boolean(types && [...types].includes('Files'));
@@ -88,6 +110,9 @@ export function mount(root, ctx) {
     labels: createLabelsDialog(ctx),
     limits: createLimitsDialog(ctx),
     about: createAboutDialog(ctx),
+    settings: createSettingsDialog(ctx),
+    replaceTrackers: createReplaceTrackersDialog(ctx),
+    autoMatch: createAutoMatchDialog(ctx),
   };
 
   const overlay = el('div', { class: 'drop-overlay', hidden: true, 'aria-hidden': 'true' }, [
@@ -137,6 +162,9 @@ export function mount(root, ctx) {
   function onAddRequest(e) {
     add.open((e && e.detail) || {});
   }
+  function onSettingsRequest(e) {
+    dialogs.settings.open((e && e.detail) || {});
+  }
 
   document.addEventListener('dragenter', onEnter);
   document.addEventListener('dragover', onOver);
@@ -144,6 +172,7 @@ export function mount(root, ctx) {
   document.addEventListener('drop', onDrop);
   app.addEventListener(REMOVE_REQUEST, onRemoveRequest);
   app.addEventListener(ADD_REQUEST, onAddRequest);
+  app.addEventListener(SETTINGS_REQUEST, onSettingsRequest);
 
   instance = { add, remove, ...dialogs };
   return () => {
@@ -153,6 +182,7 @@ export function mount(root, ctx) {
     document.removeEventListener('drop', onDrop);
     app.removeEventListener(REMOVE_REQUEST, onRemoveRequest);
     app.removeEventListener(ADD_REQUEST, onAddRequest);
+    app.removeEventListener(SETTINGS_REQUEST, onSettingsRequest);
     if (instance && instance.add === add) instance = null;
   };
 }

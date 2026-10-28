@@ -13,6 +13,7 @@
  */
 
 import { formatTrackerList, parseTrackerList, setTrackers, tiersFromTrackers } from '../../rpc/trackers.js?v=__QBV__';
+import { promptDialog } from '../dialogs/rename.js?v=__QBV__';
 
 export const id = 'trackers';
 export const labelKey = 'details.tabs.trackers';
@@ -70,48 +71,28 @@ export function create(ctx) {
     return Boolean(ctx.caps && ctx.caps.trackerList);
   }
 
-  function save(tiers, done) {
+  /** Write the tiers; resolves after the success toast, rejects with a readable message. */
+  function save(tiers) {
     const torrentId = current.id;
     return Promise.resolve()
       .then(() => setTrackers(ctx.rpc, ctx.caps, [torrentId], tiers))
-      .then(() => {
-        toast(t('details.trackers.saved'), { tone: 'success' });
-        if (done) done();
-      }, (err) => {
-        toast(t('details.trackers.saveFailed', { message: (err && err.message) || '' }), { tone: 'error' });
-        throw err;
+      .then(() => { toast(t('details.trackers.saved'), { tone: 'success' }); }, (err) => {
+        throw new Error(t('details.trackers.saveFailed', { message: (err && err.message) || '' }));
       });
   }
 
-  /** A one-field dialog for an announce URL. Resolves when saved or closed. */
+  /** The one-field dialog for an announce URL. */
   function urlDialog({ title, value, onSave }) {
-    const field = el('input', {
-      class: 'input mono', id: `tracker-url-${current.id}`, value: value || '', autocomplete: 'off', spellcheck: 'false',
-      inputmode: 'url', placeholder: t('details.trackers.urlPlaceholder'),
+    return promptDialog(ctx, {
+      title,
+      icon: 'tab-trackers',
+      label: t('details.trackers.url'),
+      value,
+      placeholder: t('details.trackers.urlPlaceholder'),
+      mono: true,
+      validate: (url) => (isAnnounceUrl(url) ? null : t('details.trackers.invalidUrl')),
+      onSave,
     });
-    const error = el('p', { class: 'field-error', role: 'alert' });
-    const cancel = el('button', { type: 'button', class: 'btn btn-secondary', text: t('core.actions.cancel') });
-    const ok = el('button', { type: 'button', class: 'btn btn-primary', text: t('core.actions.save') });
-    const form = el('form', { class: 'form-stack', on: { submit } }, [
-      el('label', { class: 'field-label', for: field.id, text: t('details.trackers.url') }),
-      field,
-      error,
-    ]);
-    function submit(e) {
-      if (e) e.preventDefault();
-      const url = field.value.trim();
-      if (!isAnnounceUrl(url)) {
-        field.setAttribute('aria-invalid', 'true');
-        error.textContent = t('details.trackers.invalidUrl');
-        return;
-      }
-      ok.disabled = true;
-      onSave(url).then(() => dialog.close('saved'), () => { ok.disabled = false; });
-    }
-    ok.addEventListener('click', () => submit());
-    cancel.addEventListener('click', () => dialog.close('cancel'));
-    const dialog = openDialog({ title, icon: 'tab-trackers', body: form, actions: [cancel, ok], initialFocus: field });
-    return dialog;
   }
 
   function editList() {
@@ -145,7 +126,10 @@ export function create(ctx) {
         return;
       }
       ok.disabled = true;
-      save(area.value, () => dialog.close('saved')).catch(() => { ok.disabled = false; });
+      save(area.value).then(() => dialog.close('saved'), (err) => {
+        ok.disabled = false;
+        error.textContent = err.message;
+      });
     });
     return dialog;
   }
@@ -177,7 +161,7 @@ export function create(ctx) {
       const tiers = tiersFromTrackers(current.trackers)
         .map((tier) => tier.filter((u) => u !== tracker.announce))
         .filter((tier) => tier.length > 0);
-      return save(tiers).catch(() => null);
+      return save(tiers).catch((err) => { toast(err.message, { tone: 'error' }); });
     });
   }
 
