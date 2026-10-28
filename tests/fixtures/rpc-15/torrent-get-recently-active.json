@@ -1,0 +1,163 @@
+{
+  "_source": "spec-derived",
+  "_note": "Derived from the Transmission RPC spec and release notes, not recorded from a daemon. Recorded bench captures live under recorded/.",
+  "dialect": "legacy",
+  "method": "torrent-get",
+  "handshake": {
+    "sessionId": "spec15Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo",
+    "rpcVersionHeader": null
+  },
+  "request": {
+    "method": "torrent-get",
+    "arguments": {
+      "fields": [
+        "id",
+        "name",
+        "status",
+        "error",
+        "errorString",
+        "totalSize",
+        "sizeWhenDone",
+        "leftUntilDone",
+        "percentDone",
+        "recheckProgress",
+        "rateDownload",
+        "rateUpload",
+        "eta",
+        "uploadRatio",
+        "uploadedEver",
+        "downloadedEver",
+        "peersConnected",
+        "peersGettingFromUs",
+        "peersSendingToUs",
+        "doneDate",
+        "activityDate",
+        "queuePosition",
+        "isFinished",
+        "trackerStats"
+      ],
+      "ids": "recently-active"
+    },
+    "tag": 3
+  },
+  "response": {
+    "result": "success",
+    "arguments": {
+      "torrents": [
+        {
+          "id": 1,
+          "name": "debian-13.1.0-amd64-netinst.iso",
+          "status": 4,
+          "error": 0,
+          "errorString": "",
+          "totalSize": 702545920,
+          "sizeWhenDone": 702545920,
+          "leftUntilDone": 262144000,
+          "percentDone": 0.6268,
+          "recheckProgress": 0,
+          "rateDownload": 3145728.4,
+          "rateUpload": 98304,
+          "eta": 168,
+          "uploadRatio": 0.12,
+          "uploadedEver": 42152755,
+          "downloadedEver": 440401920,
+          "peersConnected": 24,
+          "peersGettingFromUs": 3,
+          "peersSendingToUs": 18,
+          "doneDate": 0,
+          "activityDate": 1761600015,
+          "queuePosition": 0,
+          "isFinished": false,
+          "trackerStats": [
+            {
+              "id": 0,
+              "tier": 0,
+              "announce": "https://bttracker.debian.org/announce",
+              "scrape": "https://bttracker.debian.org/scrape",
+              "announceState": 1,
+              "lastAnnounceSucceeded": true,
+              "lastAnnounceResult": "Success",
+              "lastAnnounceTime": 1761600000,
+              "nextAnnounceTime": 1761601800,
+              "seederCount": 1400,
+              "leecherCount": 57,
+              "downloadCount": -1
+            },
+            {
+              "id": 1,
+              "tier": 1,
+              "announce": "https://tracker.example.net/announce",
+              "scrape": "https://tracker.example.net/scrape",
+              "announceState": 1,
+              "lastAnnounceSucceeded": true,
+              "lastAnnounceResult": "Success",
+              "lastAnnounceTime": 0,
+              "nextAnnounceTime": 1800,
+              "seederCount": -1,
+              "leecherCount": -1,
+              "downloadCount": -1
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "ubuntu-24.04.3-live-server-amd64.iso",
+          "status": 6,
+          "error": 0,
+          "errorString": "",
+          "totalSize": 3221225472,
+          "sizeWhenDone": 3221225472,
+          "leftUntilDone": 0,
+          "percentDone": 1,
+          "recheckProgress": 0,
+          "rateDownload": 0,
+          "rateUpload": 262144,
+          "eta": -1,
+          "uploadRatio": 2.4,
+          "uploadedEver": 7731203277,
+          "downloadedEver": 3221225472,
+          "peersConnected": 9,
+          "peersGettingFromUs": 4,
+          "peersSendingToUs": 0,
+          "doneDate": 1761503600,
+          "activityDate": 1761600015,
+          "queuePosition": 1,
+          "isFinished": false,
+          "trackerStats": [
+            {
+              "id": 0,
+              "tier": 0,
+              "announce": "https://torrent.ubuntu.com/announce",
+              "scrape": "https://torrent.ubuntu.com/scrape",
+              "announceState": 1,
+              "lastAnnounceSucceeded": true,
+              "lastAnnounceResult": "Success",
+              "lastAnnounceTime": 1761600000,
+              "nextAnnounceTime": 1761601800,
+              "seederCount": 2200,
+              "leecherCount": 310,
+              "downloadCount": -1
+            }
+          ]
+        }
+      ],
+      "removed": [
+        3,
+        999
+      ]
+    },
+    "tag": 3
+  },
+  "expect": {
+    "updated": [
+      1,
+      2
+    ],
+    "removed": [
+      3
+    ],
+    "rateDownload": {
+      "1": 3145728
+    }
+  }
+}

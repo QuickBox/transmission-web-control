@@ -1,0 +1,104 @@
+{
+  "_source": "spec-derived",
+  "_note": "Derived from the Transmission RPC spec and release notes, not recorded from a daemon. Recorded bench captures live under recorded/.",
+  "dialect": "jsonrpc",
+  "method": "session-get",
+  "handshake": {
+    "sessionId": "spec41Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo",
+    "rpcVersionHeader": "6.0.1"
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "method": "session_get",
+    "params": {},
+    "id": 1
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "result": {
+      "alt_speed_down": 50,
+      "alt_speed_enabled": false,
+      "alt_speed_up": 50,
+      "blocklist_enabled": false,
+      "blocklist_size": 0,
+      "cache_size_mb": 4,
+      "config_dir": "/home/user/.config/transmission-daemon",
+      "dht_enabled": true,
+      "download_dir": "/home/user/torrents",
+      "download_queue_enabled": true,
+      "download_queue_size": 5,
+      "encryption": "preferred",
+      "incomplete_dir": "/home/user/torrents/incomplete",
+      "incomplete_dir_enabled": false,
+      "lpd_enabled": false,
+      "peer_limit_global": 200,
+      "peer_limit_per_torrent": 50,
+      "peer_port": 51413,
+      "peer_port_random_on_start": false,
+      "pex_enabled": true,
+      "port_forwarding_enabled": false,
+      "queue_stalled_enabled": true,
+      "queue_stalled_minutes": 30,
+      "rename_partial_files": true,
+      "script_torrent_done_enabled": false,
+      "script_torrent_done_filename": "",
+      "seed_queue_enabled": false,
+      "seed_queue_size": 10,
+      "seed_ratio_limit": 2,
+      "seed_ratio_limited": false,
+      "speed_limit_down": 1024,
+      "speed_limit_down_enabled": false,
+      "speed_limit_up": 512,
+      "speed_limit_up_enabled": false,
+      "start_added_torrents": true,
+      "trash_original_torrent_files": false,
+      "utp_enabled": true,
+      "units": {
+        "memory_bytes": 1024,
+        "memory_units": [
+          "KiB",
+          "MiB",
+          "GiB",
+          "TiB"
+        ],
+        "size_bytes": 1000,
+        "size_units": [
+          "kB",
+          "MB",
+          "GB",
+          "TB"
+        ],
+        "speed_bytes": 1000,
+        "speed_units": [
+          "kB/s",
+          "MB/s",
+          "GB/s",
+          "TB/s"
+        ]
+      },
+      "default_trackers": "",
+      "script_torrent_added_enabled": false,
+      "script_torrent_added_filename": "",
+      "script_torrent_done_seeding_enabled": false,
+      "script_torrent_done_seeding_filename": "",
+      "anti_brute_force_enabled": false,
+      "anti_brute_force_threshold": 100,
+      "preferred_transports": [
+        "utp",
+        "tcp"
+      ],
+      "sequential_download": false,
+      "rpc_version": 18,
+      "rpc_version_minimum": 14,
+      "rpc_version_semver": "6.0.1",
+      "version": "4.1.3 (e1f8c4a2b7)",
+      "session_id": "spec41Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo"
+    },
+    "id": 1
+  },
+  "expect": {
+    "rpc": 18,
+    "semver": "6.0.1",
+    "daemonVersion": "4.1.3 (e1f8c4a2b7)"
+  }
+}

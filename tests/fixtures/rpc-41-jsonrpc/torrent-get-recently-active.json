@@ -1,0 +1,200 @@
+{
+  "_source": "spec-derived",
+  "_note": "Derived from the Transmission RPC spec and release notes, not recorded from a daemon. Recorded bench captures live under recorded/.",
+  "dialect": "jsonrpc",
+  "method": "torrent-get",
+  "handshake": {
+    "sessionId": "spec41Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo",
+    "rpcVersionHeader": "6.0.1"
+  },
+  "request": {
+    "jsonrpc": "2.0",
+    "method": "torrent_get",
+    "params": {
+      "fields": [
+        "id",
+        "name",
+        "status",
+        "error",
+        "error_string",
+        "total_size",
+        "size_when_done",
+        "left_until_done",
+        "percent_done",
+        "recheck_progress",
+        "rate_download",
+        "rate_upload",
+        "eta",
+        "upload_ratio",
+        "uploaded_ever",
+        "downloaded_ever",
+        "peers_connected",
+        "peers_getting_from_us",
+        "peers_sending_to_us",
+        "done_date",
+        "activity_date",
+        "queue_position",
+        "is_finished",
+        "tracker_stats",
+        "labels"
+      ],
+      "ids": "recently_active",
+      "format": "table"
+    },
+    "id": 3
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "result": {
+      "torrents": [
+        [
+          "id",
+          "name",
+          "status",
+          "error",
+          "error_string",
+          "total_size",
+          "size_when_done",
+          "left_until_done",
+          "percent_done",
+          "recheck_progress",
+          "rate_download",
+          "rate_upload",
+          "eta",
+          "upload_ratio",
+          "uploaded_ever",
+          "downloaded_ever",
+          "peers_connected",
+          "peers_getting_from_us",
+          "peers_sending_to_us",
+          "done_date",
+          "activity_date",
+          "queue_position",
+          "is_finished",
+          "tracker_stats",
+          "labels"
+        ],
+        [
+          1,
+          "debian-13.1.0-amd64-netinst.iso",
+          4,
+          0,
+          "",
+          702545920,
+          702545920,
+          262144000,
+          0.6268,
+          0,
+          3145728.4,
+          98304,
+          168,
+          0.12,
+          42152755,
+          440401920,
+          24,
+          3,
+          18,
+          0,
+          1761600015,
+          0,
+          false,
+          [
+            {
+              "id": 0,
+              "tier": 0,
+              "announce": "https://bttracker.debian.org/announce",
+              "scrape": "https://bttracker.debian.org/scrape",
+              "announce_state": 1,
+              "last_announce_succeeded": true,
+              "last_announce_result": "Success",
+              "last_announce_time": 1761600000,
+              "next_announce_time": 1761601800,
+              "seeder_count": 1400,
+              "leecher_count": 57,
+              "download_count": -1
+            },
+            {
+              "id": 1,
+              "tier": 1,
+              "announce": "https://tracker.example.net/announce",
+              "scrape": "https://tracker.example.net/scrape",
+              "announce_state": 1,
+              "last_announce_succeeded": true,
+              "last_announce_result": "Success",
+              "last_announce_time": 0,
+              "next_announce_time": 1800,
+              "seeder_count": -1,
+              "leecher_count": -1,
+              "download_count": -1
+            }
+          ],
+          [
+            "linux",
+            "iso"
+          ]
+        ],
+        [
+          2,
+          "ubuntu-24.04.3-live-server-amd64.iso",
+          6,
+          0,
+          "",
+          3221225472,
+          3221225472,
+          0,
+          1,
+          0,
+          0,
+          262144,
+          -1,
+          2.4,
+          7731203277,
+          3221225472,
+          9,
+          4,
+          0,
+          1761503600,
+          1761600015,
+          1,
+          false,
+          [
+            {
+              "id": 0,
+              "tier": 0,
+              "announce": "https://torrent.ubuntu.com/announce",
+              "scrape": "https://torrent.ubuntu.com/scrape",
+              "announce_state": 1,
+              "last_announce_succeeded": true,
+              "last_announce_result": "Success",
+              "last_announce_time": 1761600000,
+              "next_announce_time": 1761601800,
+              "seeder_count": 2200,
+              "leecher_count": 310,
+              "download_count": -1
+            }
+          ],
+          [
+            "linux"
+          ]
+        ]
+      ],
+      "removed": [
+        3,
+        999
+      ]
+    },
+    "id": 3
+  },
+  "expect": {
+    "updated": [
+      1,
+      2
+    ],
+    "removed": [
+      3
+    ],
+    "rateDownload": {
+      "1": 3145728
+    }
+  }
+}

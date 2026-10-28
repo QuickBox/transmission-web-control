@@ -1,0 +1,90 @@
+{
+  "_source": "spec-derived",
+  "_note": "Derived from the Transmission RPC spec and release notes, not recorded from a daemon. Recorded bench captures live under recorded/.",
+  "dialect": "legacy",
+  "method": "session-get",
+  "handshake": {
+    "sessionId": "spec15Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo",
+    "rpcVersionHeader": null
+  },
+  "request": {
+    "method": "session-get",
+    "arguments": {},
+    "tag": 1
+  },
+  "response": {
+    "result": "success",
+    "arguments": {
+      "alt-speed-down": 50,
+      "alt-speed-enabled": false,
+      "alt-speed-up": 50,
+      "blocklist-enabled": false,
+      "blocklist-size": 0,
+      "cache-size-mb": 4,
+      "config-dir": "/home/user/.config/transmission-daemon",
+      "dht-enabled": true,
+      "download-dir": "/home/user/torrents",
+      "download-queue-enabled": true,
+      "download-queue-size": 5,
+      "encryption": "preferred",
+      "incomplete-dir": "/home/user/torrents/incomplete",
+      "incomplete-dir-enabled": false,
+      "lpd-enabled": false,
+      "peer-limit-global": 200,
+      "peer-limit-per-torrent": 50,
+      "peer-port": 51413,
+      "peer-port-random-on-start": false,
+      "pex-enabled": true,
+      "port-forwarding-enabled": false,
+      "queue-stalled-enabled": true,
+      "queue-stalled-minutes": 30,
+      "rename-partial-files": true,
+      "script-torrent-done-enabled": false,
+      "script-torrent-done-filename": "",
+      "seed-queue-enabled": false,
+      "seed-queue-size": 10,
+      "seedRatioLimit": 2,
+      "seedRatioLimited": false,
+      "speed-limit-down": 1024,
+      "speed-limit-down-enabled": false,
+      "speed-limit-up": 512,
+      "speed-limit-up-enabled": false,
+      "start-added-torrents": true,
+      "trash-original-torrent-files": false,
+      "utp-enabled": true,
+      "units": {
+        "memory-bytes": 1024,
+        "memory-units": [
+          "KiB",
+          "MiB",
+          "GiB",
+          "TiB"
+        ],
+        "size-bytes": 1000,
+        "size-units": [
+          "kB",
+          "MB",
+          "GB",
+          "TB"
+        ],
+        "speed-bytes": 1000,
+        "speed-units": [
+          "kB/s",
+          "MB/s",
+          "GB/s",
+          "TB/s"
+        ]
+      },
+      "rpc-version": 15,
+      "rpc-version-minimum": 1,
+      "version": "2.94 (d8e60ee44f)",
+      "download-dir-free-space": 214748364800
+    },
+    "tag": 1
+  },
+  "expect": {
+    "rpc": 15,
+    "semver": null,
+    "daemonVersion": "2.94 (d8e60ee44f)"
+  }
+}
