@@ -117,3 +117,48 @@ test('teardown stops re-rendering', async () => {
   ctx.store.set({ torrents: new Map() });
   assert.equal(items(root, 'status')[0].querySelector('.nav-count').textContent, '5');
 });
+
+test('a poll patches the items in place: nodes, focus and an in-flight press survive', async () => {
+  const { ctx, root, teardown } = await setup();
+  const paused = find(root, 'status', 'Paused');
+  const linux = find(root, 'labels', 'linux');
+  const allLi = root.querySelectorAll('li');
+  paused.focus();
+  const before = new Map([...torrents()].map(([id, t]) => [id, { ...t, rateDownload: t.rateDownload + 1 }]));
+  before.delete(5);
+  ctx.store.set({ torrents: before });
+  assert.equal(find(root, 'status', 'Paused'), paused, 'the same button after the poll');
+  assert.equal(find(root, 'labels', 'linux'), linux, 'label items keep their nodes');
+  assert.equal(globalThis.document.activeElement, paused, 'focus stays on the filter');
+  assert.equal(paused.isConnected, true);
+  assert.equal(countOf(find(root, 'status', 'Error')), '0', 'counts are patched');
+  assert.equal(countOf(find(root, 'status', 'All')), '4');
+  assert.equal(root.querySelectorAll('li').length, allLi.length - 0, 'no li was dropped: torrent 5 shared every facet with others');
+  // A press that started before the poll completes on the same node after it.
+  click(paused);
+  assert.equal(ctx.store.get().filter.status, 'stopped', 'the straddled press still filters');
+  assert.equal(paused.getAttribute('aria-current'), 'true');
+  assert.equal(find(root, 'status', 'All').getAttribute('aria-current'), null);
+  teardown();
+});
+
+test('membership changes insert or drop only the affected items, in sorted order', async () => {
+  const { ctx, root, teardown } = await setup();
+  const linux = find(root, 'labels', 'linux');
+  const video = find(root, 'labels', 'video');
+  const next = torrents();
+  next.set(9, torrent({ id: 9, hash: '9'.repeat(40), state: 'seeding', labels: ['music'], trackerHosts: ['c.invalid'], downloadDir: '/data/iso' }));
+  ctx.store.set({ torrents: next });
+  assert.deepEqual(items(root, 'labels').map(labelOf), ['linux', 'music', 'video'], 'new key lands in sorted position');
+  assert.equal(find(root, 'labels', 'linux'), linux, 'existing nodes untouched by the insert');
+  assert.equal(find(root, 'labels', 'video'), video);
+  assert.deepEqual(items(root, 'trackers').map(labelOf), ['a.invalid', 'b.invalid', 'c.invalid']);
+  next.delete(9);
+  ctx.store.set({ torrents: new Map(next) });
+  assert.deepEqual(items(root, 'labels').map(labelOf), ['linux', 'video'], 'a vanished key is dropped');
+  assert.equal(find(root, 'labels', 'linux'), linux);
+  ctx.store.set({ torrents: new Map() });
+  assert.equal(section(root, 'labels').querySelector('ul').hidden, true);
+  assert.equal(section(root, 'labels').querySelector('.nav-empty').hidden, false);
+  teardown();
+});

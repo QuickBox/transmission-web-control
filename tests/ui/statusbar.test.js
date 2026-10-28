@@ -263,3 +263,15 @@ test('connection chip is a polite live region that appears while offline or unau
   assert.equal(c.hasAttribute('data-essential'), false, 'back online drops the essential mark');
   teardown();
 });
+
+test('store updates patch the chips in place', async () => {
+  const { ctx, root, teardown } = await setup();
+  const nodes = ['down', 'up', 'free', 'port', 'version', 'counts', 'connection'].map((id) => chip(root, id));
+  ctx.store.set({ stats: { downloadSpeed: 7, uploadSpeed: 8, torrentCount: 3 } });
+  ctx.store.set({ session: { ...ctx.store.get().session, altSpeedEnabled: true } });
+  ctx.store.set({ connection: { state: 'offline', error: 'x', since: 1 } });
+  ctx.store.set({ torrents: new Map([[1, torrent()]]) });
+  await flush();
+  ['down', 'up', 'free', 'port', 'version', 'counts', 'connection'].forEach((id, i) => assert.equal(chip(root, id), nodes[i], `${id} chip keeps its node`));
+  teardown();
+});

@@ -65,3 +65,25 @@ test('teardown empties the region and unsubscribes', async () => {
   ctx.store.set({ selection: new Set([1, 2]) });
   assert.equal(root.children.length, 0);
 });
+
+test('a selection change or a poll patches the bar in place; only empty <-> non-empty swaps the nodes', async () => {
+  const { ctx, root, teardown } = await setup();
+  ctx.store.set({ selection: new Set([1, 2]) });
+  const start = byAction(root, 'start');
+  const count = root.querySelector('.bulk-count');
+  start.focus();
+  ctx.store.set({ selection: new Set([1, 2, 3]) });
+  assert.equal(byAction(root, 'start'), start, 'the same Start button after the selection grew');
+  assert.equal(root.querySelector('.bulk-count'), count);
+  assert.equal(count.textContent, '3 selected');
+  assert.equal(root.getAttribute('aria-label'), '3 selected');
+  assert.equal(globalThis.document.activeElement, start, 'focus survives');
+  ctx.store.set({ torrents: new Map([[1, { id: 1 }]]) });
+  assert.equal(byAction(root, 'start'), start, 'a poll does not touch the bar');
+  ctx.store.set({ selection: new Set() });
+  assert.equal(root.children.length, 0);
+  ctx.store.set({ selection: new Set([7]) });
+  assert.equal(byAction(root, 'start'), start, 'the same nodes come back when the bar reappears');
+  assert.equal(count.textContent, '1 selected');
+  teardown();
+});

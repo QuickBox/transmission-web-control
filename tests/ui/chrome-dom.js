@@ -22,6 +22,14 @@ export function installChromeDom({ width = 1440 } = {}) {
     this.dispatch(event.type, { detail: event.detail });
     return true;
   };
+  FakeElement.prototype.insertBefore = function insertBefore(node, reference) {
+    if (node.parentNode) node.parentNode.removeChild(node);
+    const i = reference ? this.children.indexOf(reference) : -1;
+    node.parentNode = this;
+    if (i === -1) this.children.push(node);
+    else this.children.splice(i, 0, node);
+    return node;
+  };
   const docListeners = new Map();
   env.doc.addEventListener = (type, fn) => {
     if (!docListeners.has(type)) docListeners.set(type, []);

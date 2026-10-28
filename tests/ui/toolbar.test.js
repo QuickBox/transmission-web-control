@@ -268,3 +268,19 @@ test('hamburger toggles the sidebar drawer; the search toggle opens the narrow s
   assert.equal(root.hasAttribute('data-search-open'), false, 'Escape closes the narrow search');
   teardown();
 });
+
+test('store updates patch the toolbar in place: action buttons keep their nodes', async () => {
+  const { ctx, root, teardown } = await setup();
+  const start = byAction(root, 'start');
+  const labels = byAction(root, 'labels');
+  start.focus();
+  ctx.store.set({ selection: new Set([1]) });
+  ctx.store.set({ stats: { downloadSpeed: 5, uploadSpeed: 6 } });
+  ctx.store.set({ session: { ...ctx.store.get().session, altSpeedEnabled: true } });
+  ctx.store.set({ torrents: new Map([[1, { id: 1 }]]) });
+  assert.equal(byAction(root, 'start'), start);
+  assert.equal(byAction(root, 'labels'), labels);
+  assert.equal(globalThis.document.activeElement, start);
+  assert.equal(start.disabled, false);
+  teardown();
+});

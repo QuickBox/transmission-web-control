@@ -21,44 +21,52 @@ export function mount(root, ctx) {
   const t = ctx.i18n;
   const { store } = ctx;
 
+  // Built once; a selection change patches the count and only an empty <-> non-empty
+  // change attaches or detaches the bar, so a press in flight keeps its button.
+  const count = el('span', { class: 'bulk-count' });
+  const buttons = BULK_ACTIONS.map((id) => {
+    const action = ACTIONS.find((a) => a.id === id);
+    const button = el('button', {
+      type: 'button',
+      class: ['btn-icon', action.destructive && 'bulk-destructive'],
+      'aria-label': t(`main.actions.${id}`),
+      'data-action': id,
+    }, icon(action.icon, { size: 20 }));
+    tooltip(button, () => t(`main.actions.${id}`));
+    button.addEventListener('click', () => runAction(ctx, id, [...store.get().selection]));
+    return button;
+  });
+  const more = el('button', { type: 'button', class: 'btn-icon', 'aria-label': t('core.actions.more'), 'aria-haspopup': 'menu' }, icon('more', { size: 20 }));
+  tooltip(more, () => t('core.actions.more'));
+  more.addEventListener('click', () => {
+    const current = [...store.get().selection];
+    menu(more, actionMenuItems(ctx, ACTIONS.filter((a) => !a.bulk), current), { label: t('core.actions.more') });
+  });
+  const clearButton = el('button', { type: 'button', class: 'btn-icon btn-icon-md bulk-clear', 'aria-label': t('main.bulkbar.clear') }, icon('menu-close', { size: 16 }));
+  tooltip(clearButton, () => t('main.bulkbar.clear'));
+  clearButton.addEventListener('click', () => store.set({ selection: new Set() }));
+  const spacer = el('span', { class: 'bulk-spacer' });
+  let shown = false;
+
   function render(selection) {
-    const ids = [...selection];
-    if (ids.length === 0) {
-      clear(root);
-      root.removeAttribute('role');
+    const n = selection.size;
+    if (n === 0) {
+      if (shown) {
+        clear(root);
+        root.removeAttribute('role');
+        root.removeAttribute('aria-label');
+        shown = false;
+      }
       return;
     }
-    root.setAttribute('role', 'toolbar');
-    root.setAttribute('aria-label', t('core.count.selected', { count: ids.length }));
-    const buttons = BULK_ACTIONS.map((id) => {
-      const action = ACTIONS.find((a) => a.id === id);
-      const button = el('button', {
-        type: 'button',
-        class: ['btn-icon', action.destructive && 'bulk-destructive'],
-        'aria-label': t(`main.actions.${id}`),
-        'data-action': id,
-      }, icon(action.icon, { size: 20 }));
-      tooltip(button, () => t(`main.actions.${id}`));
-      button.addEventListener('click', () => runAction(ctx, id, [...store.get().selection]));
-      return button;
-    });
-    const more = el('button', { type: 'button', class: 'btn-icon', 'aria-label': t('core.actions.more'), 'aria-haspopup': 'menu' }, icon('more', { size: 20 }));
-    tooltip(more, () => t('core.actions.more'));
-    more.addEventListener('click', () => {
-      const current = [...store.get().selection];
-      menu(more, actionMenuItems(ctx, ACTIONS.filter((a) => !a.bulk), current), { label: t('core.actions.more') });
-    });
-    const clearButton = el('button', { type: 'button', class: 'btn-icon btn-icon-md bulk-clear', 'aria-label': t('main.bulkbar.clear') }, icon('menu-close', { size: 16 }));
-    tooltip(clearButton, () => t('main.bulkbar.clear'));
-    clearButton.addEventListener('click', () => store.set({ selection: new Set() }));
-
-    clear(root,
-      el('span', { class: 'bulk-count', text: t('core.count.selected', { count: ids.length }) }),
-      el('span', { class: 'bulk-spacer' }),
-      ...buttons,
-      more,
-      clearButton,
-    );
+    const label = t('core.count.selected', { count: n });
+    count.textContent = label;
+    root.setAttribute('aria-label', label);
+    if (!shown) {
+      root.setAttribute('role', 'toolbar');
+      clear(root, count, spacer, ...buttons, more, clearButton);
+      shown = true;
+    }
   }
 
   const off = store.subscribe('selection', render);
