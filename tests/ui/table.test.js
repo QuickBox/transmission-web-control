@@ -410,8 +410,8 @@ test('a row missing optional fields renders without throwing', async () => {
   assert.equal(rowsOf(root).length, 0);
   assert.equal(root.querySelector('.torrents-empty').hidden, false);
   assert.match(root.querySelector('.torrents-empty').textContent, /match/);
-  made.ctx.store.set({ torrents: new Map() });
-  assert.match(root.querySelector('.torrents-empty').textContent, /No torrents yet/);
+  made.ctx.store.set({ torrents: new Map(), connection: { state: 'online', error: null, since: 1 } });
+  assert.match(root.querySelector('.torrents-empty').textContent, /No torrents yet/, 'an online daemon with no torrents');
   assert.equal(root.querySelector('[role="grid"]').getAttribute('tabindex'), '0', 'an empty grid is itself tabbable');
   teardown();
 });
@@ -421,4 +421,33 @@ test('teardown unsubscribes from the store', async () => {
   teardown();
   ctx.store.set({ torrents: torrents(6) });
   assert.equal(rowsOf(root).length, 2, 'no re-render after teardown');
+});
+
+test('an empty list names the connection state until a poll has succeeded', async () => {
+  const made = await tableCtx();
+  const root = new FakeElement('div');
+  root.clientHeight = 300;
+  env.body.replaceChildren(root);
+  // Boot while the daemon is unreachable: the store has no torrents and the poller reported offline.
+  made.ctx.store.set({ connection: { state: 'offline', error: 'HTTP 500', since: 1 } });
+  const teardown = mount(root, made.ctx);
+  const empty = root.querySelector('.torrents-empty');
+  assert.equal(empty.hidden, false);
+  assert.match(empty.textContent, /Cannot reach Transmission/, 'offline boot tells the truth');
+  assert.doesNotMatch(empty.textContent, /No torrents/);
+  assert.equal(empty.getAttribute('data-state'), 'offline');
+  made.ctx.store.set({ connection: { state: 'unauthorized', error: 'HTTP 401', since: 2 } });
+  assert.match(empty.textContent, /refused the login/);
+  made.ctx.store.set({ connection: { state: 'connecting', error: null, since: 0 } });
+  assert.match(empty.textContent, /Connecting/);
+  // The daemon answers with no torrents: now "no torrents" is a fact.
+  made.ctx.store.set({ connection: { state: 'online', error: null, since: 3 } });
+  assert.match(empty.textContent, /No torrents yet/);
+  assert.equal(empty.getAttribute('data-state'), null);
+  // Torrents exist but the filter hides them: the filter message, whatever the connection.
+  made.ctx.store.set({ torrents: new Map([[1, torrent({ id: 1, state: 'seeding' })]]), filter: { status: 'error', label: null, tracker: null, folder: null, search: '' } });
+  assert.match(empty.textContent, /match/);
+  made.ctx.store.set({ connection: { state: 'offline', error: 'x', since: 4 } });
+  assert.match(empty.textContent, /match/, 'a loaded list keeps the filter message when the daemon drops');
+  teardown();
 });

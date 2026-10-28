@@ -230,6 +230,11 @@
 	color: var(--qb-fg-muted);
 }
 
+.torrents-empty[data-state="offline"],
+.torrents-empty[data-state="unauthorized"] {
+	color: var(--tr-st-error);
+}
+
 /* ---- Hide-on-narrow tiers -------------------------------------------- */
 
 @container torrents (max-width: 1100px) {

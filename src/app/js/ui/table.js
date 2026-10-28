@@ -430,7 +430,23 @@ export function mount(root, ctx) {
     }
     const { torrents } = store.get();
     empty.hidden = rows.length > 0;
-    empty.textContent = rows.length > 0 ? '' : t(torrents.size === 0 ? 'main.table.noTorrents' : 'main.table.noMatches');
+    empty.textContent = rows.length > 0 ? '' : emptyText(torrents);
+  }
+
+  /**
+   * What an empty list says. Until a poll has succeeded (the connection is
+   * still connecting, offline or unauthorized) the list cannot know whether
+   * torrents exist, so it shows the connection state; "no torrents" is only
+   * true once the daemon answered with none.
+   */
+  function emptyText(torrents) {
+    const { connection } = store.get();
+    if (torrents.size === 0 && connection.state !== 'online') {
+      empty.setAttribute('data-state', connection.state);
+      return t(`core.connection.${connection.state}`);
+    }
+    empty.removeAttribute('data-state');
+    return t(torrents.size === 0 ? 'main.table.noTorrents' : 'main.table.noMatches');
   }
 
   function scheduleWindow() {
@@ -660,6 +676,7 @@ export function mount(root, ctx) {
       renderWindow();
     }),
     store.subscribe('focused', renderWindow),
+    store.subscribe('connection', renderWindow),
   ];
   recompute();
 
