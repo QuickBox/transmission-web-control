@@ -6,6 +6,8 @@
  * control the user is editing is never overwritten by a refresh.
  */
 
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
+
 export const id = 'options';
 export const labelKey = 'details.tabs.options';
 export const live = false;
@@ -54,7 +56,7 @@ export function create(ctx, host) {
     return Promise.resolve()
       .then(() => ctx.rpc.call('torrent-set', { ids: [torrentId], ...patch }))
       .then(() => host.refresh(), (err) => {
-        toast(t('details.options.saveFailed', { message: (err && err.message) || '' }), { tone: 'error' });
+        toast(t('details.options.saveFailed', { message: errorMessage(t, err) }), { tone: 'error' });
         host.refresh();
       });
   }

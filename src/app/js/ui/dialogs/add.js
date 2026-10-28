@@ -8,6 +8,7 @@
 
 import { getFreeSpace } from '../../rpc/session.js?v=__QBV__';
 import { createLabelStore, memoryStorage } from '../../rpc/labels.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 const HASH_RE = /^(?:[0-9a-f]{40}|[a-z2-7]{32})$/i;
 const LINK_RE = /^(?:magnet:\?|[a-z][a-z0-9+.-]*:\/\/)\S+$/i;
@@ -241,7 +242,7 @@ export function createAddDialog(ctx, deps = {}) {
           else if (dupe) duplicates += 1;
           else failures.push({ name: item.name, message: t('dialogs.add.noAnswer') });
         } catch (err) {
-          failures.push({ name: item.name, message: (err && err.message) || '' });
+          failures.push({ name: item.name, message: errorMessage(t, err) });
         }
       }
 
@@ -250,7 +251,7 @@ export function createAddDialog(ctx, deps = {}) {
         try {
           await labelStore().write(added, wanted);
         } catch (err) {
-          toast(t('dialogs.add.labelsFailed', { message: (err && err.message) || '' }), { tone: 'warning' });
+          toast(t('dialogs.add.labelsFailed', { message: errorMessage(t, err) }), { tone: 'warning' });
         }
       }
 

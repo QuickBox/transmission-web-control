@@ -9,6 +9,7 @@
 
 import { setSession } from '../../rpc/session.js?v=__QBV__';
 import { parseAmount } from '../details/options.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 const TORRENT_FIELDS = Object.freeze([
   'id', 'downloadLimit', 'downloadLimited', 'uploadLimit', 'uploadLimited', 'honorsSessionLimits',
@@ -152,7 +153,7 @@ export function createLimitsDialog(ctx) {
           dialog.close('saved');
         }, (err) => {
           save.disabled = false;
-          error.textContent = t('dialogs.limits.failed', { message: (err && err.message) || '' });
+          error.textContent = t('dialogs.limits.failed', { message: errorMessage(t, err) });
         });
     }
 

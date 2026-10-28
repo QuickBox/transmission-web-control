@@ -8,6 +8,8 @@
  * The folder list is kept in `prefs.findDataFolders`.
  */
 
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
+
 const CHECKING = new Set([1, 2]);
 const TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -139,7 +141,7 @@ export function createAutoMatchDialog(ctx, deps = {}) {
           : t('dialogs.match.finished', { found: fmt.count(found), total: fmt.count(targets.length) });
         if (!stop) toast(progress.textContent, { tone: found ? 'success' : 'warning' });
       } catch (err) {
-        error.textContent = t('dialogs.match.failed', { message: (err && err.message) || '' });
+        error.textContent = t('dialogs.match.failed', { message: errorMessage(t, err) });
       } finally {
         running = false;
         start.disabled = false;

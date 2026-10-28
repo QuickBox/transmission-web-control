@@ -96,10 +96,15 @@
     }
   },
   "trackers": {
-    "summary": {
-      "one": "{total} tracker in {tiers} tier",
-      "other": "{total} trackers in {tiers} tiers"
+    "count": {
+      "one": "{total} tracker",
+      "other": "{total} trackers"
     },
+    "tiers": {
+      "one": "{total} tier",
+      "other": "{total} tiers"
+    },
+    "countInTiers": "{trackers} in {tiers}",
     "none": "This torrent has no trackers.",
     "tier": "Tier {n}",
     "edit": "Edit trackers",

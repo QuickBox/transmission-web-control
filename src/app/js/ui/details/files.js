@@ -14,6 +14,7 @@
  */
 
 import { nameProblem, promptDialog } from '../dialogs/rename.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 export const id = 'files';
 export const labelKey = 'details.tabs.files';
@@ -308,7 +309,7 @@ export function create(ctx, host) {
     return Promise.resolve()
       .then(() => ctx.rpc.call('torrent-set', { ids: [torrentId], ...args }))
       .then(() => host.refresh(), (err) => {
-        toast(t('details.files.saveFailed', { message: (err && err.message) || '' }), { tone: 'error' });
+        toast(t('details.files.saveFailed', { message: errorMessage(t, err) }), { tone: 'error' });
       });
   }
 
@@ -339,7 +340,7 @@ export function create(ctx, host) {
             toast(t('details.files.renamed', { name: value }), { tone: 'success' });
             host.refresh();
           }, (err) => {
-            throw new Error(t('details.files.renameFailed', { message: (err && err.message) || '' }));
+            throw new Error(t('details.files.renameFailed', { message: errorMessage(t, err) }));
           });
       },
     });

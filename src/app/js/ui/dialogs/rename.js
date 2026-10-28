@@ -4,6 +4,8 @@
  * other dialogs build on.
  */
 
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
+
 /**
  * A dialog with one labelled text field, inline validation and a Save that
  * stays disabled while the request runs.
@@ -50,7 +52,7 @@ export function promptDialog(ctx, opts) {
       .then(() => opts.onSave(value))
       .then(() => dialog.close('saved'), (err) => {
         save.disabled = false;
-        fail((err && err.message) || t('dialogs.failed'));
+        fail(err ? errorMessage(t, err) : t('dialogs.failed'));
       });
   }
 

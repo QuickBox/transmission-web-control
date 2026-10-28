@@ -7,6 +7,7 @@
 
 import { setTrackers, tiersFromTrackers } from '../../rpc/trackers.js?v=__QBV__';
 import { isAnnounceUrl } from '../details/trackers.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 /**
  * The torrents that announce to `url`, and each one's tiers after the swap.
@@ -110,7 +111,7 @@ export function createReplaceTrackersDialog(ctx) {
       } catch (err) {
         save.disabled = false;
         error.textContent = t('dialogs.replace.failed', {
-          done: fmt.count(done), total: fmt.count(plan.length), message: (err && err.message) || '',
+          done: fmt.count(done), total: fmt.count(plan.length), message: errorMessage(t, err),
         });
       }
     }

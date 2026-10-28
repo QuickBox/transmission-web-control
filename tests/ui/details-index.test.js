@@ -135,7 +135,7 @@ test('a failed fetch shows a load error, not an exception', async () => {
   await flush();
   const notice = root.querySelector('.details-notice');
   assert.equal(notice.hidden, false);
-  assert.match(notice.textContent, /Could not load details: timeout/);
+  assert.match(notice.textContent, /Could not load details: Cannot reach Transmission/, 'a request that never reached the daemon reads as the translated offline text');
   teardown();
 });
 

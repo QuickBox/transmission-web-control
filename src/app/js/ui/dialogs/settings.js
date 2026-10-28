@@ -20,6 +20,7 @@ import { VARIANTS, preference, setVariant } from '../../core/theme.js?v=__QBV__'
 import { LANGUAGES, LANGUAGE_NAMES, STORAGE_KEY as LANGUAGE_KEY, saveLanguage } from '../../core/i18n.js?v=__QBV__';
 import { parseAmount } from '../details/options.js?v=__QBV__';
 import { COLUMNS, DEFAULT_COLUMNS, columnsFromPrefs } from '../table.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 export const EXPORT_FORMAT = 'qb-transmission-settings';
 const DAYS = Object.freeze([1, 2, 4, 8, 16, 32, 64]);
@@ -348,11 +349,13 @@ export function createSettingsDialog(ctx, deps = {}) {
             chips.replaceChildren(...results.map((r) => el('span', {
               class: ['badge', 'port-chip', r.open === true && 'is-open', r.open === false && 'is-closed'],
               text: t(`dialogs.settings.port.${r.protocol}`, {
-                state: t(r.open === true ? 'dialogs.settings.port.open' : r.open === false ? 'dialogs.settings.port.closed' : 'dialogs.settings.port.unknown'),
+                state: t(r.unavailable ? 'dialogs.settings.port.unavailable'
+                  : r.open === true ? 'dialogs.settings.port.open'
+                    : r.open === false ? 'dialogs.settings.port.closed' : 'dialogs.settings.port.unknown'),
               }),
             })));
           }, (err) => {
-            chips.replaceChildren(el('span', { class: 'field-error', text: t('dialogs.settings.portFailed', { message: (err && err.message) || '' }) }));
+            chips.replaceChildren(el('span', { class: 'field-error', text: t('dialogs.settings.portFailed', { message: errorMessage(t, err) }) }));
           })
           .finally(() => { button.disabled = false; });
       });
@@ -370,7 +373,7 @@ export function createSettingsDialog(ctx, deps = {}) {
             const n = r && Number.isFinite(r.blocklistSize) ? r.blocklistSize : 0;
             size.textContent = t('dialogs.settings.blocklistSize', { count: n, total: fmt.count(n) });
             toast(t('dialogs.settings.blocklistUpdated'), { tone: 'success' });
-          }, (err) => toast(t('dialogs.settings.blocklistFailed', { message: (err && err.message) || '' }), { tone: 'error' }))
+          }, (err) => toast(t('dialogs.settings.blocklistFailed', { message: errorMessage(t, err) }), { tone: 'error' }))
           .finally(() => { button.disabled = false; });
       });
       return el('div', { class: 'option-row' }, [size, button]);
@@ -483,7 +486,7 @@ export function createSettingsDialog(ctx, deps = {}) {
             reload();
           }
         })
-        .catch((err) => toast(t('dialogs.settings.importFailed', { message: (err && err.message) || '' }), { tone: 'error' }));
+        .catch((err) => toast(t('dialogs.settings.importFailed', { message: errorMessage(t, err) }), { tone: 'error' }));
     }
 
     function uiChanged() {
@@ -562,7 +565,7 @@ export function createSettingsDialog(ctx, deps = {}) {
           }
         }, (err) => {
           save.disabled = false;
-          error.textContent = t('dialogs.settings.failed', { message: (err && err.message) || '' });
+          error.textContent = t('dialogs.settings.failed', { message: errorMessage(t, err) });
         });
     }
 
@@ -588,7 +591,7 @@ export function createSettingsDialog(ctx, deps = {}) {
         build();
       }, (err) => {
         status.textContent = '';
-        error.textContent = t('dialogs.settings.loadFailed', { message: (err && err.message) || '' });
+        error.textContent = t('dialogs.settings.loadFailed', { message: errorMessage(t, err) });
       });
 
     active = { close: () => dialog.close('cancel'), ready, showPage: (id) => showPage(id, false) };

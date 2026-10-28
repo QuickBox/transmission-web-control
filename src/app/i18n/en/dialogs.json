@@ -248,7 +248,8 @@
       "any": "Port {state}",
       "open": "open",
       "closed": "closed",
-      "unknown": "unknown"
+      "unknown": "unknown",
+      "unavailable": "unavailable"
     },
     "portFailed": "Could not test the port: {message}",
     "blocklistSize": {

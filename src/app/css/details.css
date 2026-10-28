@@ -264,8 +264,11 @@
 		padding-left: 4px;
 	}
 
+	/* Tighter sides keep five translated tabs on a 375px screen; the strip
+	   still scrolls when a catalog runs longer. */
 	.details-tab {
 		height: 44px;
+		padding: 0 8px;
 	}
 
 	.details-panel {
@@ -281,6 +284,10 @@
 	letter-spacing: 0.06em;
 	line-height: 16px;
 	text-transform: uppercase;
+	/* Long compound words (German "Downloadgeschwindigkeit") hyphenate, or
+	   break as a last resort, instead of running out of a narrow card. */
+	overflow-wrap: anywhere;
+	hyphens: auto;
 	color: var(--qb-fg-muted);
 }
 

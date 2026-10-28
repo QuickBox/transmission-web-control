@@ -4,6 +4,8 @@
  * the confirm label so the consequence is stated on the button itself.
  */
 
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
+
 const LISTED = 5;
 
 /**
@@ -59,7 +61,7 @@ export function createRemoveDialog(ctx) {
           dialog.close('removed');
         }, (err) => {
           confirmButton.disabled = false;
-          toast(t('dialogs.remove.failed', { message: (err && err.message) || '' }), { tone: 'error' });
+          toast(t('dialogs.remove.failed', { message: errorMessage(t, err) }), { tone: 'error' });
         });
     }
 

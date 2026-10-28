@@ -6,6 +6,7 @@
  */
 
 import { getFreeSpace } from '../../rpc/session.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 /**
  * The folder the selected torrents share, or the first one's when they differ.
@@ -97,7 +98,7 @@ export function createLocationDialog(ctx) {
           dialog.close('saved');
         }, (err) => {
           save.disabled = false;
-          error.textContent = t('dialogs.location.failed', { message: (err && err.message) || '' });
+          error.textContent = t('dialogs.location.failed', { message: errorMessage(t, err) });
         });
     }
 

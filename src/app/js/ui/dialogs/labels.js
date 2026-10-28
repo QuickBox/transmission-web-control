@@ -12,6 +12,7 @@
 
 import { createLabelStore } from '../../rpc/labels.js?v=__QBV__';
 import { browserStorage, parseLabels } from './add.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 /**
  * The label set each torrent ends with: its own labels, minus the removed,
@@ -97,7 +98,7 @@ export function createLabelsDialog(ctx, deps = {}) {
               toast(t('dialogs.labels.imported', { count: imported, total: fmt.count(imported) }), { tone: 'success' });
             }, (err) => {
               copy.disabled = false;
-              toast(t('dialogs.labels.importFailed', { message: (err && err.message) || '' }), { tone: 'error' });
+              toast(t('dialogs.labels.importFailed', { message: errorMessage(t, err) }), { tone: 'error' });
             });
         });
       }
@@ -137,7 +138,7 @@ export function createLabelsDialog(ctx, deps = {}) {
           dialog.close('saved');
         }, (err) => {
           save.disabled = false;
-          error.textContent = t('dialogs.labels.failed', { message: (err && err.message) || '' });
+          error.textContent = t('dialogs.labels.failed', { message: errorMessage(t, err) });
         });
     }
 

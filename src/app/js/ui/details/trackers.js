@@ -14,6 +14,7 @@
 
 import { formatTrackerList, parseTrackerList, setTrackers, tiersFromTrackers } from '../../rpc/trackers.js?v=__QBV__';
 import { promptDialog } from '../dialogs/rename.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 export const id = 'trackers';
 export const labelKey = 'details.tabs.trackers';
@@ -77,7 +78,7 @@ export function create(ctx) {
     return Promise.resolve()
       .then(() => setTrackers(ctx.rpc, ctx.caps, [torrentId], tiers))
       .then(() => { toast(t('details.trackers.saved'), { tone: 'success' }); }, (err) => {
-        throw new Error(t('details.trackers.saveFailed', { message: (err && err.message) || '' }));
+        throw new Error(t('details.trackers.saveFailed', { message: errorMessage(t, err) }));
       });
   }
 
@@ -220,7 +221,10 @@ export function create(ctx) {
       const tiers = [...byTier.keys()].sort((a, b) => a - b);
       const editable = !listMode();
       summary.textContent = trackers.length
-        ? t('details.trackers.summary', { count: trackers.length, total: fmt.count(trackers.length), tiers: fmt.count(tiers.length) })
+        ? t('details.trackers.countInTiers', {
+          trackers: t('details.trackers.count', { count: trackers.length, total: fmt.count(trackers.length) }),
+          tiers: t('details.trackers.tiers', { count: tiers.length, total: fmt.count(tiers.length) }),
+        })
         : t('details.trackers.none');
       actions.replaceChildren(listMode()
         ? el('button', { type: 'button', class: 'btn btn-secondary', 'data-focus': 'bar', on: { click: editList } }, [

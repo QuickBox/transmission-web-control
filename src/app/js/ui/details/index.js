@@ -18,6 +18,7 @@ import * as files from './files.js?v=__QBV__';
 import * as trackers from './trackers.js?v=__QBV__';
 import * as peers from './peers.js?v=__QBV__';
 import * as options from './options.js?v=__QBV__';
+import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 /**
  * @typedef {{
@@ -259,7 +260,7 @@ export function mount(root, ctx) {
         cache.set(cacheKey(tabId, id), row || {});
         loadErrors.delete(tabId);
       }, (err) => {
-        loadErrors.set(tabId, (err && err.message) || t('details.loadFailed'));
+        loadErrors.set(tabId, err ? errorMessage(t, err) : t('details.loadFailed'));
       })
       .finally(() => {
         inflight = false;

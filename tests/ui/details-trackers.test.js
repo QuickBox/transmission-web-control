@@ -31,6 +31,16 @@ function tracker(over) {
   };
 }
 
+test('the summary picks singular and plural for each count on its own', async () => {
+  const { ctx } = await makeCtx();
+  const view = trackersTab.create(ctx);
+  const summary = () => view.root.querySelector('.trackers-summary').textContent;
+  view.render(torrent({ trackers: [tracker({ id: 1 })] }), null, ok);
+  assert.equal(summary(), '1 tracker in 1 tier');
+  view.render(torrent({ trackers: [tracker({ id: 1 }), tracker({ id: 2, host: 'b.invalid', announce: 'https://b.invalid/announce' })] }), null, ok);
+  assert.equal(summary(), '2 trackers in 1 tier');
+});
+
 test('rows show tiers, an em dash for unknown counts, and the warning glyph with the message as text', async () => {
   const { ctx } = await makeCtx();
   const view = trackersTab.create(ctx);
