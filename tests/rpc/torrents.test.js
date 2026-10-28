@@ -50,9 +50,10 @@ test("deriveState covers the seven states, error first", () => {
   assert.equal(deriveState({ status: STATUS.SEED_WAIT, error: 0 }), STATE.QUEUED);
   assert.equal(deriveState({ status: STATUS.DOWNLOAD, error: 0 }), STATE.DOWNLOADING);
   assert.equal(deriveState({ status: STATUS.SEED, error: 0 }), STATE.SEEDING);
-  assert.equal(deriveState({ status: STATUS.STOPPED, error: 0, sizeWhenDone: 10, leftUntilDone: 5, percentDone: 0.5 }), STATE.STOPPED);
-  assert.equal(deriveState({ status: STATUS.STOPPED, error: 0, sizeWhenDone: 10, leftUntilDone: 0, percentDone: 1 }), STATE.FINISHED);
-  assert.equal(deriveState({ status: STATUS.STOPPED, error: 0, isFinished: true }), STATE.FINISHED);
+  assert.equal(deriveState({ status: STATUS.STOPPED, error: 0, percentDone: 0.5 }), STATE.STOPPED);
+  assert.equal(deriveState({ status: STATUS.STOPPED, error: 0, percentDone: 1, leftUntilDone: 0, isFinished: false }), STATE.STOPPED, "a complete torrent the user paused is stopped");
+  assert.equal(deriveState({ status: STATUS.STOPPED, error: 0, isFinished: true }), STATE.FINISHED, "finished = stopped because the seeding goal was met");
+  assert.equal(deriveState({ status: STATUS.SEED, error: 0, isFinished: true }), STATE.SEEDING, "isFinished only matters once stopped");
   assert.equal(deriveState({ status: STATUS.STOPPED, error: 0 }), STATE.STOPPED, "an empty stopped row is stopped, not finished");
   assert.equal(deriveState({}), STATE.STOPPED);
 });
@@ -263,6 +264,7 @@ for (const fx of torrentFixtures) {
       current = (await stateFromFixture(base)).torrents;
     }
     const out = await stateFromFixture(fx, current);
+    assert.ok(out.torrents.size > 0, "fixture yields torrents");
     for (const t of out.torrents.values()) {
       assert.ok(Number.isInteger(t.id));
       assert.ok(STATES.includes(t.state), `state ${t.state}`);
@@ -274,6 +276,21 @@ for (const fx of torrentFixtures) {
       for (const [k, v] of Object.entries(t)) {
         if (typeof v === "number") assert.ok(Number.isFinite(v), `${k} is finite`);
       }
+      if (t.error !== 0) assert.equal(t.state, STATE.ERROR);
+    }
+    if (fx.recorded && !incremental) {
+      // Bench set: two .invalid trackers per torrent, labels on >= 3.00, one local-error torrent except on 3.00.
+      for (const t of out.torrents.values()) {
+        assert.equal(t.trackers.length, 2, `torrent ${t.id} trackers`);
+        for (const host of t.trackerHosts) assert.match(host, /\.invalid$/);
+        assert.equal(t.seederCount, null, "unreachable trackers report no seeder count");
+        assert.ok(t.hash.length === 40, "hash present on a full fetch");
+      }
+      const states = new Set([...out.torrents.values()].map((t) => t.state));
+      for (const s of [STATE.SEEDING, STATE.STOPPED, STATE.DOWNLOADING, STATE.QUEUED, STATE.FINISHED]) assert.ok(states.has(s), s);
+      assert.equal(states.has(STATE.ERROR), fx.version !== "rpc-16", "local-error torrent present except on 3.00");
+      const labelled = [...out.torrents.values()].filter((t) => t.labels.length > 0);
+      assert.equal(labelled.length > 0, fx.version !== "rpc-15", "native labels on >= 3.00");
     }
     const expect = fx.data.expect ?? {};
     if (expect.ids) assert.deepEqual([...out.torrents.keys()], expect.ids);

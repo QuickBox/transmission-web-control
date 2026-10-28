@@ -5,15 +5,18 @@ import { DIALECT, createClient } from "../../src/app/js/rpc/client.js?v=__QBV__"
 import { UNKNOWN_CAPS, buildCaps, parseSemver } from "../../src/app/js/rpc/caps.js?v=__QBV__";
 import { fixtureTransport, loadFixtures, requestArgs } from "../fixtures/load.js";
 
+const REQUIRED_SEMVER_MAJOR = 6;
+
 const GATES = ["nativeLabels", "tableFormat", "sessionFields", "trackerList", "sequential", "portTestByProtocol"];
 
-/** Expected gate table per RPC integer (semver major 6 = 4.1). */
+/** Expected gate table: the legacy integer or a semver-6 daemon opens the integer gates. */
 function expectedGates(rpc, semverMajor) {
+  const atLeast = (n) => rpc >= n || semverMajor >= 6;
   return {
-    nativeLabels: rpc >= 16,
-    tableFormat: rpc >= 16,
-    sessionFields: rpc >= 16,
-    trackerList: rpc >= 17,
+    nativeLabels: atLeast(16),
+    tableFormat: atLeast(16),
+    sessionFields: atLeast(16),
+    trackerList: atLeast(17),
     sequential: semverMajor >= 6,
     portTestByProtocol: semverMajor >= 6,
   };
@@ -60,16 +63,25 @@ test("legacy: rpc comes from rpcVersion, semver is optional", () => {
   assert.deepEqual(pickGates(c17), expectedGates(17, 5));
 });
 
-test("JSON-RPC: the deprecated integer is never read; semver major 6 means RPC 18", () => {
+test("JSON-RPC: the deprecated integer is never read; every gate opens from semver major 6", () => {
   const caps = buildCaps({ rpcVersion: 99, rpcVersionSemver: "6.0.1" }, { dialect: DIALECT.JSONRPC });
-  assert.equal(caps.rpc, 18);
+  assert.equal(caps.rpc, 0, "the integer is not reported on JSON-RPC");
+  assert.equal(caps.semverMajor, REQUIRED_SEMVER_MAJOR);
   assert.equal(caps.jsonRpc, true);
   assert.equal(caps.dialect, DIALECT.JSONRPC);
-  assert.deepEqual(pickGates(caps), expectedGates(18, 6));
+  for (const g of GATES) assert.equal(caps[g], true, g);
 
-  const noSemver = buildCaps({ rpcVersion: 18 }, { dialect: DIALECT.JSONRPC });
+  const noSemver = buildCaps({ rpcVersion: 19 }, { dialect: DIALECT.JSONRPC });
   assert.equal(noSemver.rpc, 0, "without semver the JSON-RPC daemon version is unknown");
   for (const g of GATES) assert.equal(noSemver[g], false, g);
+});
+
+test("legacy 4.1.3 reports rpc-version 19: nothing gates on 18", () => {
+  const caps = buildCaps({ rpcVersion: 19, rpcVersionSemver: "6.0.1" }, { dialect: DIALECT.LEGACY });
+  assert.equal(caps.rpc, 19);
+  for (const g of GATES) assert.equal(caps[g], true, g);
+  const future = buildCaps({ rpcVersionSemver: "7.0.0" }, { dialect: DIALECT.JSONRPC });
+  for (const g of GATES) assert.equal(future[g], true, `${g} stays open past semver 6`);
 });
 
 test("has(): feature detection accepts upstream and camelCase spellings", () => {
@@ -97,29 +109,47 @@ for (const fx of sessionFixtures) {
   test(`fixture ${fx.version}/${fx.name}${fx.recorded ? " (recorded)" : ""}: caps match the version table`, async () => {
     const caps = await capsFromFixture(fx);
     const expect = fx.data.expect ?? {};
-    const rpc = fx.data.dialect === DIALECT.JSONRPC ? 18 : expect.rpc;
-    if (rpc !== undefined) assert.equal(caps.rpc, rpc);
+    const jsonrpc = fx.data.dialect === DIALECT.JSONRPC;
+    if (jsonrpc) assert.equal(caps.rpc, 0);
+    else if (expect.rpc !== undefined) assert.equal(caps.rpc, expect.rpc);
     if (expect.semver !== undefined) assert.equal(caps.semver, expect.semver);
     if (expect.daemonVersion !== undefined) assert.equal(caps.daemonVersion, expect.daemonVersion);
     assert.equal(caps.dialect, fx.data.dialect);
-    assert.equal(caps.jsonRpc, fx.data.dialect === DIALECT.JSONRPC);
+    assert.equal(caps.jsonRpc, jsonrpc);
     assert.deepEqual(pickGates(caps), expectedGates(caps.rpc, caps.semverMajor));
-    assert.equal(caps.has("download-dir"), true);
-    assert.equal(caps.has("default-trackers"), caps.rpc >= 17, "default-trackers appears with 4.0");
-    assert.equal(caps.has("preferred-transports"), caps.semverMajor >= 6, "preferred_transports appears with 4.1");
+    const fieldsLimited = Array.isArray(requestArgs(fx.data).fields);
+    if (fieldsLimited) {
+      assert.equal(caps.has("rpc-version"), requestArgs(fx.data).fields.includes("rpc-version"));
+    } else {
+      // Version-era keys are present exactly when the daemon is new enough: 4.0 adds
+      // default-trackers, 4.1 adds preferred_transports and sequential_download.
+      const major = caps.semverMajor;
+      const is40 = caps.rpc >= 17 || major >= 6;
+      assert.equal(caps.has("download-dir"), true);
+      assert.equal(caps.has("default-trackers"), is40, "default-trackers appears with 4.0");
+      assert.equal(caps.has("preferred_transports"), major >= 6, "preferred_transports appears with 4.1");
+      assert.equal(caps.has("sequential_download"), major >= 6, "sequential_download appears with 4.1");
+      assert.equal(caps.daemonVersion !== null, true);
+    }
   });
 }
 
-test("4.1.3: legacy and JSON-RPC session-get yield the same caps apart from the dialect", async () => {
-  const legacy = loadFixtures({ version: "rpc-41-legacy", name: "session-get" })[0];
-  const jsonrpc = loadFixtures({ version: "rpc-41-jsonrpc", name: "session-get" })[0];
-  assert.ok(legacy && jsonrpc, "both 4.1.3 fixtures present");
-  const a = { ...(await capsFromFixture(legacy)) };
-  const b = { ...(await capsFromFixture(jsonrpc)) };
-  for (const c of [a, b]) {
-    delete c.has;
-    delete c.dialect;
-    delete c.jsonRpc;
-  }
-  assert.deepEqual(a, b);
-});
+for (const recorded of [false, true]) {
+  test(`4.1.3${recorded ? " (recorded)" : ""}: legacy and JSON-RPC session-get yield the same caps apart from the dialect`, async () => {
+    const legacy = loadFixtures({ version: "rpc-41-legacy", name: "session-get", recorded })[0];
+    const jsonrpc = loadFixtures({ version: "rpc-41-jsonrpc", name: "session-get", recorded })[0];
+    assert.ok(legacy && jsonrpc, "both 4.1.3 fixtures present");
+    const a = { ...(await capsFromFixture(legacy)) };
+    const b = { ...(await capsFromFixture(jsonrpc)) };
+    assert.equal(a.rpc, 19, "legacy reads the integer");
+    assert.equal(b.rpc, 0, "JSON-RPC never reads it");
+    for (const c of [a, b]) {
+      delete c.has;
+      delete c.dialect;
+      delete c.jsonRpc;
+      delete c.rpc;
+    }
+    assert.deepEqual(a, b);
+    assert.equal(a.semver, "6.0.1");
+  });
+}

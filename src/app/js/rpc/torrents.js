@@ -226,9 +226,11 @@ function maxKnown(trackers, key) {
 }
 
 /**
- * Derive the display state from the raw status, error and completion.
+ * Derive the display state from the raw status and error. A stopped torrent is
+ * `finished` only when the daemon says so (`isFinished`: it stopped because the
+ * seeding goal was met); a complete torrent the user paused stays `stopped`.
  *
- * @param {{ status: number, error: number, isFinished?: boolean, percentDone?: number, leftUntilDone?: number, sizeWhenDone?: number }} t
+ * @param {{ status: number, error: number, isFinished?: boolean }} t
  * @returns {string} one of `STATES`
  */
 export function deriveState(t) {
@@ -244,13 +246,8 @@ export function deriveState(t) {
       return STATE.DOWNLOADING;
     case STATUS.SEED:
       return STATE.SEEDING;
-    default: {
-      const complete =
-        t.isFinished === true ||
-        (intOrZero(t.sizeWhenDone) > 0 && intOrZero(t.leftUntilDone) === 0) ||
-        floatOrZero(t.percentDone) >= 1;
-      return complete ? STATE.FINISHED : STATE.STOPPED;
-    }
+    default:
+      return t.isFinished === true ? STATE.FINISHED : STATE.STOPPED;
   }
 }
 

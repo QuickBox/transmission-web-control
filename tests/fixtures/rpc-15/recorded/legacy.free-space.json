@@ -1,0 +1,18 @@
+{
+ "_source": "recorded from Transmission 2.94 (d8e60ee44f) (rpc 15) bench",
+ "request": {
+  "arguments": {
+   "path": "/home/user/twc-fixtures/data"
+  },
+  "method": "free-space",
+  "tag": 1
+ },
+ "response": {
+  "arguments": {
+   "path": "/home/user/twc-fixtures/data",
+   "size-bytes": 21321236480
+  },
+  "result": "success",
+  "tag": 1
+ }
+}

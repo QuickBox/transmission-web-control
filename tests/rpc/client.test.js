@@ -12,7 +12,7 @@ import {
   toJsonRpcParams,
   toSnakeKey,
 } from "../../src/app/js/rpc/client.js?v=__QBV__";
-import { fixtureTransport, loadFixtures, makeTransport, requestArgs } from "../fixtures/load.js";
+import { fixtureTransport, isErrorResponse, loadFixtures, makeTransport, requestArgs } from "../fixtures/load.js";
 
 const SESSION = "testSessionId0123456789abcdefghijklmnopqrs";
 const LEGACY = { sessionId: SESSION, rpcVersionHeader: null };
@@ -245,6 +245,16 @@ for (const fx of loadFixtures()) {
     const transport = fixtureTransport(fx.data);
     // A 4.1 daemon answers legacy only when the client is told to; force the fixture's dialect.
     const client = createClient({ transport, dialect: fx.data.dialect });
+    if (isErrorResponse(fx.data)) {
+      await assert.rejects(client.call(fx.data.method, requestArgs(fx.data)), (err) => {
+        assert.ok(err instanceof RpcError);
+        assert.equal(err.status, 200, "an RPC-level error arrives over HTTP 200");
+        assert.equal(typeof err.message, "string");
+        if (fx.data.dialect === DIALECT.JSONRPC) assert.equal(err.code, fx.data.response.error.code);
+        return true;
+      });
+      return;
+    }
     const result = await client.call(fx.data.method, requestArgs(fx.data));
     assert.equal(client.rpcVersionHeader, fx.data.handshake.rpcVersionHeader ?? null, "409 header captured");
     const unforced = createClient({ transport: fixtureTransport(fx.data) });

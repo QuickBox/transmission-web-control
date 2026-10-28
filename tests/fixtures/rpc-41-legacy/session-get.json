@@ -82,22 +82,23 @@
       "script-torrent-done-seeding-filename": "",
       "anti-brute-force-enabled": false,
       "anti-brute-force-threshold": 100,
-      "preferred-transports": [
+      "preferred_transports": [
         "utp",
         "tcp"
       ],
-      "sequential-download": false,
-      "rpc-version": 18,
+      "sequential_download": false,
+      "tcp-enabled": true,
+      "rpc-version": 19,
       "rpc-version-minimum": 14,
       "rpc-version-semver": "6.0.1",
-      "version": "4.1.3 (e1f8c4a2b7)",
+      "version": "4.1.3 (838877323f)",
       "session-id": "spec41Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo"
     },
     "tag": 1
   },
   "expect": {
-    "rpc": 18,
+    "rpc": 19,
     "semver": "6.0.1",
-    "daemonVersion": "4.1.3 (e1f8c4a2b7)"
+    "daemonVersion": "4.1.3 (838877323f)"
   }
 }

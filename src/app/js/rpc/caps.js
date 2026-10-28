@@ -7,14 +7,14 @@
  * `rpc_version_semver` in JSON-RPC). The client has already normalised them to
  * `rpcVersion` / `rpcVersionSemver` by the time they arrive here.
  *
- * Version map: 2.94 = 15, 3.00 = 16, 4.0.x = 17, 4.1.x = 18+ with semver 6.x.
- * 4.1 features gate on the semver major, never on the integer.
+ * Version map: 2.94 = 15, 3.00 = 16, 4.0.x = 17, 4.1.x = 19 with semver 6.x.
+ * Every semver-6 daemon is past every integer gate, so a gate opens when the
+ * legacy integer reaches it OR the semver major is 6 or more; 4.1 features gate
+ * on the semver major alone. On JSON-RPC the integer is deprecated and never
+ * read, so `rpc` is 0 there and the semver carries the version.
  */
 
 import { DIALECT, toCamelKey } from "./client.js?v=__QBV__";
-
-/** First RPC integer that ships with JSON-RPC (Transmission 4.1.0). */
-const JSONRPC_RPC_FLOOR = 18;
 
 function parseInt10(value) {
   if (typeof value === "number") return Number.isInteger(value) ? value : null;
@@ -37,16 +37,16 @@ export function parseSemver(value) {
 
 /**
  * @typedef {object} Caps
- * @property {number} rpc RPC integer (15, 16, 17, 18+); 0 when unknown
+ * @property {number} rpc legacy RPC integer (15, 16, 17, 19); 0 on JSON-RPC or when unknown
  * @property {string|null} semver `rpc-version-semver` as reported (4.0+)
  * @property {number} semverMajor 0 when no semver was reported
  * @property {"legacy"|"jsonrpc"} dialect wire dialect the client selected
  * @property {boolean} jsonRpc `dialect === "jsonrpc"`
  * @property {string|null} daemonVersion the `version` session string
- * @property {boolean} nativeLabels server-side `labels` (rpc >= 16)
- * @property {boolean} tableFormat `torrent-get format:"table"` (rpc >= 16)
- * @property {boolean} sessionFields `session-get` accepts `fields` (rpc >= 16)
- * @property {boolean} trackerList `trackerList` replaces add/remove/replace (rpc >= 17)
+ * @property {boolean} nativeLabels server-side `labels` (rpc >= 16 or semver 6+)
+ * @property {boolean} tableFormat `torrent-get format:"table"` (rpc >= 16 or semver 6+)
+ * @property {boolean} sessionFields `session-get` accepts `fields` (rpc >= 16 or semver 6+)
+ * @property {boolean} trackerList `trackerList` replaces add/remove/replace (rpc >= 17 or semver 6+)
  * @property {boolean} sequential `sequential_download` (semver major >= 6)
  * @property {boolean} portTestByProtocol `port-test` takes `ip_protocol` (semver major >= 6)
  * @property {(sessionKey: string) => boolean} has feature detection on the
@@ -69,13 +69,9 @@ export function buildCaps(session, wire) {
   const semver = semverParsed ? String(source.rpcVersionSemver).trim() : null;
   const semverMajor = semverParsed ? semverParsed.major : 0;
 
-  // JSON-RPC deprecates the integer; derive the floor from the dialect instead.
-  let rpc;
-  if (jsonRpc) {
-    rpc = semverMajor >= 6 ? JSONRPC_RPC_FLOOR : 0;
-  } else {
-    rpc = parseInt10(source.rpcVersion) ?? (semverMajor >= 6 ? JSONRPC_RPC_FLOOR : 0);
-  }
+  // JSON-RPC deprecates the integer: never read it there.
+  const rpc = jsonRpc ? 0 : (parseInt10(source.rpcVersion) ?? 0);
+  const atLeast = (n) => rpc >= n || semverMajor >= 6;
 
   const keys = new Set(Object.keys(source));
 
@@ -86,10 +82,10 @@ export function buildCaps(session, wire) {
     dialect,
     jsonRpc,
     daemonVersion: typeof source.version === "string" ? source.version : null,
-    nativeLabels: rpc >= 16,
-    tableFormat: rpc >= 16,
-    sessionFields: rpc >= 16,
-    trackerList: rpc >= 17,
+    nativeLabels: atLeast(16),
+    tableFormat: atLeast(16),
+    sessionFields: atLeast(16),
+    trackerList: atLeast(17),
     sequential: semverMajor >= 6,
     portTestByProtocol: semverMajor >= 6,
     // Accepts the upstream spelling (`script-torrent-added-enabled`) or camelCase.

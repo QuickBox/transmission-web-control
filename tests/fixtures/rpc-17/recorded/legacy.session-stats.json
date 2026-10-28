@@ -1,0 +1,33 @@
+{
+ "_source": "recorded from Transmission 4.0.6 (38c164933e) (rpc 17) bench",
+ "request": {
+  "arguments": {},
+  "method": "session-stats",
+  "tag": 1
+ },
+ "response": {
+  "arguments": {
+   "activeTorrentCount": 2,
+   "cumulative-stats": {
+    "downloadedBytes": 0,
+    "filesAdded": 0,
+    "secondsActive": 97,
+    "sessionCount": 1,
+    "uploadedBytes": 0
+   },
+   "current-stats": {
+    "downloadedBytes": 0,
+    "filesAdded": 0,
+    "secondsActive": 97,
+    "sessionCount": 1,
+    "uploadedBytes": 0
+   },
+   "downloadSpeed": 0,
+   "pausedTorrentCount": 4,
+   "torrentCount": 6,
+   "uploadSpeed": 0
+  },
+  "result": "success",
+  "tag": 1
+ }
+}

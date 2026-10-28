@@ -1,0 +1,86 @@
+{
+ "_source": "recorded from Transmission 3.00 (bb6b5a062e) (rpc 16) bench",
+ "request": {
+  "arguments": {},
+  "method": "session-get",
+  "tag": 1
+ },
+ "response": {
+  "arguments": {
+   "alt-speed-down": 50,
+   "alt-speed-enabled": false,
+   "alt-speed-time-begin": 540,
+   "alt-speed-time-day": 127,
+   "alt-speed-time-enabled": false,
+   "alt-speed-time-end": 1020,
+   "alt-speed-up": 50,
+   "blocklist-enabled": false,
+   "blocklist-size": 0,
+   "blocklist-url": "http://www.example.com/blocklist",
+   "cache-size-mb": 4,
+   "config-dir": "/home/user/.config/Transmission",
+   "dht-enabled": true,
+   "download-dir": "/home/user/torrents/transmission",
+   "download-dir-free-space": 21322276864,
+   "download-queue-enabled": true,
+   "download-queue-size": 1,
+   "encryption": "preferred",
+   "idle-seeding-limit": 1800,
+   "idle-seeding-limit-enabled": false,
+   "incomplete-dir": "/home/user/torrents/transmission",
+   "incomplete-dir-enabled": false,
+   "lpd-enabled": false,
+   "peer-limit-global": 10000,
+   "peer-limit-per-torrent": 5000,
+   "peer-port": 52861,
+   "peer-port-random-on-start": true,
+   "pex-enabled": true,
+   "port-forwarding-enabled": false,
+   "queue-stalled-enabled": false,
+   "queue-stalled-minutes": 30,
+   "rename-partial-files": true,
+   "rpc-version": 16,
+   "rpc-version-minimum": 1,
+   "script-torrent-done-enabled": false,
+   "script-torrent-done-filename": "",
+   "seed-queue-enabled": false,
+   "seed-queue-size": 5000,
+   "seedRatioLimit": 2,
+   "seedRatioLimited": false,
+   "session-id": "BlcHFqJOPuzISjNp2xpkbq2E9gc91o4D7TLIj3KJjkBnMVxK",
+   "speed-limit-down": 100,
+   "speed-limit-down-enabled": false,
+   "speed-limit-up": 100,
+   "speed-limit-up-enabled": false,
+   "start-added-torrents": true,
+   "trash-original-torrent-files": false,
+   "units": {
+    "memory-bytes": 1024,
+    "memory-units": [
+     "KiB",
+     "MiB",
+     "GiB",
+     "TiB"
+    ],
+    "size-bytes": 1000,
+    "size-units": [
+     "kB",
+     "MB",
+     "GB",
+     "TB"
+    ],
+    "speed-bytes": 1000,
+    "speed-units": [
+     "kB/s",
+     "MB/s",
+     "GB/s",
+     "TB/s"
+    ]
+   },
+   "utp-enabled": false,
+   "version": "3.00 (bb6b5a062e)"
+  },
+  "result": "success",
+  "tag": 1
+ }
+}

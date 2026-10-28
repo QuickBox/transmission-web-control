@@ -88,17 +88,18 @@
         "tcp"
       ],
       "sequential_download": false,
-      "rpc_version": 18,
+      "tcp_enabled": true,
+      "rpc_version": 19,
       "rpc_version_minimum": 14,
       "rpc_version_semver": "6.0.1",
-      "version": "4.1.3 (e1f8c4a2b7)",
+      "version": "4.1.3 (838877323f)",
       "session_id": "spec41Zq9dP0TtKkW1xCv4nHj2BbLmSsRe8Ya3UuIo"
     },
     "id": 1
   },
   "expect": {
-    "rpc": 18,
+    "rpc": 19,
     "semver": "6.0.1",
-    "daemonVersion": "4.1.3 (e1f8c4a2b7)"
+    "daemonVersion": "4.1.3 (838877323f)"
   }
 }

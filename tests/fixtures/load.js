@@ -2,13 +2,14 @@
  * Fixture loader and fake transport shared by the RPC tests.
  *
  * Layout: `tests/fixtures/<version>/<name>.json` holds spec-derived captures;
- * `tests/fixtures/<version>/recorded/<name>.json` holds captures recorded from
- * a real daemon. Every JSON file under both is loaded, so a recorded capture
- * is exercised by the same tests the moment it lands.
+ * `tests/fixtures/<version>/recorded/<dialect>.<call>.json` holds captures
+ * recorded from a real daemon, with `recorded/handshake-409.json` carrying the
+ * headers that daemon put on its 409. Every JSON file under both is loaded, so
+ * a recorded capture is exercised by the same tests the moment it lands.
  *
- * Fixture shape:
+ * Spec-derived file shape:
  * {
- *   "_source":   "spec-derived" | "recorded <bench, date>",
+ *   "_source":   "spec-derived",
  *   "dialect":   "legacy" | "jsonrpc",
  *   "method":    "torrent-get" | "session-get" | ...   (legacy spelling)
  *   "handshake": { "sessionId": string, "rpcVersionHeader": string|null },
@@ -16,6 +17,10 @@
  *   "response":  <wire body as the daemon answers>,
  *   "expect":    <optional assertions a test may read>
  * }
+ *
+ * Recorded file shape: `{ "_source", "request", "response" }`. The dialect is
+ * the file-name prefix, the method comes from the request, and the handshake
+ * from `handshake-409.json`. Both shapes load into the spec-derived one.
  */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -23,6 +28,13 @@ import { join, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const FIXTURE_ROOT = dirname(fileURLToPath(import.meta.url));
+
+const HANDSHAKE_FILE = "handshake-409.json";
+const RECORDED_SESSION_ID = "recordedSessionId0123456789abcdefghijklmnop";
+
+function readJson(path) {
+  return JSON.parse(readFileSync(path, "utf8"));
+}
 
 function jsonFiles(dir) {
   let names;
@@ -45,7 +57,34 @@ export function fixtureVersions() {
 }
 
 /**
- * @param {{ version?: string, method?: string, name?: string }} [filter]
+ * Lift a recorded capture into the spec-derived shape.
+ * `legacy.torrent-get-table.json` -> dialect `legacy`, name `torrent-get-table`;
+ * `jsonrpc.torrent_get_recent.json` -> dialect `jsonrpc`, name `torrent-get-recent`.
+ */
+function liftRecorded(path, data, handshakeHeaders) {
+  const file = basename(path, ".json");
+  const dot = file.indexOf(".");
+  const prefix = dot === -1 ? "" : file.slice(0, dot);
+  const dialect = prefix === "jsonrpc" || (data.request && data.request.jsonrpc) ? "jsonrpc" : "legacy";
+  const name = (dot === -1 ? file : file.slice(dot + 1)).replace(/_/g, "-");
+  const method = String(data.request && data.request.method ? data.request.method : name).replace(/_/g, "-");
+  const rpcVersionHeader = handshakeHeaders["X-Transmission-Rpc-Version"] ?? null;
+  return {
+    name,
+    data: {
+      _source: data._source,
+      dialect,
+      method,
+      handshake: { sessionId: RECORDED_SESSION_ID, rpcVersionHeader },
+      request: data.request,
+      response: data.response,
+      expect: data.expect,
+    },
+  };
+}
+
+/**
+ * @param {{ version?: string, method?: string, name?: string, recorded?: boolean }} [filter]
  * @returns {{ version: string, name: string, path: string, recorded: boolean, data: object }[]}
  */
 export function loadFixtures(filter = {}) {
@@ -53,16 +92,33 @@ export function loadFixtures(filter = {}) {
   for (const version of fixtureVersions()) {
     if (filter.version && filter.version !== version) continue;
     const dir = join(FIXTURE_ROOT, version);
-    const paths = [
-      ...jsonFiles(dir).map((p) => ({ p, recorded: false })),
-      ...jsonFiles(join(dir, "recorded")).map((p) => ({ p, recorded: true })),
-    ];
-    for (const { p, recorded } of paths) {
-      const data = JSON.parse(readFileSync(p, "utf8"));
-      if (filter.method && data.method !== filter.method) continue;
-      const name = basename(p, ".json");
-      if (filter.name && filter.name !== name) continue;
-      out.push({ version, name, path: p, recorded, data });
+    const entries = [];
+    if (filter.recorded !== true) {
+      for (const p of jsonFiles(dir)) {
+        entries.push({ path: p, recorded: false, name: basename(p, ".json"), data: readJson(p) });
+      }
+    }
+    if (filter.recorded !== false) {
+      const recordedDir = join(dir, "recorded");
+      const handshakePath = join(recordedDir, HANDSHAKE_FILE);
+      let headers = {};
+      try {
+        headers = readJson(handshakePath).headers ?? {};
+      } catch {
+        headers = {};
+      }
+      for (const p of jsonFiles(recordedDir)) {
+        if (basename(p) === HANDSHAKE_FILE) continue;
+        const raw = readJson(p);
+        if (!raw.request || !raw.response) continue;
+        const { name, data } = liftRecorded(p, raw, headers);
+        entries.push({ path: p, recorded: true, name, data });
+      }
+    }
+    for (const e of entries) {
+      if (filter.method && e.data.method !== filter.method) continue;
+      if (filter.name && filter.name !== e.name) continue;
+      out.push({ version, ...e });
     }
   }
   return out;
@@ -72,6 +128,12 @@ export function loadFixtures(filter = {}) {
 export function requestArgs(fixture) {
   const req = fixture.request ?? {};
   return fixture.dialect === "jsonrpc" ? (req.params ?? {}) : (req.arguments ?? {});
+}
+
+/** True when the recorded daemon answered the call with an RPC-level error. */
+export function isErrorResponse(fixture) {
+  const res = fixture.response ?? {};
+  return fixture.dialect === "jsonrpc" ? Boolean(res.error) : res.result !== "success";
 }
 
 /**

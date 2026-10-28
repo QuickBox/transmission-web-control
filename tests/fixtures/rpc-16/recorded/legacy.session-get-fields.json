@@ -1,0 +1,27 @@
+{
+ "_source": "recorded from Transmission 3.00 (bb6b5a062e) (rpc 16) bench",
+ "request": {
+  "arguments": {
+   "fields": [
+    "alt-speed-enabled",
+    "speed-limit-down",
+    "speed-limit-up",
+    "version",
+    "rpc-version"
+   ]
+  },
+  "method": "session-get",
+  "tag": 1
+ },
+ "response": {
+  "arguments": {
+   "alt-speed-enabled": false,
+   "rpc-version": 16,
+   "speed-limit-down": 100,
+   "speed-limit-up": 100,
+   "version": "3.00 (bb6b5a062e)"
+  },
+  "result": "success",
+  "tag": 1
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "_source": "recorded from Transmission 4.0.6 (38c164933e) (rpc 17) bench",
+ "request": {
+  "arguments": {
+   "fields": [
+    "alt-speed-enabled",
+    "speed-limit-down",
+    "speed-limit-up",
+    "version",
+    "rpc-version"
+   ]
+  },
+  "method": "session-get",
+  "tag": 1
+ },
+ "response": {
+  "arguments": {
+   "alt-speed-enabled": false,
+   "rpc-version": 17,
+   "speed-limit-down": 100,
+   "speed-limit-up": 100,
+   "version": "4.0.6 (38c164933e)"
+  },
+  "result": "success",
+  "tag": 1
+ }
+}
