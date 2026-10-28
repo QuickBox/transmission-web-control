@@ -28,5 +28,72 @@
     "trackerWarning": "Tracker warning",
     "noTorrents": "No torrents yet. Add one with the button above or drop a file anywhere.",
     "noMatches": "No torrents match the current filter."
+  },
+  "actions": {
+    "menu": "Filters",
+    "add": "Add torrent",
+    "start": "Start",
+    "pause": "Pause",
+    "verify": "Verify local data",
+    "reannounce": "Ask tracker for more peers",
+    "forceStart": "Force start",
+    "remove": "Remove",
+    "move": "Set location",
+    "limits": "Speed limits",
+    "labels": "Labels",
+    "queue": "Queue",
+    "queueTop": "Move to top",
+    "queueUp": "Move up",
+    "queueDown": "Move down",
+    "queueBottom": "Move to bottom",
+    "settings": "Settings",
+    "about": "About"
+  },
+  "search": {
+    "placeholder": "Search torrents",
+    "clear": "Clear search",
+    "open": "Search"
+  },
+  "toolbar": {
+    "transferGroup": "Transfer",
+    "manageGroup": "Manage",
+    "rates": "Download {down}, upload {up}",
+    "altSpeed": "Temporary speed limits",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "sidebar": {
+    "status": "Status",
+    "labels": "Labels",
+    "trackers": "Trackers",
+    "folders": "Folders",
+    "all": "All",
+    "active": "Active",
+    "stopped": "Paused",
+    "warning": "Warning",
+    "noLabels": "No labels yet",
+    "noTrackers": "No trackers",
+    "noFolders": "No folders"
+  },
+  "statusbar": {
+    "down": "Download rate",
+    "up": "Upload rate",
+    "limit": "{rate} of {limit}",
+    "altSpeed": "Temporary speed limits",
+    "altSpeedOn": "Limits on",
+    "free": "Free space in the download folder",
+    "freeValue": "{free} free",
+    "port": "Peer port",
+    "portOpen": "Port {protocol} open",
+    "portClosed": "Port {protocol} closed",
+    "portUnknown": "Port {protocol} unknown",
+    "version": "Transmission {version}",
+    "rpc": "RPC {rpc}"
+  },
+  "bulkbar": {
+    "clear": "Clear selection"
+  },
+  "feedback": {
+    "actionFailed": "Could not {action}: {message}"
   }
 }
