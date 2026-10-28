@@ -49,7 +49,8 @@
     "settings": "Indstillinger",
     "about": "Om",
     "replaceTrackers": "Erstat trackers",
-    "findData": "Find data"
+    "findData": "Find data",
+    "rename": "Omdøb"
   },
   "search": {
     "placeholder": "Søg i torrents",

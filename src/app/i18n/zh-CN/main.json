@@ -49,7 +49,8 @@
     "settings": "设置",
     "about": "关于",
     "replaceTrackers": "替换追踪器",
-    "findData": "查找数据"
+    "findData": "查找数据",
+    "rename": "重命名"
   },
   "search": {
     "placeholder": "搜索种子",

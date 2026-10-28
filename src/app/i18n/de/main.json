@@ -49,7 +49,8 @@
     "settings": "Einstellungen",
     "about": "Info",
     "replaceTrackers": "Tracker ersetzen",
-    "findData": "Daten suchen"
+    "findData": "Daten suchen",
+    "rename": "Umbenennen"
   },
   "search": {
     "placeholder": "Torrents durchsuchen",
