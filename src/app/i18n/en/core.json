@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "Transmission",
+    "brand": "QuickBox"
+  },
+  "actions": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "apply": "Apply",
+    "retry": "Retry",
+    "back": "Back",
+    "more": "More",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "connection": {
+    "connecting": "Connecting to Transmission…",
+    "online": "Connected",
+    "offline": "Cannot reach Transmission. Retrying.",
+    "unauthorized": "Transmission refused the login. Check the RPC username and password.",
+    "restored": "Connection restored"
+  },
+  "status": {
+    "stopped": "Stopped",
+    "queued": "Queued",
+    "checking": "Checking",
+    "downloading": "Downloading",
+    "seeding": "Seeding",
+    "finished": "Finished",
+    "error": "Error"
+  },
+  "count": {
+    "torrents": { "one": "{count} torrent", "other": "{count} torrents" },
+    "selected": { "one": "{count} selected", "other": "{count} selected" }
+  },
+  "units": {
+    "size1000": "B kB MB GB TB PB",
+    "size1024": "B KiB MiB GiB TiB PiB",
+    "perSecond": "{size}/s",
+    "day": "{n}d",
+    "hour": "{n}h",
+    "minute": "{n}m",
+    "second": "{n}s"
+  },
+  "theme": {
+    "label": "Theme",
+    "auto": "Auto (dashboard)",
+    "spectre": "Spectre",
+    "smoked": "Smoked",
+    "reel": "Reel",
+    "defaulted": "Light"
+  },
+  "language": {
+    "label": "Language",
+    "auto": "Auto (dashboard)"
+  },
+  "a11y": {
+    "skipToList": "Skip to torrent list",
+    "loading": "Loading",
+    "notifications": "Notifications"
+  },
+  "errors": {
+    "generic": "Something went wrong: {message}"
+  }
+}
