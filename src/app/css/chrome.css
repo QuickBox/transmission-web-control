@@ -84,7 +84,6 @@
 }
 
 .tb-hamburger,
-.tb-more,
 .tb-search-toggle {
 	display: none;
 }
@@ -151,8 +150,7 @@
 		display: none;
 	}
 
-	.shell-toolbar .tb-hamburger,
-	.shell-toolbar .tb-more {
+	.shell-toolbar .tb-hamburger {
 		display: inline-flex;
 	}
 
@@ -456,9 +454,6 @@
 		display: none;
 	}
 
-	.shell-statusbar .chip-connection {
-		display: inline-flex;
-	}
 }
 
 /* ---- Bulk bar -------------------------------------------------------- */

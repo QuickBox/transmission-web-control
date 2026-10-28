@@ -1,9 +1,71 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { installChromeDom, chromeCtx, shell, click, byLabel, byAction, flush } from './chrome-dom.js';
 
 const env = installChromeDom();
-const { ACTIONS, mount, runAction } = await import('../../src/app/js/ui/toolbar.js');
+const { ACTIONS, SURFACES, actionEnabled, mount, runAction } = await import('../../src/app/js/ui/toolbar.js');
+const CHROME_CSS = readFileSync(new URL('../../src/app/css/chrome.css', import.meta.url), 'utf8');
+
+/** Split a stylesheet into top-level rules and the body of each `@container toolbar (...)` block. */
+function toolbarLayers(css) {
+  const layers = { base: '', containers: {} };
+  let i = 0;
+  while (i < css.length) {
+    const at = css.indexOf('@container toolbar', i);
+    if (at === -1) {
+      layers.base += css.slice(i);
+      break;
+    }
+    layers.base += css.slice(i, at);
+    const open = css.indexOf('{', at);
+    let depth = 1;
+    let j = open + 1;
+    while (j < css.length && depth > 0) {
+      if (css[j] === '{') depth += 1;
+      else if (css[j] === '}') depth -= 1;
+      j += 1;
+    }
+    const query = css.slice(at, open).trim();
+    const width = Number(/max-width:\s*(\d+)px/.exec(query)[1]);
+    layers.containers[width] = css.slice(open + 1, j - 1);
+    i = j;
+  }
+  return layers;
+}
+
+/** Is `selector` set to `display: none` by a rule in `cssText`? */
+function hiddenIn(cssText, selector) {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|[,\\s])${escaped}\\s*(,[^{]*)?\\{[^}]*display:\\s*none`, 'm');
+  const commaRe = new RegExp(`[^{}]*${escaped}[^{]*\\{[^}]*display:\\s*none`);
+  return re.test(cssText) || commaRe.test(cssText);
+}
+
+/**
+ * Action ids a user can reach at a toolbar container width, from the
+ * toolbar's own structure (`SURFACES`) and the stylesheet's visibility rules.
+ */
+function reachableAt(width) {
+  const layers = toolbarLayers(CHROME_CSS);
+  const active = Object.keys(layers.containers).map(Number).filter((max) => width <= max).map((max) => layers.containers[max]);
+  const hidden = (selector) => hiddenIn(layers.base, selector) || active.some((body) => hiddenIn(body, selector));
+  const out = new Set();
+  const secondaryHidden = hidden('.shell-toolbar .tb-secondary');
+  const nonRemoveGroupsHidden = hidden('.shell-toolbar .tb-group:not(:has([data-action="remove"]))');
+  for (const id of SURFACES.buttons) {
+    const action = ACTIONS.find((a) => a.id === id);
+    const inManage = action.group === 'manage';
+    const inRemove = action.group === 'remove';
+    if (nonRemoveGroupsHidden && !inRemove) continue;
+    if (secondaryHidden && inManage) continue;
+    out.add(id);
+  }
+  const queueReachable = !(secondaryHidden || nonRemoveGroupsHidden);
+  if (queueReachable) for (const id of SURFACES.queueMenu) out.add(id);
+  if (!hidden('.tb-more') && !hidden('.shell-toolbar .tb-more')) for (const id of SURFACES.moreMenu) out.add(id);
+  return out;
+}
 
 async function setup(opts = {}) {
   const made = await chromeCtx(opts);
@@ -18,9 +80,29 @@ test('action table: every entry has an icon and exactly one of method/dialog', (
     assert.equal([a.method, a.dialog].filter(Boolean).length, 1, a.id);
     if (a.method) assert.match(a.method, /^(torrent-|queue-move-)/, 'legacy spelling');
   }
-  assert.deepEqual(ACTIONS.filter((a) => a.dialog).map((a) => `${a.id}:${a.dialog}`), ['remove:remove', 'move:location', 'limits:limits', 'labels:labels', 'replaceTrackers:replaceTrackers', 'findData:autoMatch']);
+  assert.deepEqual(ACTIONS.filter((a) => a.dialog).map((a) => `${a.id}:${a.dialog}`), ['remove:remove', 'move:location', 'limits:limits', 'labels:labels', 'replaceTrackers:replaceTrackers', 'findData:autoMatch', 'rename:rename']);
   assert.deepEqual(ACTIONS.filter((a) => a.allowEmpty).map((a) => a.id), ['replaceTrackers'], 'only Replace trackers runs on an empty selection');
+  assert.deepEqual(ACTIONS.filter((a) => a.single).map((a) => a.id), ['rename'], 'only Rename needs exactly one torrent');
+  const rename = ACTIONS.find((a) => a.id === 'rename');
+  assert.deepEqual([0, 1, 2].map((n) => actionEnabled(rename, n)), [false, true, false]);
+  assert.deepEqual([0, 1, 2].map((n) => actionEnabled(ACTIONS.find((a) => a.id === 'start'), n)), [false, true, true]);
   assert.deepEqual(ACTIONS.filter((a) => a.bulk).map((a) => a.id), ['start', 'pause', 'remove']);
+});
+
+test('every action is reachable at every width, from the toolbar structure and the stylesheet rules', () => {
+  const all = new Set(ACTIONS.map((a) => a.id));
+  for (const width of [1920, 1440, 960]) {
+    assert.deepEqual([...reachableAt(width)].sort(), [...all].sort(), `wide ${width}: every action has an entry point`);
+  }
+  assert.deepEqual([...reachableAt(800)].sort(), [...all].sort(), 'medium: More carries what the groups fold');
+  assert.deepEqual([...reachableAt(375)].sort(), [...all].sort(), 'narrow: Remove stays a button, the rest is in More');
+  // The derivation reads the real rules: a stylesheet that hides More on wide loses the tools.
+  const layers = toolbarLayers(CHROME_CSS);
+  assert.equal(hiddenIn(layers.base, '.tb-more'), false, '.tb-more is not hidden by default');
+  assert.equal(hiddenIn(layers.base, '.tb-hamburger'), true, 'the parser sees the hamburger hidden by default');
+  assert.equal(hiddenIn(layers.containers[959], '.shell-toolbar .tb-secondary'), true, 'the parser sees secondary hidden under 960');
+  assert.ok(SURFACES.buttons.includes('labels'), 'Labels has a toolbar button in the manage group');
+  for (const id of ['replaceTrackers', 'findData', 'rename']) assert.ok(SURFACES.moreMenu.includes(id), `${id} is in More`);
 });
 
 test('mounts the groups; selection enables the action buttons', async () => {
@@ -36,7 +118,7 @@ test('mounts the groups; selection enables the action buttons', async () => {
   assert.ok(root.querySelector('.tb-hamburger'));
   assert.ok(root.querySelector('.tb-more'));
   assert.ok(root.querySelector('[role="search"]'));
-  for (const id of ['start', 'pause', 'verify', 'reannounce', 'remove', 'move', 'limits', 'queue']) {
+  for (const id of ['start', 'pause', 'verify', 'reannounce', 'remove', 'move', 'limits', 'labels', 'queue']) {
     const button = byAction(root, id);
     assert.ok(button, id);
     assert.equal(button.disabled, true, `${id} disabled with nothing selected`);
@@ -111,10 +193,11 @@ test('Move, Speed limits, Remove, Settings and About go to the dialog registry, 
   click(byLabel(root, 'About'));
   click(byLabel(root, 'Settings'));
   assert.equal(calls.length, 0, 'dialog actions call the registry openers (no-ops while it is not mounted) and make no RPC');
-  for (const id of ['remove', 'move', 'limits', 'labels', 'findData']) {
+  for (const id of ['remove', 'move', 'limits', 'labels', 'findData', 'rename']) {
     assert.equal(await runAction(ctx, id, [7]), true, `${id} resolves through the registry`);
     assert.equal(await runAction(ctx, id, []), false, `${id} needs a selection`);
   }
+  assert.equal(await runAction(ctx, 'rename', [7, 8]), false, 'Rename refuses two torrents');
   assert.equal(await runAction(ctx, 'replaceTrackers', []), true, 'Replace trackers runs on every torrent when nothing is selected');
   assert.equal(calls.length, 0);
   teardown();
@@ -134,10 +217,14 @@ test('the Queue button and More button open menus built from the action table', 
   assert.ok(more.some((i) => i.label === 'Settings'));
   assert.ok(more.some((i) => i.label === 'Replace trackers' && !i.disabled));
   assert.ok(more.some((i) => i.label === 'Find data' && !i.disabled));
+  assert.ok(more.some((i) => i.label === 'Rename' && !i.disabled), 'Rename enabled with one torrent selected');
+  ctx.store.set({ selection: new Set([1, 2]) });
+  click(root.querySelector('.tb-more'));
+  assert.equal(menus.at(-1).items.find((i) => i.label === 'Rename').disabled, true, 'Rename needs exactly one torrent');
   assert.ok(!more.some((i) => i.label === 'Remove'), 'Remove stays a visible button');
   ctx.store.set({ selection: new Set() });
   click(root.querySelector('.tb-more'));
-  const empty = menus[2].items;
+  const empty = menus.at(-1).items;
   assert.equal(empty.find((i) => i.label === 'Find data').disabled, true, 'Find data needs a selection');
   assert.equal(empty.find((i) => i.label === 'Replace trackers').disabled, false, 'Replace trackers works on all torrents');
   assert.equal(empty.find((i) => i.label === 'Start').disabled, true);

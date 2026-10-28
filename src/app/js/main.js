@@ -17,10 +17,10 @@ import { tooltip } from './core/tooltip.js?v=__QBV__';
 import { createToast } from './core/toast.js?v=__QBV__';
 import { createDialogs } from './core/dialog.js?v=__QBV__';
 import { menu } from './core/menu.js?v=__QBV__';
-import { RpcError, createClient } from './rpc/client.js?v=__QBV__';
+import { createClient } from './rpc/client.js?v=__QBV__';
 import { UNKNOWN_CAPS, buildCaps } from './rpc/caps.js?v=__QBV__';
 import { getSession } from './rpc/session.js?v=__QBV__';
-import { createPoller } from './rpc/poller.js?v=__QBV__';
+import { connectionFailure, createPoller } from './rpc/poller.js?v=__QBV__';
 import { memoryStorage } from './rpc/labels.js?v=__QBV__';
 import * as toolbar from './ui/toolbar.js?v=__QBV__';
 import * as sidebar from './ui/sidebar.js?v=__QBV__';
@@ -136,15 +136,6 @@ function documentVisibility() {
       document.addEventListener('visibilitychange', fn);
       return () => document.removeEventListener('visibilitychange', fn);
     },
-  };
-}
-
-function connectionFailure(err) {
-  const status = err instanceof RpcError ? err.status : 0;
-  return {
-    state: status === 401 || status === 403 ? 'unauthorized' : 'offline',
-    error: err && err.message ? String(err.message) : 'request failed',
-    since: Date.now(),
   };
 }
 

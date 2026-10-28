@@ -8,8 +8,10 @@ import {
   ALWAYS_VISIBLE,
   DEFAULT_INTERVAL_SECONDS,
   INTERVAL_PREF,
+  connectionFailure,
   createPoller,
 } from "../../src/app/js/rpc/poller.js?v=__QBV__";
+import { RpcError } from "../../src/app/js/rpc/client.js?v=__QBV__";
 import { createStore } from "../../src/app/js/core/store.js?v=__QBV__";
 import { fixtureVersions, loadFixtures, makeTransport, okResponse, recordedTransport } from "../fixtures/load.js";
 
@@ -235,4 +237,13 @@ test("failures mark the connection and keep polling; 401 is unauthorized", async
   await timers.flush();
   assert.equal(store.get().connection.state, "online");
   poller.stop();
+});
+
+test("connectionFailure maps 401/403 to unauthorized and everything else to offline", () => {
+  assert.deepEqual(connectionFailure(new RpcError(401, "nope"), 7), { state: "unauthorized", error: "nope", since: 7 });
+  assert.deepEqual(connectionFailure(new RpcError(403, "no"), 8), { state: "unauthorized", error: "no", since: 8 });
+  assert.deepEqual(connectionFailure(new RpcError(500, "HTTP 500"), 9), { state: "offline", error: "HTTP 500", since: 9 });
+  assert.deepEqual(connectionFailure(new TypeError("Failed to fetch"), 10), { state: "offline", error: "Failed to fetch", since: 10 });
+  assert.deepEqual(connectionFailure(null, 11), { state: "offline", error: "request failed", since: 11 });
+  assert.ok(Number.isFinite(connectionFailure(new Error("x")).since), "since defaults to now");
 });

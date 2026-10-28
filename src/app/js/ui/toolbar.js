@@ -13,7 +13,7 @@ import { errorMessage } from '../core/errors.js?v=__QBV__';
 import { preference, setVariant, VARIANTS } from '../core/theme.js?v=__QBV__';
 import { setSession } from '../rpc/session.js?v=__QBV__';
 import {
-  openAbout, openAdd, openAutoMatch, openLabels, openLimits, openLocation, openRemove, openReplaceTrackers, openSettings,
+  openAbout, openAdd, openAutoMatch, openLabels, openLimits, openLocation, openRemove, openRename, openReplaceTrackers, openSettings,
 } from './dialogs/index.js?v=__QBV__';
 import { createSearch } from './search.js?v=__QBV__';
 import { quickboxMark } from '../core/brand.js?v=__QBV__';
@@ -26,6 +26,7 @@ const DIALOGS = Object.freeze({
   labels: openLabels,
   replaceTrackers: openReplaceTrackers,
   autoMatch: openAutoMatch,
+  rename: (ids) => openRename(ids[0]),
 });
 
 /**
@@ -33,9 +34,11 @@ const DIALOGS = Object.freeze({
  * `dialog` names the registry opener called with the ids instead. `group`
  * places the control: toolbar groups, `queue` (Queue menu) or `tools` (More
  * menu only); `bulk` marks the bulk-bar set; `allowEmpty` lets the action run
- * with nothing selected (the dialog then covers every torrent).
+ * with nothing selected (the dialog then covers every torrent); `single`
+ * needs exactly one torrent.
  * @type {readonly { id: string, icon: string, method?: string, dialog?: keyof typeof DIALOGS,
- *   group: 'transfer'|'remove'|'manage'|'queue'|'tools', bulk?: boolean, destructive?: boolean, allowEmpty?: boolean }[]}
+ *   group: 'transfer'|'remove'|'manage'|'queue'|'tools', bulk?: boolean, destructive?: boolean,
+ *   allowEmpty?: boolean, single?: boolean }[]}
  */
 export const ACTIONS = Object.freeze([
   { id: 'start', icon: 'toolbar-start', method: 'torrent-start', group: 'transfer', bulk: true },
@@ -53,9 +56,32 @@ export const ACTIONS = Object.freeze([
   { id: 'queueBottom', icon: 'toolbar-move-down', method: 'queue-move-bottom', group: 'queue' },
   { id: 'replaceTrackers', icon: 'tab-trackers', dialog: 'replaceTrackers', group: 'tools', allowEmpty: true },
   { id: 'findData', icon: 'file-folder', dialog: 'autoMatch', group: 'tools' },
+  { id: 'rename', icon: 'header-rename', dialog: 'rename', group: 'tools', single: true },
 ]);
 
 const ACTION_BY_ID = new Map(ACTIONS.map((a) => [a.id, a]));
+
+const byGroup = (...groups) => ACTIONS.filter((a) => groups.includes(a.group));
+
+/**
+ * Where each action lives in the toolbar, derived from the same filters
+ * `mount` renders with, so a test can check reachability against the CSS
+ * visibility rules instead of the DOM alone.
+ */
+export const SURFACES = Object.freeze({
+  /** Icon buttons in the transfer, remove and manage groups. */
+  buttons: Object.freeze(byGroup('transfer', 'remove', 'manage').map((a) => a.id)),
+  /** The Queue button's menu (the manage group's last control). */
+  queueMenu: Object.freeze(byGroup('queue').map((a) => a.id)),
+  /** The More menu: the tools, and the button actions again for narrow layouts. */
+  moreMenu: Object.freeze(byGroup('transfer', 'manage', 'queue', 'tools').map((a) => a.id)),
+});
+
+/** Does an action run for this many selected torrents? */
+export function actionEnabled(action, count) {
+  if (action.single) return count === 1;
+  return count > 0 || Boolean(action.allowEmpty);
+}
 
 /**
  * Run one action on `ids`. RPC actions resolve after the next poll tick so the
@@ -67,7 +93,7 @@ const ACTION_BY_ID = new Map(ACTIONS.map((a) => [a.id, a]));
  */
 export async function runAction(ctx, actionId, ids) {
   const action = ACTION_BY_ID.get(actionId);
-  if (!action || !Array.isArray(ids) || (ids.length === 0 && !action.allowEmpty)) return false;
+  if (!action || !Array.isArray(ids) || !actionEnabled(action, ids.length)) return false;
   if (action.dialog) {
     DIALOGS[action.dialog](ids);
     return true;
@@ -94,7 +120,7 @@ export function actionMenuItems(ctx, actions, ids) {
     label: ctx.i18n(`main.actions.${action.id}`),
     icon: action.icon,
     destructive: Boolean(action.destructive),
-    disabled: ids.length === 0 && !action.allowEmpty,
+    disabled: !actionEnabled(action, ids.length),
     onSelect: () => runAction(ctx, action.id, ids),
   }));
 }
@@ -152,15 +178,15 @@ export function mount(root, ctx) {
   }
 
   const queueButton = iconButton(t('main.actions.queue'), 'toolbar-move-up', () => {
-    menu(queueButton, actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'queue'), selected()), { label: t('main.actions.queue') });
+    menu(queueButton, actionMenuItems(ctx, byGroup('queue'), selected()), { label: t('main.actions.queue') });
   }, { attrs: { 'aria-haspopup': 'menu', 'data-action': 'queue' } });
   actionButtons.set('queue', queueButton);
 
   const transferGroup = el('div', { class: 'btn-group tb-group', role: 'group', 'aria-label': t('main.toolbar.transferGroup') },
-    ACTIONS.filter((a) => a.group === 'transfer').map(actionButton));
-  const removeGroup = el('div', { class: 'btn-group tb-group', role: 'group' }, ACTIONS.filter((a) => a.group === 'remove').map(actionButton));
+    byGroup('transfer').map(actionButton));
+  const removeGroup = el('div', { class: 'btn-group tb-group', role: 'group' }, byGroup('remove').map(actionButton));
   const manageGroup = el('div', { class: 'btn-group tb-group tb-secondary', role: 'group', 'aria-label': t('main.toolbar.manageGroup') }, [
-    ...ACTIONS.filter((a) => a.group === 'manage' && a.id !== 'labels').map(actionButton),
+    ...byGroup('manage').map(actionButton),
     queueButton,
   ]);
 
@@ -222,10 +248,10 @@ export function mount(root, ctx) {
     const ids = selected();
     const session = store.get().session;
     const items = [
-      ...actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'transfer' || a.group === 'manage'), ids),
-      { label: t('main.actions.queue'), icon: 'toolbar-move-up', items: actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'queue'), ids) },
+      ...actionMenuItems(ctx, byGroup('transfer', 'manage'), ids),
+      { label: t('main.actions.queue'), icon: 'toolbar-move-up', items: actionMenuItems(ctx, byGroup('queue'), ids) },
       'separator',
-      ...actionMenuItems(ctx, ACTIONS.filter((a) => a.group === 'tools'), ids),
+      ...actionMenuItems(ctx, byGroup('tools'), ids),
       'separator',
       { label: t('main.toolbar.altSpeed'), checked: Boolean(session.altSpeedEnabled), onSelect: () => altSpeed.click() },
       { label: t('core.theme.label'), icon: 'palette-switch', items: THEME_CHOICES.map((choice) => ({ label: t(`core.theme.${choice}`), checked: preference() === choice, onSelect: () => setVariant(choice) })) },
@@ -260,10 +286,11 @@ export function mount(root, ctx) {
   // ---- store wiring --------------------------------------------------------
 
   function applySelection(selection) {
-    const none = selection.size === 0;
-    for (const button of actionButtons.values()) {
-      button.disabled = none;
-      button.setAttribute('aria-disabled', String(none));
+    for (const [id, button] of actionButtons) {
+      const action = ACTION_BY_ID.get(id);
+      const off = action ? !actionEnabled(action, selection.size) : selection.size === 0;
+      button.disabled = off;
+      button.setAttribute('aria-disabled', String(off));
     }
   }
 

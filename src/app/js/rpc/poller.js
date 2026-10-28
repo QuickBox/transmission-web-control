@@ -38,7 +38,13 @@ function intervalMs(prefs) {
   return seconds * 1000;
 }
 
-function connectionFor(err, now) {
+/**
+ * The store's `connection` value for a failed request: `unauthorized` on a
+ * 401/403, `offline` for anything else.
+ * @param {unknown} err
+ * @param {number} [now] timestamp for `since`
+ */
+export function connectionFailure(err, now = Date.now()) {
   const status = err instanceof RpcError ? err.status : 0;
   return {
     state: status === 401 || status === 403 ? "unauthorized" : "offline",
@@ -109,7 +115,7 @@ export function createPoller({ client, caps, store, visibility = ALWAYS_VISIBLE,
       primed = true;
       setConnection({ state: "online", error: null, since: now() });
     } catch (err) {
-      setConnection(connectionFor(err, now()));
+      setConnection(connectionFailure(err, now()));
     }
   }
 

@@ -49,7 +49,8 @@
     "settings": "Settings",
     "about": "About",
     "replaceTrackers": "Replace trackers",
-    "findData": "Find data"
+    "findData": "Find data",
+    "rename": "Rename"
   },
   "search": {
     "placeholder": "Search torrents",

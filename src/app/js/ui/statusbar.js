@@ -122,6 +122,9 @@ export function mount(root, ctx, options = {}) {
     const { connection: c } = store.get();
     const online = c.state === 'online';
     connection.hidden = online;
+    // A daemon that cannot be reached must show at every width; the narrow layout keeps only essential chips.
+    if (online) connection.removeAttribute('data-essential');
+    else connection.setAttribute('data-essential', '');
     connection.setAttribute('data-state', c.state);
     connection.textContent = online ? '' : t(`core.connection.${c.state}`);
   }

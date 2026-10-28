@@ -250,13 +250,16 @@ test('connection chip is a polite live region that appears while offline or unau
   assert.equal(c.getAttribute('role'), 'status');
   assert.equal(c.getAttribute('aria-live'), 'polite');
   assert.equal(c.hidden, true);
+  assert.equal(c.hasAttribute('data-essential'), false, 'nothing to show while online, at any width');
   ctx.store.set({ connection: { state: 'offline', error: 'HTTP 500', since: 2 } });
   assert.equal(c.hidden, false);
+  assert.equal(c.hasAttribute('data-essential'), true, 'an unreachable daemon shows on phones too');
   assert.equal(c.getAttribute('data-state'), 'offline');
   assert.match(c.textContent, /Cannot reach Transmission/);
   ctx.store.set({ connection: { state: 'unauthorized', error: 'HTTP 401', since: 3 } });
   assert.match(c.textContent, /refused the login/);
   ctx.store.set({ connection: { state: 'online', error: null, since: 4 } });
   assert.equal(c.hidden, true);
+  assert.equal(c.hasAttribute('data-essential'), false, 'back online drops the essential mark');
   teardown();
 });
