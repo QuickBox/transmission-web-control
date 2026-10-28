@@ -8,6 +8,7 @@
  */
 
 import { setSession } from '../../rpc/session.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { parseAmount } from '../details/options.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
@@ -146,7 +147,7 @@ export function createLimitsDialog(ctx) {
       save.disabled = true;
       Promise.resolve()
         .then(() => (targets.length && Object.keys(torrentArgs).length
-          ? ctx.rpc.call('torrent-set', { ids: targets, ...torrentArgs }) : null))
+          ? ctx.rpc.call('torrent-set', { ids: targets, ...torrentArgs }).then(() => refreshAfterWrite(ctx, targets)) : null))
         .then(() => (Object.keys(patch).length ? setSession(ctx.rpc, ctx.caps, session, patch) : null))
         .then(() => {
           toast(t('dialogs.limits.saved'), { tone: 'success' });

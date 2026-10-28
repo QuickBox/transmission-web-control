@@ -13,6 +13,7 @@
  */
 
 import { formatTrackerList, parseTrackerList, setTrackers, tiersFromTrackers } from '../../rpc/trackers.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { promptDialog } from '../dialogs/rename.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
@@ -77,6 +78,7 @@ export function create(ctx) {
     const torrentId = current.id;
     return Promise.resolve()
       .then(() => setTrackers(ctx.rpc, ctx.caps, [torrentId], tiers))
+      .then(() => refreshAfterWrite(ctx, [torrentId]))
       .then(() => { toast(t('details.trackers.saved'), { tone: 'success' }); }, (err) => {
         throw new Error(t('details.trackers.saveFailed', { message: errorMessage(t, err) }));
       });

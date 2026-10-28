@@ -6,6 +6,7 @@
  */
 
 import { setTrackers, tiersFromTrackers } from '../../rpc/trackers.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { isAnnounceUrl } from '../details/trackers.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
@@ -106,6 +107,7 @@ export function createReplaceTrackersDialog(ctx) {
           await setTrackers(ctx.rpc, ctx.caps, [step.id], step.tiers);
           done += 1;
         }
+        await refreshAfterWrite(ctx, plan.map((step) => step.id));
         toast(t('dialogs.replace.done', { count: done, total: fmt.count(done) }), { tone: 'success' });
         dialog.close('saved');
       } catch (err) {

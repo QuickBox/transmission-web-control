@@ -31,6 +31,7 @@ export function mount(root, ctx, options = {}) {
   const t = ctx.i18n;
   const { store } = ctx;
   const now = options.now || Date.now;
+  const app = root.closest('#app');
 
   function chip(id, iconName, extra = {}) {
     const value = el('span', { class: 'chip-value', text: '' });
@@ -126,6 +127,10 @@ export function mount(root, ctx, options = {}) {
     if (online) connection.removeAttribute('data-essential');
     else connection.setAttribute('data-essential', '');
     connection.setAttribute('data-state', c.state);
+    // The footer and the shell carry the state, so the narrow layout can give the
+    // message the whole row and lift the bulk bar above it.
+    root.setAttribute('data-connection', c.state);
+    if (app) app.setAttribute('data-connection', c.state);
     connection.textContent = online ? '' : t(`core.connection.${c.state}`);
   }
 

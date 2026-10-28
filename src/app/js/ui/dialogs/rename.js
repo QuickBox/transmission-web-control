@@ -5,6 +5,7 @@
  */
 
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 
 /**
  * A dialog with one labelled text field, inline validation and a Save that
@@ -113,6 +114,7 @@ export function createRenameDialog(ctx) {
       onSave: (value) => {
         if (value === torrent.name) return Promise.resolve();
         return ctx.rpc.call('torrent-rename-path', { ids: [id], path: torrent.name, name: value })
+          .then(() => refreshAfterWrite(ctx, [id]))
           .then(() => toast(t('dialogs.rename.done', { name: value }), { tone: 'success' }));
       },
     });

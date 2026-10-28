@@ -14,6 +14,7 @@
  */
 
 import { nameProblem, promptDialog } from '../dialogs/rename.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 export const id = 'files';
@@ -352,6 +353,7 @@ export function create(ctx, host) {
   function send(args) {
     return Promise.resolve()
       .then(() => ctx.rpc.call('torrent-set', { ids: [torrentId], ...args }))
+      .then(() => refreshAfterWrite(ctx, [torrentId]))
       .then(() => host.refresh(), (err) => {
         toast(t('details.files.saveFailed', { message: errorMessage(t, err) }), { tone: 'error' });
       });
@@ -380,6 +382,7 @@ export function create(ctx, host) {
         if (value === node.name) return Promise.resolve();
         return Promise.resolve()
           .then(() => ctx.rpc.call('torrent-rename-path', { ids: [torrentId], path: node.key, name: value }))
+          .then(() => refreshAfterWrite(ctx, [torrentId]))
           .then(() => {
             toast(t('details.files.renamed', { name: value }), { tone: 'success' });
             host.refresh();

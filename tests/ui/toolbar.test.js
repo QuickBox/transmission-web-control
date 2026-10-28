@@ -132,13 +132,14 @@ test('mounts the groups; selection enables the action buttons', async () => {
   teardown();
 });
 
-test('Start/Pause run the RPC on the selection in legacy spelling and tick the poller', async () => {
-  const { ctx, root, calls, ticks, teardown } = await setup();
+test('Start/Pause run the RPC on the selection in legacy spelling and refresh those torrents', async () => {
+  const { ctx, root, calls, refreshes, ticks, teardown } = await setup();
   ctx.store.set({ selection: new Set([3, 1]) });
   click(byAction(root, 'start'));
   await flush();
   assert.deepEqual(calls, [{ method: 'torrent-start', args: { ids: [3, 1] } }]);
-  assert.equal(ticks.length, 1, 'the list refreshes after the action');
+  assert.deepEqual(refreshes, [[3, 1]], 'the written ids are re-read at once, not left to a poll');
+  assert.equal(ticks.length, 0);
   click(byAction(root, 'pause'));
   await flush();
   assert.equal(calls.at(-1).method, 'torrent-stop');

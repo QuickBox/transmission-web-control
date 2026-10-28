@@ -454,6 +454,29 @@
 		display: none;
 	}
 
+	/* While the daemon is unreachable the message takes the whole row: the rate
+	   and free-space chips step aside and the text ellipsises instead of clipping. */
+	.shell-statusbar[data-connection]:not([data-connection="online"]) .chip:not(.chip-connection) {
+		display: none;
+	}
+
+	.shell-statusbar[data-connection]:not([data-connection="online"]) .chip-connection {
+		display: block;
+		flex: 1 1 auto;
+		min-width: 0;
+		max-width: 100%;
+		height: auto;
+		min-height: 22px;
+		line-height: 20px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* The bulk bar docks to the bottom edge; with a selection it must not cover the message. */
+	.shell[data-connection]:not([data-connection="online"]) .shell-bulkbar:not(:empty) {
+		bottom: var(--statusbar-h);
+	}
 }
 
 /* ---- Bulk bar -------------------------------------------------------- */

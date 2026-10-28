@@ -101,8 +101,17 @@ export async function chromeCtx({ caps, respond, session } = {}) {
   made.ctx.caps = caps || buildCaps(baseSession, { dialect: 'legacy' });
   made.ctx.store.set({ session: baseSession, connection: { state: 'online', error: null, since: 1 } });
   const ticks = [];
-  made.ctx.poller = { tick: async () => { ticks.push(Date.now()); }, refreshAll: async () => {}, start: async () => {}, stop() {}, isRunning: () => true, isPaused: () => false };
-  return { ...made, ticks };
+  const refreshes = [];
+  made.ctx.poller = {
+    tick: async () => { ticks.push(Date.now()); },
+    refreshTorrents: async (ids) => { refreshes.push([...ids]); },
+    refreshAll: async () => {},
+    start: async () => {},
+    stop() {},
+    isRunning: () => true,
+    isPaused: () => false,
+  };
+  return { ...made, ticks, refreshes };
 }
 
 export const click = (node, init = {}) => node.dispatch('click', { ctrlKey: false, metaKey: false, shiftKey: false, ...init });

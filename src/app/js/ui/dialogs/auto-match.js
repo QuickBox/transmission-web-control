@@ -9,6 +9,7 @@
  */
 
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 
 const CHECKING = new Set([1, 2]);
 const TIMEOUT_MS = 10 * 60 * 1000;
@@ -132,6 +133,7 @@ export function createAutoMatchDialog(ctx, deps = {}) {
             },
           });
           if (outcome.folder) found += 1;
+          await refreshAfterWrite(ctx, [torrent.id]);
           results.append(el('li', { class: ['match-result', outcome.folder ? 'is-found' : 'is-missing'] }, [
             el('span', { class: 'match-name', text: torrent.name }),
             el('span', { class: 'mono match-folder', text: outcome.folder || t('dialogs.match.notFound') }),

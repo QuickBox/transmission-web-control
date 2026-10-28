@@ -7,6 +7,7 @@
  */
 
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 
 export const id = 'options';
 export const labelKey = 'details.tabs.options';
@@ -55,6 +56,7 @@ export function create(ctx, host) {
     if (torrentId == null) return Promise.resolve();
     return Promise.resolve()
       .then(() => ctx.rpc.call('torrent-set', { ids: [torrentId], ...patch }))
+      .then(() => refreshAfterWrite(ctx, [torrentId]))
       .then(() => host.refresh(), (err) => {
         toast(t('details.options.saveFailed', { message: errorMessage(t, err) }), { tone: 'error' });
         host.refresh();

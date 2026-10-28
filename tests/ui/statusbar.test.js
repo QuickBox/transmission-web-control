@@ -1,6 +1,35 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { installChromeDom, chromeCtx, shell, flush, torrent } from './chrome-dom.js';
+
+const CHROME_CSS = readFileSync(new URL('../../src/app/css/chrome.css', import.meta.url), 'utf8');
+
+/** Body of the first `@media (max-width: 639px)` block that styles the status bar. */
+function narrowBlock(css) {
+  let i = 0;
+  while ((i = css.indexOf('@media (max-width: 639px)', i)) !== -1) {
+    const open = css.indexOf('{', i);
+    let depth = 1;
+    let j = open + 1;
+    while (j < css.length && depth > 0) {
+      if (css[j] === '{') depth += 1;
+      else if (css[j] === '}') depth -= 1;
+      j += 1;
+    }
+    const body = css.slice(open + 1, j - 1);
+    if (body.includes('.shell-statusbar')) return body;
+    i = j;
+  }
+  return '';
+}
+
+/** The declarations of the first rule in `cssText` whose selector contains `fragment`. */
+function ruleFor(cssText, fragment) {
+  const re = new RegExp(`[^{}]*${fragment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^{]*\\{([^}]*)\\}`);
+  const m = re.exec(cssText);
+  return m ? m[1] : null;
+}
 
 const env = installChromeDom();
 const { FREE_SPACE_INTERVAL_MS, PORT_RETRY_MS, mount } = await import('../../src/app/js/ui/statusbar.js');
@@ -274,4 +303,33 @@ test('store updates patch the chips in place', async () => {
   await flush();
   ['down', 'up', 'free', 'port', 'version', 'counts', 'connection'].forEach((id, i) => assert.equal(chip(root, id), nodes[i], `${id} chip keeps its node`));
   teardown();
+});
+
+test('the footer and the shell expose the connection state for the narrow layout', async () => {
+  const { ctx, root, teardown } = await setup();
+  const app = root.closest('#app');
+  assert.equal(root.getAttribute('data-connection'), 'online');
+  assert.equal(app.getAttribute('data-connection'), 'online');
+  ctx.store.set({ connection: { state: 'unauthorized', error: 'HTTP 401', since: 2 } });
+  assert.equal(root.getAttribute('data-connection'), 'unauthorized');
+  assert.equal(app.getAttribute('data-connection'), 'unauthorized');
+  ctx.store.set({ connection: { state: 'online', error: null, since: 3 } });
+  assert.equal(app.getAttribute('data-connection'), 'online');
+  teardown();
+});
+
+test('narrow CSS: while not online the message owns the footer row and the bulk bar lifts above it', () => {
+  const block = narrowBlock(CHROME_CSS);
+  assert.ok(block, 'a narrow status-bar block exists');
+  const hideOthers = ruleFor(block, '.shell-statusbar[data-connection]:not([data-connection="online"]) .chip:not(.chip-connection)');
+  assert.ok(hideOthers && /display:\s*none/.test(hideOthers), 'rate and free chips hide while offline or unauthorized');
+  const message = ruleFor(block, '.shell-statusbar[data-connection]:not([data-connection="online"]) .chip-connection');
+  assert.ok(message, 'the connection chip has a narrow rule');
+  assert.match(message, /flex:\s*1 1 auto/);
+  assert.match(message, /min-width:\s*0/);
+  assert.match(message, /text-overflow:\s*ellipsis/);
+  assert.match(message, /overflow:\s*hidden/);
+  const lift = ruleFor(block, '.shell[data-connection]:not([data-connection="online"]) .shell-bulkbar:not(:empty)');
+  assert.ok(lift && /bottom:\s*var\(--statusbar-h\)/.test(lift), 'the docked bulk bar sits above the footer while not online');
+  assert.equal(ruleFor(block, '.shell-statusbar[data-connection="online"] .chip-connection'), null, 'no special case keeps the chip while online');
 });

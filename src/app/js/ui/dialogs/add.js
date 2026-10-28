@@ -7,6 +7,7 @@
  */
 
 import { getFreeSpace } from '../../rpc/session.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { createLabelStore, memoryStorage } from '../../rpc/labels.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
@@ -255,6 +256,7 @@ export function createAddDialog(ctx, deps = {}) {
         }
       }
 
+      if (added.length) await refreshAfterWrite(ctx, added.map((a) => a.id));
       if (added.length || duplicates) {
         if (added.length) {
           toast(t('dialogs.add.added', { count: added.length, total: fmt.count(added.length) }), { tone: 'success' });

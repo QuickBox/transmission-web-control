@@ -247,3 +247,67 @@ test("connectionFailure maps 401/403 to unauthorized and everything else to offl
   assert.deepEqual(connectionFailure(null, 11), { state: "offline", error: "request failed", since: 11 });
   assert.ok(Number.isFinite(connectionFailure(new Error("x")).since), "since defaults to now");
 });
+
+test("refreshTorrents re-reads the ids with the full field set, merges new objects, and joins the in-flight job", async () => {
+  const gets = [];
+  let release = null;
+  const transport = makeTransport({ sessionId: SESSION, rpcVersionHeader: null }, {
+    "torrent-get": async (body) => {
+      gets.push(body.arguments);
+      if (body.arguments.ids === undefined) {
+        return okResponse("legacy", body, { torrents: [{ id: 1, name: "idle", hashString: "h1", status: 0, labels: [] }, { id: 2, name: "b", hashString: "h2", status: 0 }] });
+      }
+      if (body.arguments.ids === "recently-active") return okResponse("legacy", body, { torrents: [], removed: [] });
+      if (release) await release;
+      return okResponse("legacy", body, { torrents: body.arguments.ids.map((id) => ({ id, name: id === 1 ? "idle" : "b", hashString: `h${id}`, status: 0, labels: ["fresh"] })) });
+    },
+    "session-get": (body) => okResponse("legacy", body, { "rpc-version": 16 }),
+    "session-stats": (body) => okResponse("legacy", body, {}),
+  });
+  const client = createClient({ transport });
+  const caps = buildCaps({ rpcVersion: 16 }, { dialect: DIALECT.LEGACY });
+  const store = createStore();
+  const timers = fakeTimers();
+  const poller = createPoller({ client, caps, store, timers });
+  await poller.start();
+  const before = store.get().torrents.get(1);
+  const stale = store.get().torrents.get(2);
+
+  let unblock;
+  release = new Promise((r) => { unblock = r; });
+  const refresh = poller.refreshTorrents([1, 1, "x"]);
+  const joined = poller.tick();
+  assert.equal(joined, refresh, "a tick asked for during a refresh joins it");
+  unblock();
+  await refresh;
+  const after = store.get().torrents.get(1);
+  assert.notEqual(after, before, "the refreshed torrent is a new object");
+  assert.deepEqual(after.labels, ["fresh"]);
+  assert.equal(after.hash, "h1");
+  assert.equal(store.get().torrents.get(2), stale, "untouched rows keep identity");
+  const idsGet = gets.find((a) => Array.isArray(a.ids));
+  assert.deepEqual(idsGet.ids, [1], "ids are de-duplicated and non-integers dropped");
+  assert.ok(idsGet.fields.includes("hashString") && idsGet.fields.includes("labels"), "full base fields, not the poll subset");
+  assert.equal(await poller.refreshTorrents([]), undefined, "nothing to refresh resolves at once");
+  assert.equal(gets.filter((a) => Array.isArray(a.ids)).length, 1);
+  poller.stop();
+});
+
+test("a failing refresh marks the connection and does not throw", async () => {
+  const transport = makeTransport({ sessionId: SESSION, rpcVersionHeader: null }, {
+    "torrent-get": (body) => (body.arguments.ids === undefined
+      ? okResponse("legacy", body, { torrents: [{ id: 1, name: "a", hashString: "h1" }] })
+      : new Response("nope", { status: 500 })),
+    "session-get": (body) => okResponse("legacy", body, { "rpc-version": 15 }),
+    "session-stats": (body) => okResponse("legacy", body, {}),
+  });
+  const client = createClient({ transport });
+  const caps = buildCaps({ rpcVersion: 15 }, { dialect: DIALECT.LEGACY });
+  const store = createStore();
+  const poller = createPoller({ client, caps, store, timers: fakeTimers() });
+  await poller.start();
+  await poller.refreshTorrents([1]);
+  assert.equal(store.get().connection.state, "offline");
+  assert.equal(store.get().torrents.get(1).name, "a", "the store keeps the last good row");
+  poller.stop();
+});

@@ -37,12 +37,12 @@ test('empty without a selection; renders count, Start, Pause, Remove, More and C
 });
 
 test('Start runs on the current selection; More lists the remaining actions; Clear empties the selection', async () => {
-  const { ctx, root, calls, ticks, menus, teardown } = await setup();
+  const { ctx, root, calls, refreshes, menus, teardown } = await setup();
   ctx.store.set({ selection: new Set([4, 9]) });
   click(byAction(root, 'start'));
   await flush();
   assert.deepEqual(calls, [{ method: 'torrent-start', args: { ids: [4, 9] } }]);
-  assert.equal(ticks.length, 1);
+  assert.deepEqual(refreshes, [[4, 9]]);
 
   click(root.querySelectorAll('button').find((b) => b.getAttribute('aria-label') === 'More'));
   assert.equal(menus.length, 1);

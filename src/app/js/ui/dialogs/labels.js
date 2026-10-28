@@ -11,6 +11,7 @@
  */
 
 import { createLabelStore } from '../../rpc/labels.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { browserStorage, parseLabels } from './add.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
@@ -133,6 +134,7 @@ export function createLabelsDialog(ctx, deps = {}) {
       save.disabled = true;
       const writes = [...groups.values()];
       writes.reduce((p, g) => p.then(() => labels.write(g.torrents, g.labels)), Promise.resolve())
+        .then(() => refreshAfterWrite(ctx, targets.map((tor) => tor.id)))
         .then(() => {
           toast(t('dialogs.labels.saved'), { tone: 'success' });
           dialog.close('saved');

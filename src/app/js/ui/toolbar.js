@@ -16,6 +16,7 @@ import {
   openAbout, openAdd, openAutoMatch, openLabels, openLimits, openLocation, openRemove, openRename, openReplaceTrackers, openSettings,
 } from './dialogs/index.js?v=__QBV__';
 import { createSearch } from './search.js?v=__QBV__';
+import { refreshAfterWrite } from '../rpc/poller.js?v=__QBV__';
 import { quickboxMark } from '../core/brand.js?v=__QBV__';
 
 /** Dialog openers by action, each taking the selected ids. */
@@ -103,7 +104,7 @@ export async function runAction(ctx, actionId, ids) {
     // The daemon applies most of these after the reply, so the list can lag a
     // poll behind; the notice confirms the request was accepted right away.
     ctx.ui.toast(ctx.i18n(`main.feedback.done.${action.id}`, { count: ids.length, total: ctx.fmt.count(ids.length) }), { tone: 'success', timeout: 3000 });
-    if (ctx.poller) await ctx.poller.tick();
+    await refreshAfterWrite(ctx, ids);
     return true;
   } catch (err) {
     ctx.ui.toast(ctx.i18n('main.feedback.actionFailed', {

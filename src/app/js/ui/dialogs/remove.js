@@ -52,8 +52,11 @@ export function createRemoveDialog(ctx) {
       Promise.resolve()
         .then(() => ctx.rpc.call('torrent-remove', { ids: removeIds, 'delete-local-data': deleteData.checked }))
         .then(() => {
-          const { selection, focused } = ctx.store.get();
+          const { selection, focused, torrents } = ctx.store.get();
           const patch = {};
+          const next = new Map(torrents);
+          for (const id of removeIds) next.delete(id);
+          if (next.size !== torrents.size) patch.torrents = next;
           if (removeIds.some((id) => selection.has(id))) patch.selection = new Set([...selection].filter((id) => !removeIds.includes(id)));
           if (removeIds.includes(focused)) patch.focused = null;
           if (Object.keys(patch).length) ctx.store.set(patch);

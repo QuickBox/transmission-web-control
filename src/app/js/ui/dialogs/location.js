@@ -6,6 +6,7 @@
  */
 
 import { getFreeSpace } from '../../rpc/session.js?v=__QBV__';
+import { refreshAfterWrite } from '../../rpc/poller.js?v=__QBV__';
 import { errorMessage } from '../../core/errors.js?v=__QBV__';
 
 /**
@@ -91,6 +92,7 @@ export function createLocationDialog(ctx) {
       save.disabled = true;
       Promise.resolve()
         .then(() => ctx.rpc.call('torrent-set-location', { ids: targets.map((tor) => tor.id), location, move }))
+        .then(() => refreshAfterWrite(ctx, targets.map((tor) => tor.id)))
         .then(() => {
           toast(t(move ? 'dialogs.location.moving' : 'dialogs.location.pointed', {
             count: targets.length, total: fmt.count(targets.length),

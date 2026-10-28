@@ -59,6 +59,7 @@ export function connectionFailure(err, now = Date.now()) {
  * @property {() => void} stop
  * @property {() => Promise<void>} tick one incremental poll now (joins a running one)
  * @property {() => Promise<void>} refreshAll one full fetch now (drops torrents the daemon no longer lists)
+ * @property {(ids: number[]) => Promise<void>} refreshTorrents re-read these ids with the full field set
  * @property {() => boolean} isRunning
  * @property {() => boolean} isPaused true while hidden
  */
@@ -128,6 +129,29 @@ export function createPoller({ client, caps, store, visibility = ALWAYS_VISIBLE,
     return inflight;
   }
 
+  /**
+   * Re-read `ids` with the full field set and merge them as new objects, so a
+   * write to an idle torrent (which `recently-active` never reports) reaches
+   * the store at once. Serialised with the poll: it waits for an in-flight
+   * job, and a tick asked for while it runs joins it.
+   */
+  function refreshTorrents(ids) {
+    const targets = [...new Set(Array.isArray(ids) ? ids : [])].filter(Number.isInteger);
+    if (targets.length === 0) return Promise.resolve();
+    const previous = inflight ? inflight.catch(() => {}) : Promise.resolve();
+    const job = previous
+      .then(async () => {
+        const { torrents } = await fetchTorrents(client, caps, store.get().torrents, { ids: targets });
+        store.set({ torrents });
+      })
+      .catch((err) => setConnection(connectionFailure(err, now())));
+    const held = job.finally(() => {
+      if (inflight === held) inflight = null;
+    });
+    inflight = held;
+    return held;
+  }
+
   function clearTimer() {
     if (timer !== null) {
       clock.clearTimeout(timer);
@@ -170,7 +194,21 @@ export function createPoller({ client, caps, store, visibility = ALWAYS_VISIBLE,
     },
     tick: () => poll(!primed),
     refreshAll: () => poll(true),
+    refreshTorrents,
     isRunning: () => running,
     isPaused: () => running && visibility.isHidden(),
   });
+}
+
+/**
+ * What every successful torrent write calls: refresh the written ids through
+ * the app's poller so the change shows without waiting for a poll that may
+ * never report an idle torrent. Resolves at once when no poller is mounted.
+ * @param {{ poller?: { refreshTorrents: (ids: number[]) => Promise<void> } }} ctx
+ * @param {number[]} ids
+ */
+export function refreshAfterWrite(ctx, ids) {
+  return ctx && ctx.poller && typeof ctx.poller.refreshTorrents === "function"
+    ? ctx.poller.refreshTorrents(ids)
+    : Promise.resolve();
 }
