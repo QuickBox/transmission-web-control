@@ -1,0 +1,15 @@
+Transmission web interface for QuickBox
+=======================================
+
+Icons
+-----
+The glyph path data in `js/core/icons.js` is a subset of Material Design Icons
+(MDI), redistributed under the Apache License, Version 2.0.
+
+  Project: Material Design Icons (Templarian/MaterialDesign on GitHub)
+  License: Apache-2.0
+
+The glyphs are tinted at render time with the active theme colour; no original
+colour is retained. The work is provided "AS IS", without warranties or
+conditions of any kind. This notice preserves the attribution and licence
+pointer the Apache License requires when the material is redistributed.

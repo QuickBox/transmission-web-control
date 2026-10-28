@@ -14,12 +14,18 @@
  *   stripe      a left border or inset stripe accent
  *   rpc-version the RPC version read outside `js/rpc/caps.js`
  *   mjs         a `.mjs` file (the daemon's web server is only known to serve `.js`)
+ *   i18n-manifest  `i18n/manifest.json` disagrees with the catalog files on
+ *               disk, or names an unknown language or namespace
+ *
+ * The entry pages beside the app directory (`src/index*.html`) are scanned
+ * with the same line gates.
  */
 
-import { readdirSync, readFileSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join, relative, sep, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { LANGUAGES, NAMESPACES } from '../src/app/js/core/i18n.js';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 const EXTENSIONS = new Set(['.js', '.css', '.html', '.json', '.mjs']);
@@ -83,9 +89,57 @@ function walk(dir, out = []) {
  * @param {string} appDir the directory to scan (normally `src/app`)
  * @returns {{ files: number, hits: string[] }}
  */
-export function scan(appDir) {
-  const files = walk(appDir);
+function entryPages(appDir) {
+  const parent = dirname(appDir);
+  let names = [];
+  try {
+    names = readdirSync(parent);
+  } catch {
+    return [];
+  }
+  return names.filter((n) => /^index[\w.-]*\.html$/.test(n)).map((n) => join(parent, n));
+}
+
+function listed(manifest, lang) {
+  return Array.isArray(manifest[lang]) ? manifest[lang] : [];
+}
+
+function manifestHits(appDir) {
+  const dir = join(appDir, 'i18n');
+  if (!existsSync(dir)) return [];
+  const onDisk = {};
+  for (const lang of readdirSync(dir)) {
+    if (!statSync(join(dir, lang)).isDirectory()) continue;
+    onDisk[lang] = readdirSync(join(dir, lang)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5));
+  }
+  let manifest;
+  try {
+    manifest = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8'));
+  } catch {
+    return ['i18n/manifest.json: [i18n-manifest] missing or not JSON'];
+  }
   const hits = [];
+  for (const [lang, names] of Object.entries(onDisk)) {
+    for (const ns of names) {
+      const rel = `i18n/${lang}/${ns}.json`;
+      if (!LANGUAGES.includes(lang)) hits.push(`${rel}: [i18n-manifest] unknown language "${lang}"`);
+      if (!NAMESPACES.includes(ns)) hits.push(`${rel}: [i18n-manifest] unknown namespace "${ns}"`);
+      if (!listed(manifest, lang).includes(ns)) hits.push(`${rel}: [i18n-manifest] not listed in i18n/manifest.json`);
+    }
+  }
+  for (const lang of Object.keys(manifest)) {
+    for (const ns of listed(manifest, lang)) {
+      if (!(onDisk[lang] || []).includes(ns)) {
+        hits.push(`i18n/manifest.json: [i18n-manifest] lists ${lang}/${ns}.json, which does not exist`);
+      }
+    }
+  }
+  return hits;
+}
+
+export function scan(appDir) {
+  const files = [...walk(appDir), ...entryPages(appDir)];
+  const hits = manifestHits(appDir);
   for (const file of files) {
     const rel = relative(appDir, file).split(sep).join('/');
     if (rel.endsWith('.mjs')) hits.push(`${rel}: [mjs] modules must be .js`);
@@ -130,6 +184,11 @@ const BAD = {
   'i18n/en/p.json': '{"a": "see https://example.test"}',
   'js/q.js': 'node.style.borderLeftColor = c;',
   'js/r.js': 'const ns = "https://www.w3.org/2000/svg";',
+  '../index.html': '<button title="Add">+</button>',
+  '../index.mobile.html': '<script src="https://cdn.example.test/x.js"></script>',
+  'i18n/de/core.json': '{"a": "A"}',
+  'i18n/en/extra.json': '{"a": "A"}',
+  'i18n/manifest.json': '{"en": ["core", "main"]}',
 };
 
 const GOOD = {
@@ -141,9 +200,12 @@ const GOOD = {
   'js/core/dom.js': 'node.textContent = text; app.querySelector("#app");',
   'css/base.css': '.btn { border: 1px solid var(--qb-border); box-shadow: 0 0 0 2px var(--qb-ring); }',
   'i18n/en/core.json': '{"a": "Speed {size}/s", "b": "#1 in queue"}',
+  'i18n/manifest.json': '{"en": ["core"]}',
+  '../index.html': '<title>Transmission</title><link rel="stylesheet" href="app/css/base.css?v=__QBV__">',
 };
 
 function writeTree(root, files) {
+  mkdirSync(root, { recursive: true });
   for (const [rel, body] of Object.entries(files)) {
     const full = join(root, rel);
     mkdirSync(dirname(full), { recursive: true });
@@ -155,19 +217,19 @@ function selftest() {
   const base = mkdtempSync(join(tmpdir(), 'twc-check-'));
   const failures = [];
   try {
-    const empty = join(base, 'empty');
-    mkdirSync(empty);
+    const empty = join(base, 'empty', 'app');
+    mkdirSync(empty, { recursive: true });
     if (scan(empty).files !== 0) failures.push('empty tree reported files');
     if (report(empty) === 0) failures.push('zero files passed');
 
-    const good = join(base, 'good');
+    const good = join(base, 'good', 'app');
     writeTree(good, GOOD);
     const g = scan(good);
     if (g.hits.length) failures.push(`clean tree hit:\n  ${g.hits.join('\n  ')}`);
     if (report(good) !== 0) failures.push('clean tree did not pass');
 
     for (const [rel, body] of Object.entries(BAD)) {
-      const dir = join(base, `bad-${rel.replace(/[^\w]/g, '_')}`);
+      const dir = join(base, `bad-${rel.replace(/[^\w]/g, '_')}`, 'app');
       writeTree(dir, { ...GOOD, [rel]: body });
       const b = scan(dir);
       if (!b.hits.some((h) => h.startsWith(rel))) failures.push(`not caught: ${rel} ${body}`);

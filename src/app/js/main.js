@@ -9,8 +9,14 @@
 
 import { el, svg, clear } from './core/dom.js?v=__QBV__';
 import { createStore } from './core/store.js?v=__QBV__';
-import { detectLanguage, loadTranslator } from './core/i18n.js?v=__QBV__';
+import { detectLanguage, fetchManifest, loadTranslator } from './core/i18n.js?v=__QBV__';
 import { bindFormat } from './core/format.js?v=__QBV__';
+import { startTheme } from './core/theme.js?v=__QBV__';
+import { icon } from './core/icons.js?v=__QBV__';
+import { tooltip } from './core/tooltip.js?v=__QBV__';
+import { createToast } from './core/toast.js?v=__QBV__';
+import { createDialogs } from './core/dialog.js?v=__QBV__';
+import { menu } from './core/menu.js?v=__QBV__';
 import * as toolbar from './ui/toolbar.js?v=__QBV__';
 import * as sidebar from './ui/sidebar.js?v=__QBV__';
 import * as table from './ui/table.js?v=__QBV__';
@@ -56,11 +62,13 @@ export const MODULES = Object.freeze([
  *   icon: (name: string, opts?: { size?: number, label?: string }) => SVGElement,
  *   tooltip: (target: Element, text: string | (() => string)) => () => void,
  *   toast: (message: string, opts?: { tone?: Tone, timeout?: number }) => void,
- *   openDialog: (opts: { title: string, body: Node | Node[], actions?: Node[],
- *     size?: 'sm'|'md'|'lg', onClose?: () => void }) => { root: HTMLElement, close: () => void },
- *   confirm: (opts: { title: string, message: string, confirmLabel?: string,
- *     destructive?: boolean }) => Promise<boolean>,
- *   menu: (anchor: Element, items: MenuItem[]) => { close: () => void },
+ *   openDialog: (opts: { title: string, description?: string, body?: Node | Node[],
+ *     actions?: Node[], size?: 'sm'|'md'|'lg', tone?: 'info'|'warning'|'danger'|'success',
+ *     icon?: string, dismissible?: boolean, initialFocus?: HTMLElement,
+ *     onClose?: (reason: string) => void }) => { root: HTMLElement, body: HTMLElement, close: () => void },
+ *   confirm: (opts: { title: string, message: string, confirmLabel?: string, cancelLabel?: string,
+ *     destructive?: boolean, tone?: 'info'|'warning'|'danger'|'success' }) => Promise<boolean>,
+ *   menu: (anchor: HTMLElement, items: MenuItem[], opts?: { label?: string }) => { close: () => void },
  * }} Ui
  *
  * @typedef {{
@@ -80,19 +88,27 @@ function notWired(name) {
   };
 }
 
-/** @returns {AppContext['ui']} */
-function buildUi() {
-  return {
-    el,
-    svg,
-    clear,
-    icon: notWired('ui.icon'),
-    tooltip: notWired('ui.tooltip'),
-    toast: notWired('ui.toast'),
-    openDialog: notWired('ui.openDialog'),
-    confirm: notWired('ui.confirm'),
-    menu: notWired('ui.menu'),
-  };
+/**
+ * @param {import('./core/i18n.js').Translate} t
+ * @returns {AppContext['ui']}
+ */
+function buildUi(t) {
+  const { openDialog, confirm } = createDialogs(t);
+  return { el, svg, clear, icon, tooltip, toast: createToast(t), openDialog, confirm, menu };
+}
+
+/** Landmark names, and the off-canvas sidebar's scrim and Escape close. */
+function wireShell(app, t) {
+  for (const name of ['toolbar', 'sidebar', 'table', 'details', 'statusbar']) {
+    const region = app.querySelector(`[data-region="${name}"]`);
+    if (region) region.setAttribute('aria-label', t(`core.regions.${name}`));
+  }
+  const closeSidebar = () => app.removeAttribute('data-sidebar-open');
+  const scrim = app.querySelector('[data-shell-scrim]');
+  if (scrim) scrim.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && app.hasAttribute('data-sidebar-open') && !app.inert) closeSidebar();
+  });
 }
 
 /** @returns {{ rpc: Rpc, caps: Caps|null }} */
@@ -113,8 +129,9 @@ function regionFor(app, name) {
  * @returns {Promise<AppContext>}
  */
 export async function boot(app) {
+  startTheme();
   const lang = detectLanguage();
-  const t = await loadTranslator({ lang });
+  const t = await loadTranslator({ lang, available: await fetchManifest() });
   document.documentElement.setAttribute('lang', t.lang);
 
   const units = {};
@@ -133,8 +150,9 @@ export async function boot(app) {
     caps,
     i18n: t,
     fmt: bindFormat({ locale: t.lang, units }),
-    ui: buildUi(),
+    ui: buildUi(t),
   };
+  wireShell(app, t);
 
   for (const [name, mod] of MODULES) {
     try {

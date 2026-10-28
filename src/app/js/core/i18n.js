@@ -192,16 +192,38 @@ export async function fetchCatalog(lang, ns) {
 }
 
 /**
+ * Fetch `i18n/manifest.json`, the list of catalog files that exist
+ * (`{ "<code>": ["<namespace>", ...] }`), so the loader never requests a
+ * file that is not there. Resolves `null` when the manifest is unreadable.
+ * @returns {Promise<Record<string, string[]>|null>}
+ */
+export async function fetchManifest() {
+  const url = new URL('../../i18n/manifest.json?v=__QBV__', import.meta.url);
+  try {
+    const res = await fetch(url, { credentials: 'same-origin' });
+    const body = res.ok ? await res.json() : null;
+    return body && typeof body === 'object' && !Array.isArray(body) ? body : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Load every namespace for `lang` (and English beneath it) and return `t`.
  * A missing or broken catalog degrades to English, never to a failure.
- * @param {{ lang: string, namespaces?: readonly string[], load?: (lang: string, ns: string) => Promise<unknown|null> }} opts
+ * With `available` (the manifest), only listed files are requested.
+ * @param {{ lang: string, namespaces?: readonly string[], available?: Record<string, string[]>|null,
+ *   load?: (lang: string, ns: string) => Promise<unknown|null> }} opts
  * @returns {Promise<Translate>}
  */
-export async function loadTranslator({ lang, namespaces = NAMESPACES, load = fetchCatalog }) {
+export async function loadTranslator({ lang, namespaces = NAMESPACES, available = null, load = fetchCatalog }) {
   const code = matchLanguage(lang) || 'en';
   const english = new Map();
   const active = new Map();
-  const safeLoad = (l, ns) => Promise.resolve().then(() => load(l, ns)).catch(() => null);
+  const listed = (l, ns) => !available || (Array.isArray(available[l]) && available[l].includes(ns));
+  const safeLoad = (l, ns) => (listed(l, ns)
+    ? Promise.resolve().then(() => load(l, ns)).catch(() => null)
+    : Promise.resolve(null));
   await Promise.all(namespaces.map(async (ns) => {
     const [en, own] = await Promise.all([
       safeLoad('en', ns),

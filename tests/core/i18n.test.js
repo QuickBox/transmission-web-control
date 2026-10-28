@@ -136,3 +136,14 @@ test('the shipped English core catalog is plain text and loads', async () => {
   assert.equal(t('core.count.torrents', { count: 3 }), '3 torrents');
   assert.equal(t('core.status.seeding'), 'Seeding');
 });
+
+test('with a manifest, only listed catalogs are requested', async () => {
+  const { load, calls } = fakeLoader({ 'en/core': { a: 'A' }, 'de/core': { a: 'DE' } });
+  const t = await loadTranslator({
+    lang: 'de', namespaces: ['core', 'main'], available: { en: ['core'], de: ['core'] }, load,
+  });
+  assert.equal(t('core.a'), 'DE');
+  assert.deepEqual(calls.sort(), ['de/core', 'en/core']);
+  const none = await loadTranslator({ lang: 'fr', namespaces: ['core'], available: { en: ['core'] }, load });
+  assert.equal(none('core.a'), 'A');
+});

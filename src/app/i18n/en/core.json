@@ -32,8 +32,14 @@
     "error": "Error"
   },
   "count": {
-    "torrents": { "one": "{count} torrent", "other": "{count} torrents" },
-    "selected": { "one": "{count} selected", "other": "{count} selected" }
+    "torrents": {
+      "one": "{count} torrent",
+      "other": "{count} torrents"
+    },
+    "selected": {
+      "one": "{count} selected",
+      "other": "{count} selected"
+    }
   },
   "units": {
     "size1000": "B kB MB GB TB PB",
@@ -63,5 +69,24 @@
   },
   "errors": {
     "generic": "Something went wrong: {message}"
+  },
+  "regions": {
+    "toolbar": "Toolbar",
+    "sidebar": "Filters",
+    "table": "Torrents",
+    "details": "Torrent details",
+    "statusbar": "Status"
+  },
+  "dialog": {
+    "close": "Close dialog"
+  },
+  "toast": {
+    "dismiss": "Dismiss notification"
+  },
+  "tone": {
+    "info": "Information",
+    "success": "Success",
+    "warning": "Warning",
+    "error": "Error"
   }
 }

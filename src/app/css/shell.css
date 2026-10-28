@@ -1,0 +1,195 @@
+/*
+ * App shell: top bar, sidebar, main column (torrent list above the details
+ * drawer) and status bar. Each region is owned by one UI module; this file
+ * only places them.
+ *
+ * Wide (960px and up): a docked 264px sidebar, or a 64px rail when
+ * `#app[data-sidebar="rail"]`. The details drawer sits under the list at
+ * `--details-h` (default 38%).
+ * Medium (640-959px): the sidebar is an off-canvas drawer opened with
+ * `#app[data-sidebar-open]`; details open as a right sheet with
+ * `#app[data-details="open"]`.
+ * Narrow (below 640px): details open full screen; the bulk bar docks to the
+ * bottom whenever its region has content.
+ */
+
+.shell {
+	--toolbar-h: 56px;
+	--statusbar-h: 32px;
+	--sidebar-w: 264px;
+	display: grid;
+	grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+	grid-template-rows: var(--toolbar-h) minmax(0, 1fr) var(--statusbar-h);
+	grid-template-areas:
+		"toolbar toolbar"
+		"sidebar main"
+		"statusbar statusbar";
+	height: 100vh;
+	height: 100dvh;
+	overflow: hidden;
+	background: var(--qb-background);
+}
+
+.shell[data-sidebar="rail"] {
+	--sidebar-w: 64px;
+}
+
+.shell-toolbar {
+	grid-area: toolbar;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	padding: 0 12px;
+	border-bottom: 1px solid var(--qb-border);
+	background: var(--qb-surface);
+	container: toolbar / inline-size;
+}
+
+.shell-sidebar {
+	grid-area: sidebar;
+	min-height: 0;
+	overflow: auto;
+	border-right: 1px solid var(--qb-border);
+	background: var(--qb-surface);
+	container: sidebar / inline-size;
+}
+
+.shell-main {
+	grid-area: main;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 0;
+}
+
+.shell-table {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	background: var(--qb-surface);
+	container: torrents / inline-size;
+}
+
+.shell-details {
+	flex: none;
+	height: var(--details-h, 38%);
+	min-height: 160px;
+	max-height: 70%;
+	overflow: auto;
+	border-top: 1px solid var(--qb-border);
+	background: var(--qb-surface);
+	container: details / inline-size;
+}
+
+.shell-statusbar {
+	grid-area: statusbar;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+	padding: 0 12px;
+	overflow: hidden;
+	border-top: 1px solid var(--qb-border);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	color: var(--qb-fg-muted);
+	background: var(--qb-surface);
+}
+
+.shell-scrim {
+	display: none;
+}
+
+.shell-bulkbar:empty {
+	display: none;
+}
+
+.shell-dialogs {
+	display: contents;
+}
+
+@media (max-width: 959px) {
+	.shell {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas:
+			"toolbar"
+			"main"
+			"statusbar";
+	}
+
+	.shell-sidebar {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 800;
+		width: min(300px, 85vw);
+		border-right: 1px solid var(--qb-border);
+		box-shadow: var(--qb-shadow);
+		transform: translateX(-100%);
+		visibility: hidden;
+		transition: transform 0.2s ease-out, visibility 0.2s;
+	}
+
+	.shell[data-sidebar-open] .shell-sidebar {
+		transform: none;
+		visibility: visible;
+	}
+
+	.shell[data-sidebar-open] .shell-scrim {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 790;
+		background: color-mix(in srgb, var(--qb-overlay) 50%, transparent);
+	}
+
+	.shell-details {
+		display: none;
+	}
+
+	.shell[data-details="open"] .shell-details {
+		display: block;
+		position: fixed;
+		top: var(--toolbar-h);
+		right: 0;
+		bottom: var(--statusbar-h);
+		z-index: 700;
+		width: min(480px, 90vw);
+		height: auto;
+		max-height: none;
+		border: 1px solid var(--qb-border);
+		border-right: 0;
+		box-shadow: var(--qb-shadow);
+	}
+}
+
+@media (max-width: 639px) {
+	.shell-toolbar {
+		gap: 4px;
+		padding: 0 8px;
+	}
+
+	.shell[data-details="open"] .shell-details {
+		inset: 0;
+		z-index: 850;
+		width: auto;
+		border: 0;
+	}
+
+	.shell-bulkbar:not(:empty) {
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 750;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+		border-top: 1px solid var(--qb-border);
+		background: var(--qb-surface);
+		box-shadow: var(--qb-shadow-soft);
+	}
+}

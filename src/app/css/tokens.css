@@ -1,0 +1,247 @@
+/*
+ * Design tokens. Every hex colour in the app lives in this file.
+ *
+ * The four `--qb-*` variant blocks are copied verbatim from the club-QuickBox
+ * ruTorrent skin (`style.css`, section 1), which carries the QuickBox v4
+ * dashboard theme values: spectre (default), reel, smoked and defaulted (the
+ * light theme). `data-qb-variant` on <html> selects a block.
+ *
+ * `--tr-st-*` is the torrent status family. It never reuses `--qb-primary`,
+ * so two states shown side by side never share a hue: stopped grey, queued
+ * violet, checking amber, downloading sky, seeding emerald, finished lime,
+ * error red. Dark variants use the -400 step; the light variant uses -700
+ * (-800 for amber and lime), which keeps every chip at 4.5:1 or better on its
+ * 12% tint over the surface.
+ */
+
+:root,
+:root[data-qb-variant="spectre"] {
+	--qb-background: #060818;
+	--qb-foreground: #e0e6ed;
+	--qb-surface: #0e1726;
+	--qb-surface-2: #181e2e;
+	--qb-surface-3: #1b2436;
+	--qb-muted: #181e2e;
+	--qb-fg-muted: #94a3b8;
+	--qb-border: #1b2e4b;
+	--qb-border-soft: #142138;
+	--qb-input: #0a1120;
+	--qb-primary: #26ae7f;
+	--qb-primary-fg: #060818;
+	--qb-primary-text: #26ae7f;
+	/* Primary hover fill: moves AWAY from --qb-primary-fg (lighter under a dark
+	 * label, darker under a light one) so the label keeps its contrast. */
+	--qb-primary-hover: color-mix(in srgb, var(--qb-primary) 88%, white);
+	--qb-accent: #2aebcb;
+	--qb-accent-fg: #060818;
+	--qb-accent-text: #2aebcb;
+	--qb-destructive: #e7515a;
+	--qb-destructive-text: #f87171;
+	--qb-ring: #2aebcb;
+	--qb-focus: rgba(42, 235, 203, 0.35);
+	--qb-header-gradient: linear-gradient(to right, #2aebcb, #26ae7f);
+	--qb-scrollbar-track: #0a1120;
+	--qb-scrollbar-thumb: #26ae7f;
+	--qb-scrollbar-thumb-hover: #2aebcb;
+	--qb-tooltip-bg: rgba(14, 23, 38, 0.96);
+	--qb-tooltip-fg: #e0e6ed;
+	--qb-tooltip-border: rgba(27, 46, 75, 0.5);
+	--qb-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+	--qb-shadow-soft: 0 8px 20px rgba(2, 6, 23, 0.35);
+	--qb-speed-down: #38bdf8;
+	--qb-speed-up: #26ae7f;
+	--qb-speed-total: #2aebcb;
+	--qb-prg-start: #26ae7f;
+	--qb-prg-end: #2aebcb;
+	--qb-pill-bg: rgba(0, 0, 0, 0.28);
+	--qb-icon: #94a3b8;
+	--qb-icon-hover: #e0e6ed;
+	--qb-state-downloading: #38bdf8;
+	--qb-state-seeding: #26ae7f;
+	--qb-state-paused: #fbbf24;
+	--qb-state-stopped: #94a3b8;
+	--qb-state-error: #e7515a;
+}
+
+:root[data-qb-variant="reel"] {
+	--qb-background: #181614;
+	--qb-foreground: #e3e0db;
+	--qb-surface: #22201e;
+	--qb-surface-2: #2a2826;
+	--qb-surface-3: #332f2b;
+	--qb-muted: #2a2826;
+	--qb-fg-muted: #9c958d;
+	--qb-border: #34302c;
+	--qb-border-soft: #262320;
+	--qb-input: #1b1917;
+	--qb-primary: #f0a500;
+	--qb-primary-fg: #181614;
+	--qb-primary-text: #f0a500;
+	--qb-primary-hover: color-mix(in srgb, var(--qb-primary) 88%, white);
+	--qb-accent: #483d2c;
+	--qb-accent-fg: #e3e0db;
+	--qb-accent-text: #e8c582;
+	--qb-destructive: #e7515a;
+	--qb-destructive-text: #f87171;
+	--qb-ring: #f0a500;
+	--qb-focus: rgba(240, 165, 0, 0.35);
+	--qb-header-gradient: linear-gradient(to right, #f0a500, #cc8c00);
+	--qb-scrollbar-track: #1e1c1a;
+	--qb-scrollbar-thumb: #483d2c;
+	--qb-scrollbar-thumb-hover: #f0a500;
+	--qb-tooltip-bg: rgba(24, 22, 20, 0.96);
+	--qb-tooltip-fg: #e3e0db;
+	--qb-tooltip-border: rgba(52, 48, 44, 0.6);
+	--qb-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+	--qb-shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.35);
+	--qb-speed-down: #38bdf8;
+	--qb-speed-up: #f0a500;
+	--qb-speed-total: #e8c582;
+	--qb-prg-start: #cc8c00;
+	--qb-prg-end: #f0a500;
+	--qb-pill-bg: rgba(0, 0, 0, 0.3);
+	--qb-icon: #9c958d;
+	--qb-icon-hover: #e3e0db;
+	--qb-state-downloading: #38bdf8;
+	--qb-state-seeding: #f0a500;
+	--qb-state-paused: #d9a441;
+	--qb-state-stopped: #9c958d;
+	--qb-state-error: #e7515a;
+}
+
+:root[data-qb-variant="smoked"] {
+	--qb-background: #161c23;
+	--qb-foreground: #e0e6ed;
+	--qb-surface: #1d2530;
+	--qb-surface-2: #171e27;
+	--qb-surface-3: #252e3a;
+	--qb-muted: #171e27;
+	--qb-fg-muted: #888ea8;
+	--qb-border: #2f3c4b;
+	--qb-border-soft: #222c38;
+	--qb-input: #171e27;
+	--qb-primary: #4361ee;
+	--qb-primary-fg: #fafafa;
+	--qb-primary-text: #60a5fa;
+	--qb-primary-hover: color-mix(in srgb, var(--qb-primary) 88%, black);
+	--qb-accent: #2aebcb;
+	--qb-accent-fg: #161c23;
+	--qb-accent-text: #2aebcb;
+	--qb-destructive: #e7515a;
+	--qb-destructive-text: #f87171;
+	--qb-ring: #2aebcb;
+	--qb-focus: rgba(42, 235, 203, 0.3);
+	--qb-header-gradient: linear-gradient(to right, #60a5fa, #3b82f6);
+	--qb-scrollbar-track: #171e27;
+	--qb-scrollbar-thumb: #4361ee;
+	--qb-scrollbar-thumb-hover: #2aebcb;
+	--qb-tooltip-bg: rgba(29, 37, 48, 0.96);
+	--qb-tooltip-fg: #e0e6ed;
+	--qb-tooltip-border: rgba(47, 60, 75, 0.6);
+	--qb-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+	--qb-shadow-soft: 0 8px 20px rgba(2, 6, 23, 0.35);
+	--qb-speed-down: #38bdf8;
+	--qb-speed-up: #60a5fa;
+	--qb-speed-total: #2aebcb;
+	--qb-prg-start: #3b82f6;
+	--qb-prg-end: #60a5fa;
+	--qb-pill-bg: rgba(0, 0, 0, 0.28);
+	--qb-icon: #888ea8;
+	--qb-icon-hover: #e0e6ed;
+	--qb-state-downloading: #38bdf8;
+	--qb-state-seeding: #34d399;
+	--qb-state-paused: #fbbf24;
+	--qb-state-stopped: #888ea8;
+	--qb-state-error: #e7515a;
+}
+
+:root[data-qb-variant="defaulted"] {
+	--qb-background: #f1f2f3;
+	--qb-foreground: #515365;
+	--qb-surface: #ffffff;
+	--qb-surface-2: #ebedf2;
+	--qb-surface-3: #e2e5ea;
+	--qb-muted: #ebedf2;
+	--qb-fg-muted: #646982;
+	--qb-border: #d3d3d3;
+	--qb-border-soft: #e3e3e3;
+	--qb-input: #ffffff;
+	--qb-primary: #4361ee;
+	--qb-primary-fg: #ffffff;
+	--qb-primary-text: #1d4ed8;
+	--qb-primary-hover: color-mix(in srgb, var(--qb-primary) 88%, black);
+	--qb-accent: #0d6efd;
+	--qb-accent-fg: #ffffff;
+	--qb-accent-text: #0a58ca;
+	--qb-destructive: #e7515a;
+	--qb-destructive-text: #c0303a;
+	--qb-ring: #4361ee;
+	--qb-focus: rgba(67, 97, 238, 0.25);
+	--qb-header-gradient: linear-gradient(to right, #818cf8, #6366f1);
+	--qb-scrollbar-track: #ebedf2;
+	--qb-scrollbar-thumb: #4361ee;
+	--qb-scrollbar-thumb-hover: #0d6efd;
+	--qb-tooltip-bg: rgba(255, 255, 255, 0.96);
+	--qb-tooltip-fg: #515365;
+	--qb-tooltip-border: rgba(211, 211, 211, 0.6);
+	--qb-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+	--qb-shadow-soft: 0 8px 20px rgba(15, 23, 42, 0.06);
+	--qb-speed-down: #0284c7;
+	--qb-speed-up: #1d4ed8;
+	--qb-speed-total: #0a58ca;
+	--qb-prg-start: #4361ee;
+	--qb-prg-end: #6366f1;
+	--qb-pill-bg: rgba(0, 0, 0, 0.06);
+	--qb-icon: #646982;
+	--qb-icon-hover: #1d4ed8;
+	--qb-state-downloading: #0284c7;
+	--qb-state-seeding: #15803d;
+	--qb-state-paused: #b45309;
+	--qb-state-stopped: #646982;
+	--qb-state-error: #c0303a;
+}
+
+
+:root,
+:root[data-qb-variant="spectre"],
+:root[data-qb-variant="reel"],
+:root[data-qb-variant="smoked"] {
+	--tr-st-stopped: #9ca3af;
+	--tr-st-queued: #a78bfa;
+	--tr-st-checking: #fbbf24;
+	--tr-st-downloading: #38bdf8;
+	--tr-st-seeding: #34d399;
+	--tr-st-finished: #a3e635;
+	--tr-st-error: #f87171;
+}
+
+:root[data-qb-variant="defaulted"] {
+	--tr-st-stopped: #374151;
+	--tr-st-queued: #6d28d9;
+	--tr-st-checking: #92400e;
+	--tr-st-downloading: #0369a1;
+	--tr-st-seeding: #047857;
+	--tr-st-finished: #3f6212;
+	--tr-st-error: #b91c1c;
+}
+
+/* Shared primitives. */
+:root {
+	--qb-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+	--qb-font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+	--qb-radius: 8px;
+	--qb-radius-lg: 12px;
+	--qb-radius-xl: 14px;
+	--qb-overlay: #000000;
+	--qb-destructive-fg: #ffffff;
+	--qb-destructive-solid: #dc2626;
+	--qb-destructive-solid-hover: #b91c1c;
+	--qb-switch-thumb: var(--qb-foreground);
+	color-scheme: dark;
+	accent-color: var(--qb-primary);
+}
+
+:root[data-qb-variant="defaulted"] {
+	--qb-switch-thumb: #ffffff;
+	color-scheme: light;
+}

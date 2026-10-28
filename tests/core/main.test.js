@@ -12,8 +12,12 @@ class FakeNode {
   addEventListener() {}
   append(...nodes) { this.children.push(...nodes); }
   replaceChildren() { this.children = []; }
+  getAttribute(k) { return this.attributes.has(k) ? this.attributes.get(k) : null; }
+  hasAttribute(k) { return this.attributes.has(k); }
+  removeAttribute(k) { this.attributes.delete(k); }
   querySelector(sel) {
     const m = /^\[data-region="(\w+)"\]$/.exec(sel);
+    if (!m) return null;
     return this.children.find((c) => c.attributes && c.attributes.get('data-region') === m[1]) || null;
   }
 }
@@ -25,7 +29,9 @@ globalThis.document = {
   createElement: (tag) => new FakeNode(tag),
   createElementNS: (ns, tag) => new FakeNode(tag),
   getElementById: () => null,
+  addEventListener() {},
 };
+globalThis.addEventListener = () => {};
 
 const { boot, MODULES } = await import('../../src/app/js/main.js');
 
@@ -49,6 +55,10 @@ test('boot mounts every module into its own region and publishes the context', a
   assert.equal(ctx.i18n.lang, 'de');
   assert.equal(typeof ctx.store.subscribe, 'function');
   assert.equal(ctx.fmt.bytes(1500), '1,50 kB');
-  assert.throws(() => ctx.ui.toast('x'), /ui\.toast is not wired yet/);
+  for (const name of ['icon', 'tooltip', 'toast', 'openDialog', 'confirm', 'menu']) {
+    assert.equal(typeof ctx.ui[name], 'function', name);
+  }
+  assert.equal(existing.attributes.get('aria-label'), 'core.regions.table');
+  assert.equal(root.attributes.get('data-qb-variant'), 'spectre');
   assert.throws(() => ctx.rpc.call('session-get'), /rpc\.call is not wired yet/);
 });
