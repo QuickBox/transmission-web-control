@@ -92,7 +92,7 @@ export function mount(root, ctx, options = {}) {
       el('span', { class: 'count-pill nav-count', text: ctx.fmt.count(count) }),
     ]);
     tooltip(button, () => (hint ? `${label} (${hint})` : `${label} · ${ctx.fmt.count(count)}`));
-    return el('li', { role: 'none' }, button);
+    return el('li', {}, button);
   }
 
   function section(id, title, items) {

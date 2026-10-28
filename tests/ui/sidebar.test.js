@@ -54,6 +54,8 @@ test('renders four sections with status counts in sidebar order', async () => {
   assert.deepEqual(items(root, 'trackers').map((i) => `${labelOf(i)}:${countOf(i)}`), ['a.invalid:2', 'b.invalid:3']);
   assert.deepEqual(items(root, 'folders').map((i) => `${labelOf(i)}:${countOf(i)}`), ['iso:3', 'video:2']);
   for (const b of root.querySelectorAll('button')) assert.equal(b.getAttribute('title'), null);
+  for (const li of root.querySelectorAll('li')) assert.equal(li.getAttribute('role'), null, 'list items keep their listitem role');
+  assert.equal(section(root, 'status').querySelector('ul').getAttribute('role'), 'list');
   teardown();
 });
 

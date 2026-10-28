@@ -7,7 +7,7 @@
 
 .torrents {
 	--row-h: 40px;
-	--cols: 44px minmax(220px, 1fr);
+	--cols: 44px minmax(180px, 1fr);
 	position: relative;
 	min-width: 100%;
 	font-size: 13px;
@@ -204,6 +204,12 @@
 	background: var(--st);
 }
 
+/* A stopped or finished bar is history, not activity: soften its fill toward the surface. The chip keeps the full token for text contrast. */
+.progress[data-state="stopped"] .progress-bar::after,
+.progress[data-state="finished"] .progress-bar::after {
+	background: color-mix(in srgb, var(--st) 55%, var(--qb-surface));
+}
+
 .progress-text {
 	text-align: end;
 	font-variant-numeric: tabular-nums;
@@ -316,6 +322,10 @@
 	.torrents-row .cell-rateUpload { grid-area: up; }
 	.torrents-row .cell-eta { grid-area: eta; }
 	.torrents-row .cell-totalSize { grid-area: size; justify-self: end; }
+
+	.torrents-row .cell-eta[data-empty] {
+		display: none;
+	}
 
 	.torrents-row .cell-rateDownload:not(:empty)::before { content: "↓ "; }
 	.torrents-row .cell-rateUpload:not(:empty)::before { content: "↑ "; }
