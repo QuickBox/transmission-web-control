@@ -58,7 +58,8 @@ function matches(query) {
 
 /**
  * Focus a torrent's details: sets `focused`, switches to `tab` when given,
- * opens the sheet on medium and narrow layouts and moves focus to the tabs.
+ * and on medium and narrow layouts opens the sheet and moves focus to the
+ * tabs. On wide layouts focus stays where it is unless `focus: true`.
  * @param {number} [id] keep the current torrent when omitted
  * @param {{ tab?: string, focus?: boolean }} [opts]
  */
@@ -313,7 +314,11 @@ export function mount(root, ctx) {
       app.setAttribute('data-details', 'open');
       setSheetInert(matches(FULL_QUERY));
     }
-    if (opts.focus !== false && shownTorrent) tabButtons.get(activeId).focus();
+    // Focus moves into the details only where they cover the list (the
+    // sheets) or when the caller asks; on wide layouts the list keeps focus so
+    // arrow keys keep moving through torrents.
+    const intoSheet = isOpen();
+    if (shownTorrent && (opts.focus === true || (opts.focus !== false && intoSheet))) tabButtons.get(activeId).focus();
   }
 
   function close() {

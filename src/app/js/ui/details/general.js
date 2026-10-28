@@ -51,10 +51,11 @@ export function create(ctx) {
     return node;
   }
 
-  function card(key, labelKey) {
+  function card(key, labelKey, subKey) {
     return el('div', { class: 'stat-card' }, [
       el('span', { class: 'detail-label', text: t(labelKey) }),
       value(key, 'tabular'),
+      subKey ? value(subKey, 'stat-sub') : null,
     ]);
   }
 
@@ -91,7 +92,7 @@ export function create(ctx) {
     el('span', { class: 'details-notice-icon' }, [icon('state-error', { size: 18 })]),
     value('notice'),
   ]);
-  const bar = el('div', { class: 'progress', 'aria-hidden': 'true' }, [el('span', { class: 'progress-fill' })]);
+  const bar = el('div', { class: 'meter', 'aria-hidden': 'true' }, [el('span', { class: 'meter-fill' })]);
   const progressCard = el('div', { class: 'stat-card stat-card-progress' }, [
     el('span', { class: 'detail-label', text: t('details.general.progress') }),
     value('progress', 'tabular'),
@@ -108,7 +109,7 @@ export function create(ctx) {
       card('down', 'details.general.downloadSpeed'),
       card('up', 'details.general.uploadSpeed'),
       card('eta', 'details.general.eta'),
-      card('peers', 'details.general.peers'),
+      card('peers', 'details.general.peers', 'peersSub'),
       card('seeders', 'details.general.seeders'),
       card('leechers', 'details.general.leechers'),
     ]),
@@ -162,11 +163,11 @@ export function create(ctx) {
       set('down', fmt.speed(torrent.rateDownload));
       set('up', fmt.speed(torrent.rateUpload));
       set('eta', torrent.state === 'downloading' ? fmt.eta(torrent.eta) : '—');
-      set('peers', t('details.general.peersValue', {
-        connected: fmt.count(torrent.peersConnected),
+      set('peers', fmt.count(torrent.peersConnected));
+      set('peersSub', torrent.peersConnected > 0 ? t('details.general.peersDetail', {
         sending: fmt.count(torrent.peersSendingToUs),
         getting: fmt.count(torrent.peersGettingFromUs),
-      }));
+      }) : '');
       set('seeders', torrent.seederCount == null || torrent.seederCount < 0 ? '—' : fmt.count(torrent.seederCount));
       set('leechers', torrent.leecherCount == null || torrent.leecherCount < 0 ? '—' : fmt.count(torrent.leecherCount));
 

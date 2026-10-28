@@ -123,7 +123,8 @@ test('5,000 files: builds fast and renders only the rows in view', async () => {
 
 test('rows carry tree semantics and untrusted names as text', async () => {
   const hostile = { files: [{ name: 'x/<b onmouseover=alert(1)>.mkv', length: 1 }], fileStats: [{ wanted: true, priority: 0 }] };
-  const { list } = await view(hostile);
+  const { tab, list } = await view(hostile);
+  assert.equal(tab.root.querySelector('.files-summary').textContent, '1 file', 'no download split when every file is wanted');
   const [folder, file] = rowsOf(list);
   assert.equal(folder.getAttribute('aria-expanded'), 'true');
   assert.equal(folder.getAttribute('aria-level'), '1');

@@ -24,7 +24,9 @@ test('General formats through ctx.fmt and shows unknown counts as an em dash', a
   assert.equal(card('Download speed').textContent, 'Download speed2.50 MB/s');
   assert.equal(card('Seeders').textContent, 'Seeders—');
   assert.equal(card('Leechers').textContent, 'Leechers—');
-  assert.equal(card('Peers').textContent, 'Peers12 connected · 9 sending · 2 receiving');
+  assert.equal(card('Peers').textContent, 'Peers129 sending · 2 receiving');
+  const idle = await generalView(torrent({ peersConnected: 0, peersSendingToUs: 0, peersGettingFromUs: 0 }), null);
+  assert.equal(idle.card('Peers').textContent, 'Peers0', 'no sending/receiving split without peers');
 });
 
 test('General shows static facts once fetched, and an em dash where the daemon has none', async () => {

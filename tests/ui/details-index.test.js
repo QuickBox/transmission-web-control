@@ -181,12 +181,17 @@ test('on medium screens the sheet is not modal and the back button closes it', a
   teardown();
 });
 
-test('on wide screens openDetails only focuses: no sheet attribute', async () => {
+test('on wide screens openDetails sets focused, opens no sheet, and leaves keyboard focus alone', async () => {
   const { ctx, app, teardown } = await setup(1440);
   ctx.store.set({ torrents: new Map([[1, torrent()]]) });
+  const list = app.querySelector('.shell-table');
+  list.focus();
   details.openDetails(1);
   assert.equal(app.hasAttribute('data-details'), false);
   assert.equal(ctx.store.get().focused, 1);
+  assert.equal(env.doc.activeElement, list, 'the list keeps focus on wide layouts');
+  details.openDetails(1, { focus: true });
+  assert.equal(env.doc.activeElement.getAttribute('role'), 'tab');
   teardown();
 });
 

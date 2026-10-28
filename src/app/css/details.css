@@ -66,6 +66,38 @@
 	display: flex;
 }
 
+/* With nothing focused the drawer shrinks to one line, so the list keeps the
+ * height instead of an empty panel. */
+.shell-details:has(> .details.is-empty) {
+	height: auto;
+	min-height: 0;
+}
+
+.details.is-empty .details-grip {
+	display: none;
+}
+
+.details.is-empty .details-empty {
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 4px 10px;
+	padding: 12px 16px;
+}
+
+.details.is-empty .details-empty-icon {
+	margin: 0;
+}
+
+.details.is-empty .details-empty-icon .icon {
+	width: 20px;
+	height: 20px;
+}
+
+.details.is-empty .details-empty-title {
+	font-size: 14px;
+}
+
 .details-empty-icon {
 	margin-bottom: 6px;
 	color: var(--qb-icon);
@@ -265,7 +297,7 @@
 	font-size: 12px;
 }
 
-.progress {
+.meter {
 	display: block;
 	height: 6px;
 	overflow: hidden;
@@ -273,7 +305,7 @@
 	background: var(--qb-muted);
 }
 
-.progress-fill {
+.meter-fill {
 	display: block;
 	width: 0;
 	height: 100%;
@@ -282,15 +314,25 @@
 	transition: width 0.3s ease-out;
 }
 
-.progress[data-state="checking"] .progress-fill {
-	background: var(--tr-st-checking);
+/* A torrent's own bar speaks the list's status colours, so the same torrent
+   never shows two colours on one screen; file meters keep the theme ramp. */
+.meter[data-state] { --st: var(--tr-st-downloading); }
+.meter[data-state="stopped"] { --st: var(--tr-st-stopped); }
+.meter[data-state="queued"] { --st: var(--tr-st-queued); }
+.meter[data-state="checking"] { --st: var(--tr-st-checking); }
+.meter[data-state="seeding"] { --st: var(--tr-st-seeding); }
+.meter[data-state="finished"] { --st: var(--tr-st-finished); }
+.meter[data-state="error"] { --st: var(--tr-st-error); }
+
+.meter[data-state] { background: color-mix(in srgb, var(--st) 18%, transparent); }
+.meter[data-state] .meter-fill { background: var(--st); }
+
+.meter[data-state="stopped"] .meter-fill,
+.meter[data-state="finished"] .meter-fill {
+	background: color-mix(in srgb, var(--st) 55%, var(--qb-surface));
 }
 
-.progress[data-state="error"] .progress-fill {
-	background: var(--tr-st-error);
-}
-
-.progress-sm {
+.meter-sm {
 	width: 56px;
 	height: 4px;
 }
@@ -332,7 +374,9 @@
 
 .stat-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	/* At most five per row, so the ten cards fill two even rows on wide
+	 * drawers instead of leaving one orphan; never narrower than 148px. */
+	grid-template-columns: repeat(auto-fill, minmax(max(148px, calc((100% - 32px) / 5)), 1fr));
 	gap: 8px;
 }
 
@@ -347,7 +391,16 @@
 	background: var(--qb-surface-2);
 }
 
-.stat-card-progress .progress {
+.stat-sub {
+	overflow: hidden;
+	font-size: 12px;
+	font-weight: 400;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--qb-fg-muted);
+}
+
+.stat-card-progress .meter {
 	margin-top: 4px;
 }
 
@@ -575,7 +628,7 @@
 		width: 72px;
 	}
 
-	.file-done .progress {
+	.file-done .meter {
 		display: none;
 	}
 }

@@ -25,7 +25,13 @@ body {
 	background: var(--qb-background);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	scrollbar-color: var(--qb-scrollbar-thumb) var(--qb-scrollbar-track);
+}
+
+/* Thin, quiet scrollbars: the thumb is a muted tint of the variant's thumb
+ * colour on a clear track, so it never reads as a primary-coloured control. */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in srgb, var(--qb-scrollbar-thumb) 45%, transparent) transparent;
 }
 
 h1,
@@ -54,24 +60,7 @@ a {
 	outline-offset: 2px;
 }
 
-::-webkit-scrollbar {
-	width: 10px;
-	height: 10px;
-}
 
-::-webkit-scrollbar-track {
-	background: var(--qb-scrollbar-track);
-}
-
-::-webkit-scrollbar-thumb {
-	background: var(--qb-scrollbar-thumb);
-	border: 2px solid var(--qb-scrollbar-track);
-	border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-	background: var(--qb-scrollbar-thumb-hover);
-}
 
 .sr-only {
 	position: absolute;
@@ -196,6 +185,15 @@ a {
 	color: var(--qb-icon-hover);
 }
 
+.btn-icon:not(:disabled):active {
+	background: var(--qb-surface-3);
+	color: var(--qb-primary-text);
+}
+
+.btn:not(:disabled):active {
+	transform: translateY(1px);
+}
+
 .btn-icon[aria-pressed="true"],
 .btn-icon[aria-expanded="true"] {
 	color: var(--qb-primary-text);
@@ -254,6 +252,13 @@ a {
 	outline: none;
 	border-color: var(--qb-ring);
 	box-shadow: 0 0 0 3px var(--qb-focus);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
 }
 
 .input[aria-invalid="true"] {

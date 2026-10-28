@@ -230,8 +230,8 @@ export function create(ctx, host) {
       priorityChip(node),
       el('span', { class: 'file-size tabular', text: fmt.bytes(node.size) }),
       el('span', { class: 'file-done tabular' }, [
-        el('span', { class: 'progress progress-sm', 'aria-hidden': 'true' }, [
-          el('span', { class: 'progress-fill', style: { width: `${Math.min(1, fraction) * 100}%` } }),
+        el('span', { class: 'meter meter-sm', 'aria-hidden': 'true' }, [
+          el('span', { class: 'meter-fill', style: { width: `${Math.min(1, fraction) * 100}%` } }),
         ]),
         el('span', { text: fmt.percent(fraction, { digits: 0 }) }),
       ]),
@@ -463,7 +463,8 @@ export function create(ctx, host) {
       rows = visibleRows(tree.roots, expanded);
       if (focusIndex >= rows.length) focusIndex = Math.max(0, rows.length - 1);
       const wantedCount = Array.isArray(detail.fileStats) ? detail.fileStats.filter((s) => s && s.wanted).length : null;
-      summary.textContent = wantedCount == null
+      // The download split is only news when some files are skipped.
+      summary.textContent = wantedCount == null || wantedCount === tree.count
         ? t('details.files.count', { count: tree.count, total: fmt.count(tree.count) })
         : t('details.files.countWanted', { count: tree.count, total: fmt.count(tree.count), wanted: fmt.count(wantedCount) });
       message.hidden = !state.error;

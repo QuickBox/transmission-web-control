@@ -226,7 +226,7 @@ export function createSettingsDialog(ctx, deps = {}) {
 
     function rowShell(row, controlNode, extras = []) {
       const id = `${uid}-${toCamelKey(row.key)}`;
-      return el('div', { class: ['option-row', row.type === 'textarea' && 'option-row-stack'] }, [
+      return el('div', { class: ['option-row', (row.type === 'textarea' || row.type === 'text') && 'option-row-stack'] }, [
         el('label', { class: 'option-label', for: id, id: `${id}-label`, text: label(row.key) }),
         controlNode,
         ...extras,
