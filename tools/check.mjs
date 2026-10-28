@@ -17,6 +17,9 @@
  *   mjs         a `.mjs` file (the daemon's web server is only known to serve `.js`)
  *   i18n-manifest  `i18n/manifest.json` disagrees with the catalog files on
  *               disk, or names an unknown language or namespace
+ *   token       a `var(--name)` read (with or without a fallback) of a custom
+ *               property that no CSS declaration or JS style write under the
+ *               app defines; an undefined token paints nothing, silently
  *
  * Paths in hits are relative to the app directory, so the entry pages show as
  * `../index.html`.
@@ -128,17 +131,41 @@ function manifestHits(appDir) {
  *   under its parent is scanned, so the whole shipped tree is covered
  * @returns {{ files: number, hits: string[] }}
  */
+const TOKEN_READ = /var\(\s*(--[\w-]+)/g;
+/** CSS `--x:` declarations, JS `setProperty('--x'` and `'--x':` style-object keys. */
+const TOKEN_DEFS = [
+  /(?:^|[\s;{])(--[\w-]+)\s*:/g,
+  /setProperty\(\s*['"`](--[\w-]+)['"`]/g,
+  /['"`](--[\w-]+)['"`]\s*:/g,
+];
+
+/** Every custom property the tree defines, from CSS declarations and JS style writes. */
+export function definedTokens(sources) {
+  const defined = new Set();
+  for (const text of sources) {
+    for (const re of TOKEN_DEFS) {
+      for (const m of text.matchAll(re)) defined.add(m[1]);
+    }
+  }
+  return defined;
+}
+
 export function scan(appDir) {
   const files = walk(dirname(appDir));
   const hits = manifestHits(appDir);
+  const sources = new Map(files.map((file) => [file, readFileSync(file, 'utf8')]));
+  const defined = definedTokens(sources.values());
   for (const file of files) {
     const rel = relative(appDir, file).split(sep).join('/');
     if (rel.endsWith('.mjs')) hits.push(`${rel}: [mjs] modules must be .js`);
-    const lines = readFileSync(file, 'utf8').split('\n');
+    const lines = sources.get(file).split('\n');
     lines.forEach((line, i) => {
       for (const gate of GATES) {
         if (gate.skip && gate.skip(rel)) continue;
         if (gate.test(line)) hits.push(`${rel}:${i + 1}: [${gate.id}] ${line.trim().slice(0, 120)}`);
+      }
+      for (const m of line.matchAll(TOKEN_READ)) {
+        if (!defined.has(m[1])) hits.push(`${rel}:${i + 1}: [token] ${m[1]} is read but defined nowhere under the app`);
       }
     });
   }
@@ -180,10 +207,14 @@ const BAD = {
   'i18n/de/core.json': '{"a": "A"}',
   'i18n/en/extra.json': '{"a": "A"}',
   'i18n/manifest.json': '{"en": ["core", "main"]}',
+  'css/s.css': '.x { color: var(--qb-nope); }',
+  'js/t.js': "node.style.setProperty('fill', 'var(--qb-missing, red)');",
 };
 
 const GOOD = {
-  'css/tokens.css': ':root { --qb-bg: #0b1220; }',
+  'css/tokens.css': ':root { --qb-bg: #0b1220; --qb-border: #1f2937; --qb-ring: #22d3ee; }',
+  'js/core/measure.js': "root.style.setProperty('--row-h', '40px'); el('span', { style: { '--pct': '50%' } });",
+  'css/rows.css': '.row { height: var(--row-h); } .bar::after { width: var(--pct, 0%); color: var(--qb-bg, red); }',
   'js/rpc/caps.js': 'const v = session["rpc-version-semver"] || session["rpc-version"];',
   'js/rpc/client.js': 'const RPC_VERSION_HEADER = "X-Transmission-Rpc-Version"; h.get("x-transmission-rpc-version");',
   'js/core/icons.js': 'document.createElementNS("http://www.w3.org/2000/svg", "svg");',
