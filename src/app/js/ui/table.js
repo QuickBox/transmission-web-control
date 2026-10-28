@@ -286,7 +286,7 @@ export function mount(root, ctx) {
       'data-narrow': column.narrow,
     });
     if (column.id === 'name') {
-      const name = el('span', { class: 'cell-name', text: torrent.name });
+      const name = el('span', { class: 'cell-name-text', text: torrent.name });
       tooltip(name, () => torrent.name);
       cell.append(name);
       if (torrent.warning) {

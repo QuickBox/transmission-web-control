@@ -119,8 +119,9 @@
 	overflow: hidden;
 }
 
-.cell-name > .cell-name {
+.cell-name-text {
 	display: block;
+	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -289,6 +290,17 @@
 
 	.torrents-row .cell-name {
 		grid-area: name;
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		overflow: hidden;
+		white-space: normal;
+		font-weight: 500;
+	}
+
+	.torrents-row .cell-name-text {
+		flex: 1 1 auto;
+		min-width: 0;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
@@ -296,7 +308,11 @@
 		overflow: hidden;
 		white-space: normal;
 		overflow-wrap: anywhere;
-		font-weight: 500;
+	}
+
+	.torrents-row .cell-warning {
+		flex: none;
+		margin-top: 2px;
 	}
 
 	.torrents-row .cell-status {

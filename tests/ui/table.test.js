@@ -162,9 +162,10 @@ test('mount renders a grid with header, rows, aria row counts and publishes orde
   assert.equal(rows[0].querySelector('.progress-bar').styles.get('--pct'), '50%');
   const hostile = '<img src=x onerror=alert(1)>';
   ctx.store.set({ torrents: new Map([[1, torrent({ id: 1, name: hostile })]]) });
-  assert.equal(rowFor(root, 1).querySelector('.cell-name').textContent, hostile);
-  assert.equal(rowFor(root, 1).querySelector('.cell-name').children.length, 1, 'name is one text node');
-  assert.equal(rowFor(root, 1).querySelector('.cell-name').getAttribute('title'), null, 'no native title');
+  assert.equal(rowFor(root, 1).querySelector('.cell-name-text').textContent, hostile);
+  assert.equal(rowFor(root, 1).querySelector('.cell-name-text').children.length, 1, 'name is one text node');
+  assert.equal(rowFor(root, 1).querySelector('.cell-name-text').getAttribute('title'), null, 'no native title');
+  assert.equal(rowFor(root, 1).querySelector('.cell-name').children.length, 1, 'the name cell holds the text span (no glyph without a warning)');
   teardown();
 });
 
