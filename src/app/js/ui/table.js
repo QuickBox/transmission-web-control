@@ -41,15 +41,15 @@ const countOrEmpty = (ctx, n) => (n === null || n === undefined ? ctx.fmt.count(
  */
 export const COLUMNS = Object.freeze([
   { id: 'name', width: 'minmax(220px, 1fr)', sortable: true, narrow: 0, value: (t) => t.name },
-  { id: 'status', width: '124px', sortable: true, narrow: 0, value: (t) => STATES.indexOf(t.state) },
-  { id: 'percentDone', width: '150px', sortable: true, narrow: 0, value: (t) => t.percentDone },
+  { id: 'status', width: 'minmax(128px, max-content)', sortable: true, narrow: 0, value: (t) => STATES.indexOf(t.state) },
+  { id: 'percentDone', width: '132px', sortable: true, narrow: 0, value: (t) => t.percentDone },
   { id: 'totalSize', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.totalSize, text: (t, ctx) => ctx.fmt.bytes(t.totalSize) },
-  { id: 'rateDownload', width: '104px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateDownload, text: (t, ctx) => (t.rateDownload > 0 ? ctx.fmt.speed(t.rateDownload) : '') },
-  { id: 'rateUpload', width: '104px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateUpload, text: (t, ctx) => (t.rateUpload > 0 ? ctx.fmt.speed(t.rateUpload) : '') },
-  { id: 'eta', width: '92px', align: 'end', sortable: true, narrow: 1, value: (t) => (t.eta < 0 ? null : t.eta), text: (t, ctx) => ctx.fmt.eta(t.eta) },
+  { id: 'rateDownload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateDownload, text: (t, ctx) => (t.rateDownload > 0 ? ctx.fmt.speed(t.rateDownload) : '') },
+  { id: 'rateUpload', width: '96px', align: 'end', sortable: true, narrow: 0, value: (t) => t.rateUpload, text: (t, ctx) => (t.rateUpload > 0 ? ctx.fmt.speed(t.rateUpload) : '') },
+  { id: 'eta', width: '84px', align: 'end', sortable: true, narrow: 1, value: (t) => (t.eta < 0 ? null : t.eta), text: (t, ctx) => ctx.fmt.eta(t.eta) },
   { id: 'uploadRatio', width: '72px', align: 'end', sortable: true, narrow: 2, value: (t) => t.uploadRatio, text: (t, ctx) => ctx.fmt.ratio(t.uploadRatio) },
-  { id: 'seederCount', width: '84px', align: 'end', sortable: true, narrow: 2, value: (t) => t.seederCount, text: (t, ctx) => countOrEmpty(ctx, t.seederCount) },
-  { id: 'leecherCount', width: '84px', align: 'end', sortable: true, narrow: 2, value: (t) => t.leecherCount, text: (t, ctx) => countOrEmpty(ctx, t.leecherCount) },
+  { id: 'seederCount', width: '76px', align: 'end', sortable: true, narrow: 2, value: (t) => t.seederCount, text: (t, ctx) => countOrEmpty(ctx, t.seederCount) },
+  { id: 'leecherCount', width: '76px', align: 'end', sortable: true, narrow: 2, value: (t) => t.leecherCount, text: (t, ctx) => countOrEmpty(ctx, t.leecherCount) },
   { id: 'uploadedEver', width: '96px', align: 'end', sortable: true, narrow: 3, value: (t) => t.uploadedEver, text: (t, ctx) => ctx.fmt.bytes(t.uploadedEver) },
   { id: 'addedDate', width: '156px', sortable: true, narrow: 3, value: (t) => t.addedDate, text: (t, ctx) => ctx.fmt.date(t.addedDate) },
   { id: 'doneDate', width: '156px', sortable: true, narrow: 3, value: (t) => t.doneDate, text: (t, ctx) => ctx.fmt.date(t.doneDate) },
@@ -63,10 +63,14 @@ export const COLUMNS = Object.freeze([
 
 const COLUMN_BY_ID = new Map(COLUMNS.map((c) => [c.id, c]));
 
-/** Columns shown until the user picks their own set (`prefs.columns`). */
+/**
+ * Columns shown until the user picks their own set (`prefs.columns`). The
+ * fixed widths sum to about 1110px, so the set fits a 1440px window with the
+ * sidebar docked and no sideways scroll; the name column takes the rest.
+ */
 export const DEFAULT_COLUMNS = Object.freeze([
-  'name', 'totalSize', 'percentDone', 'eta', 'uploadRatio', 'status',
-  'seederCount', 'leecherCount', 'rateDownload', 'rateUpload', 'uploadedEver', 'addedDate',
+  'name', 'status', 'percentDone', 'totalSize', 'rateDownload', 'rateUpload', 'eta',
+  'uploadRatio', 'seederCount', 'leecherCount',
 ]);
 
 /** Columns a card shows regardless of `prefs.columns`. */

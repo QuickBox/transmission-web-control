@@ -348,6 +348,11 @@
 	color: var(--qb-icon);
 }
 
+.chip[hidden],
+.search-clear[hidden] {
+	display: none;
+}
+
 .chip[data-chip="alt-speed"] {
 	color: var(--tr-st-checking);
 	background: color-mix(in srgb, var(--tr-st-checking) 14%, transparent);

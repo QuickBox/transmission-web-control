@@ -91,6 +91,11 @@
 	text-align: end;
 }
 
+.cell-status {
+	overflow: visible;
+	text-overflow: clip;
+}
+
 .cell-check {
 	display: flex;
 	align-items: center;
@@ -169,7 +174,7 @@
 .progress {
 	--st: var(--tr-st-downloading);
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) 44px;
+	grid-template-columns: minmax(0, 1fr) 52px;
 	align-items: center;
 	gap: 8px;
 }
@@ -242,12 +247,13 @@
 
 	.torrents-row {
 		display: grid;
-		grid-template-columns: 44px minmax(0, 1fr) auto;
+		grid-template-columns: 44px auto auto auto minmax(0, 1fr) auto;
 		grid-template-areas:
-			"check name   status"
-			"check bar    bar"
-			"check meta   meta";
+			"check name name name name   status"
+			"check bar  bar  bar  bar    bar"
+			"check down up   eta  size   size";
 		grid-template-rows: auto 6px auto;
+		column-gap: 10px;
 		row-gap: 8px;
 		padding: 10px 12px 10px 0;
 		align-items: start;
@@ -260,6 +266,7 @@
 
 	.torrents-row .cell-check {
 		grid-area: check;
+		display: flex;
 		align-self: stretch;
 		min-height: 44px;
 	}
@@ -290,27 +297,25 @@
 		grid-area: bar;
 	}
 
-	.torrents-row .progress {
-		grid-template-columns: minmax(0, 1fr) 40px;
-	}
-
 	.torrents-row .cell-rateDownload,
 	.torrents-row .cell-rateUpload,
 	.torrents-row .cell-eta,
 	.torrents-row .cell-totalSize {
-		grid-area: meta;
-		display: inline;
 		font-size: 12px;
+		white-space: nowrap;
+		text-align: start;
 		color: var(--qb-fg-muted);
 	}
 
+	.torrents-row .cell-rateDownload { grid-area: down; }
+	.torrents-row .cell-rateUpload { grid-area: up; }
+	.torrents-row .cell-eta { grid-area: eta; }
+	.torrents-row .cell-totalSize { grid-area: size; justify-self: end; }
+
 	.torrents-row .cell-rateDownload:not(:empty)::before { content: "↓ "; }
 	.torrents-row .cell-rateUpload:not(:empty)::before { content: "↑ "; }
-	.torrents-row .cell-rateDownload:not(:empty)::after,
-	.torrents-row .cell-rateUpload:not(:empty)::after,
-	.torrents-row .cell-eta:not(:empty)::after { content: " · "; }
 
-	.torrents-row [data-col]:not(.cell-name):not(.cell-status):not(.cell-percentDone):not(.cell-rateDownload):not(.cell-rateUpload):not(.cell-eta):not(.cell-totalSize) {
+	.torrents-row .cell[data-col]:not(.cell-check):not(.cell-name):not(.cell-status):not(.cell-percentDone):not(.cell-rateDownload):not(.cell-rateUpload):not(.cell-eta):not(.cell-totalSize) {
 		display: none;
 	}
 }
