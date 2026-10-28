@@ -1,0 +1,37 @@
+{
+  "columns": {
+    "name": "Nazwa",
+    "totalSize": "Rozmiar",
+    "uploadRatio": "Proporcje",
+    "queuePosition": "Kolejka",
+    "labels": "Etykiety",
+    "trackers": "Trackery"
+  },
+  "actions": {
+    "add": "Dodaj torrenta",
+    "pause": "Wstrzymaj",
+    "reannounce": "Zapytaj tracker o więcej peerów",
+    "remove": "Usuń",
+    "labels": "Etykiety",
+    "queue": "Kolejka",
+    "queueTop": "Przesuń na górę",
+    "queueUp": "Przesuń wyżej",
+    "queueDown": "Przesuń niżej",
+    "queueBottom": "Przesuń na dół",
+    "about": "O webgui",
+    "replaceTrackers": "Zamień trackery"
+  },
+  "sidebar": {
+    "labels": "Etykiety",
+    "trackers": "Trackery",
+    "folders": "Katalogi",
+    "all": "Wszystkie",
+    "active": "Aktywne",
+    "stopped": "Wstrzymane",
+    "warning": "Ostrzeżenia"
+  },
+  "statusbar": {
+    "down": "Prędkość pobierania",
+    "up": "Prędkość wysyłania"
+  }
+}

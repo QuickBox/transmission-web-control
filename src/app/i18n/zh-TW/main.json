@@ -1,0 +1,39 @@
+{
+  "columns": {
+    "name": "名稱",
+    "status": "狀態",
+    "percentDone": "進度",
+    "totalSize": "大小",
+    "uploadRatio": "分享率",
+    "queuePosition": "佇列",
+    "labels": "使用者標籤"
+  },
+  "actions": {
+    "add": "新增種子",
+    "start": "開始",
+    "pause": "暫停",
+    "reannounce": "取得更多 Peer",
+    "remove": "刪除",
+    "labels": "使用者標籤",
+    "queue": "佇列",
+    "queueTop": "置頂",
+    "queueUp": "上移",
+    "queueDown": "下移",
+    "queueBottom": "置底",
+    "about": "關於",
+    "replaceTrackers": "更換 Tracker"
+  },
+  "sidebar": {
+    "status": "狀態",
+    "labels": "使用者標籤",
+    "folders": "資料夾",
+    "all": "全部",
+    "active": "正在使用",
+    "stopped": "暫停",
+    "warning": "警告"
+  },
+  "statusbar": {
+    "down": "下載速度",
+    "up": "上傳速度"
+  }
+}

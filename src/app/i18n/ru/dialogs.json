@@ -1,0 +1,42 @@
+{
+  "add": {
+    "labels": "Метки",
+    "submit": "Добавить"
+  },
+  "remove": {
+    "confirm": "Удалить"
+  },
+  "labels": {
+    "titleOne": "Метки"
+  },
+  "about": {
+    "title": "О программе",
+    "unknown": "Неизвестно"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Загрузка",
+      "network": "Сеть",
+      "queue": "Очередь",
+      "seeding": "Раздача"
+    },
+    "rows": {
+      "encryption": "Шифрование",
+      "seedRatioLimit": "Рейтинг"
+    },
+    "minutes": "минут",
+    "portStatus": "Порт",
+    "testing": "Тестирую…",
+    "port": {
+      "unknown": "неизвестно"
+    },
+    "export": "Экспорт",
+    "import": "Импорт"
+  },
+  "replace": {
+    "title": "Заменить трекеры"
+  },
+  "match": {
+    "submit": "Старт"
+  }
+}

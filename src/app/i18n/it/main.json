@@ -1,0 +1,40 @@
+{
+  "columns": {
+    "name": "Nome",
+    "status": "Stato",
+    "percentDone": "Avanzamento",
+    "totalSize": "Dimensione",
+    "uploadRatio": "Rapporto condivisione",
+    "queuePosition": "Coda",
+    "labels": "Etichette",
+    "trackers": "Tracker"
+  },
+  "actions": {
+    "add": "Aggiungi Torrent",
+    "start": "Avvia",
+    "pause": "Pausa",
+    "reannounce": "Chiedi più peer al tracker",
+    "remove": "Rimuovi",
+    "labels": "Etichette",
+    "queue": "Coda",
+    "queueTop": "Sposta all'inizio",
+    "queueUp": "Sposta su",
+    "queueBottom": "Sposta alla fine",
+    "about": "Info su",
+    "replaceTrackers": "Sostituisci tracker"
+  },
+  "sidebar": {
+    "status": "Stato",
+    "labels": "Etichette",
+    "trackers": "Tracker",
+    "folders": "Cartelle",
+    "all": "Tutti",
+    "active": "Attivi",
+    "stopped": "In Pausa",
+    "warning": "Avvisi"
+  },
+  "statusbar": {
+    "down": "Velocità download",
+    "up": "Velocità upload"
+  }
+}

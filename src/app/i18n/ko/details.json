@@ -1,0 +1,44 @@
+{
+  "tabs": {
+    "files": "파일",
+    "trackers": "트래커",
+    "peers": "피어"
+  },
+  "loading": "로딩 중…",
+  "general": {
+    "progress": "진행",
+    "ratio": "비율",
+    "downloadSpeed": "다운로드 속도",
+    "peers": "피어",
+    "size": "크기",
+    "hash": "해쉬",
+    "comment": "코멘트"
+  },
+  "files": {
+    "label": "파일",
+    "name": "이름",
+    "size": "크기",
+    "priority": "우선도",
+    "high": "높음",
+    "normal": "보통",
+    "low": "낮음"
+  },
+  "peers": {
+    "client": "클라이언트"
+  },
+  "trackers": {
+    "remove": "제거",
+    "health": {
+      "pending": "대기 중"
+    }
+  },
+  "options": {
+    "priorityHigh": "높음",
+    "priorityNormal": "보통",
+    "priorityLow": "낮음",
+    "seeding": "시드 중",
+    "ratio": "비율",
+    "minutes": "분",
+    "peers": "피어"
+  }
+}

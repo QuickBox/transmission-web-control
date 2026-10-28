@@ -1,0 +1,34 @@
+{
+  "tabs": {
+    "files": "Fișiere",
+    "trackers": "Trackere"
+  },
+  "loading": "Încărcare…",
+  "general": {
+    "progress": "Progres",
+    "ratio": "Rația",
+    "downloadSpeed": "Viteza de descărcare",
+    "size": "Mărime",
+    "comment": "Comentariu"
+  },
+  "files": {
+    "label": "Fișiere",
+    "name": "Nume",
+    "size": "Mărime",
+    "priority": "Prioritate",
+    "high": "Mare",
+    "normal": "Normală",
+    "low": "Mică"
+  },
+  "trackers": {
+    "remove": "Şterge"
+  },
+  "options": {
+    "priorityHigh": "Mare",
+    "priorityNormal": "Normală",
+    "priorityLow": "Mică",
+    "seeding": "Trimite date",
+    "ratio": "Rația",
+    "minutes": "minute"
+  }
+}

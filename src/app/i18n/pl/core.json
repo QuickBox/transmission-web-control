@@ -1,0 +1,26 @@
+{
+  "actions": {
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "save": "Zapisz",
+    "more": "Więcej"
+  },
+  "connection": {
+    "online": "Połączono"
+  },
+  "status": {
+    "queued": "W kolejce",
+    "checking": "Sprawdzanie",
+    "downloading": "Pobieranie",
+    "seeding": "Wysyłanie"
+  },
+  "language": {
+    "label": "Język"
+  },
+  "a11y": {
+    "loading": "Ładowanie"
+  },
+  "regions": {
+    "table": "Torrenty"
+  }
+}

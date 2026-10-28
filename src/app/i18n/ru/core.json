@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "save": "Сохранить",
+    "more": "Дополнительно"
+  },
+  "connection": {
+    "online": "Соединено"
+  },
+  "status": {
+    "queued": "В очереди",
+    "checking": "Проверка",
+    "downloading": "Загрузка",
+    "seeding": "Раздача",
+    "error": "С ошибкой"
+  },
+  "language": {
+    "label": "Язык"
+  },
+  "a11y": {
+    "loading": "Загрузка"
+  },
+  "regions": {
+    "table": "Торренты",
+    "statusbar": "Статус"
+  }
+}

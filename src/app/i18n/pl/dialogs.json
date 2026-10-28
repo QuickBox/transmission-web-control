@@ -1,0 +1,38 @@
+{
+  "add": {
+    "labels": "Etykiety",
+    "submit": "Dodaj"
+  },
+  "remove": {
+    "confirm": "Usuń"
+  },
+  "labels": {
+    "titleOne": "Etykiety"
+  },
+  "about": {
+    "title": "O webgui",
+    "unknown": "Nieznany"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Pobieranie",
+      "network": "Sieć",
+      "queue": "Kolejka",
+      "seeding": "Wysyłanie"
+    },
+    "rows": {
+      "encryption": "Szyfrowanie",
+      "seedRatioLimit": "Proporcje"
+    },
+    "minutes": "minut",
+    "testing": "Testowanie…",
+    "port": {
+      "unknown": "nieznany"
+    },
+    "export": "Eksportuj",
+    "import": "Importuj"
+  },
+  "replace": {
+    "title": "Zmiana trackerów"
+  }
+}

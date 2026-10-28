@@ -1,0 +1,42 @@
+{
+  "add": {
+    "labels": "使用者標籤",
+    "submit": "新增"
+  },
+  "remove": {
+    "confirm": "刪除"
+  },
+  "labels": {
+    "titleOne": "使用者標籤"
+  },
+  "about": {
+    "title": "關於",
+    "unknown": "未知"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "正在下載",
+      "network": "網路傳輸",
+      "queue": "佇列",
+      "seeding": "正在做種"
+    },
+    "rows": {
+      "encryption": "資料傳輸加密方式",
+      "seedRatioLimit": "分享率"
+    },
+    "minutes": "分鐘",
+    "portStatus": "連接埠",
+    "testing": "正在測試…",
+    "port": {
+      "unknown": "未知"
+    },
+    "export": "匯出",
+    "import": "匯入"
+  },
+  "replace": {
+    "title": "取代 Tracker 地址"
+  },
+  "match": {
+    "submit": "開始"
+  }
+}

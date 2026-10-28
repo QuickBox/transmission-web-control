@@ -1,0 +1,26 @@
+{
+  "actions": {
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "save": "Salva",
+    "more": "Altro"
+  },
+  "connection": {
+    "online": "Connesso"
+  },
+  "status": {
+    "checking": "In controllo",
+    "downloading": "In Download",
+    "seeding": "In Seed"
+  },
+  "language": {
+    "label": "Lingua"
+  },
+  "a11y": {
+    "loading": "Caricamento in corso"
+  },
+  "regions": {
+    "table": "Torrent",
+    "statusbar": "Stato"
+  }
+}

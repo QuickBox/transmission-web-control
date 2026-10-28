@@ -1,0 +1,25 @@
+{
+  "columns": {
+    "name": "Naam",
+    "percentDone": "Voortgang",
+    "totalSize": "Totale grootte"
+  },
+  "actions": {
+    "pause": "Pauze",
+    "reannounce": "Tracker om meer peers vragen",
+    "remove": "Verwijder",
+    "about": "Over",
+    "replaceTrackers": "Vervang trackers"
+  },
+  "sidebar": {
+    "folders": "Mappen",
+    "all": "Alles",
+    "active": "Actief",
+    "stopped": "Gepauzeerd",
+    "warning": "Waarschuwing"
+  },
+  "statusbar": {
+    "down": "Download snelheid",
+    "up": "Upload snelheid"
+  }
+}

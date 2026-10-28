@@ -1,0 +1,23 @@
+{
+  "actions": {
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "save": "Opslaan"
+  },
+  "connection": {
+    "online": "Verbonden"
+  },
+  "status": {
+    "checking": "Verifiëren",
+    "downloading": "Downloaden",
+    "seeding": "Uploaden",
+    "error": "Fout"
+  },
+  "a11y": {
+    "loading": "Bezig met laden"
+  },
+  "tone": {
+    "warning": "Waarschuwing",
+    "error": "Fout"
+  }
+}

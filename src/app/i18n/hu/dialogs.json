@@ -1,0 +1,32 @@
+{
+  "remove": {
+    "confirm": "Törlés"
+  },
+  "about": {
+    "title": "Névjegy",
+    "unknown": "Ismeretlen"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Letöltés",
+      "network": "Hálózat",
+      "queue": "Sor",
+      "seeding": "Seed"
+    },
+    "rows": {
+      "encryption": "Titkosítás",
+      "seedRatioLimit": "Arány"
+    },
+    "minutes": "perc",
+    "testing": "Tesztelés…",
+    "port": {
+      "unknown": "ismeretlen"
+    }
+  },
+  "replace": {
+    "title": "Tracker cseréje"
+  },
+  "match": {
+    "submit": "Indítás"
+  }
+}

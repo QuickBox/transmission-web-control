@@ -1,0 +1,43 @@
+{
+  "tabs": {
+    "files": "Fájlok",
+    "trackers": "Trackerek",
+    "peers": "Peerek"
+  },
+  "loading": "Betöltés…",
+  "general": {
+    "ratio": "Arány",
+    "downloadSpeed": "Letöltési sebesség",
+    "peers": "Peerek",
+    "size": "Méret",
+    "comment": "Megjegyzés"
+  },
+  "files": {
+    "label": "Fájlok",
+    "name": "Név",
+    "size": "Méret",
+    "priority": "Prioritás",
+    "high": "Magas",
+    "normal": "Normál",
+    "low": "Alacsony",
+    "rename": "Átnevezés…"
+  },
+  "peers": {
+    "client": "Kliens"
+  },
+  "trackers": {
+    "remove": "Törlés",
+    "health": {
+      "pending": "Várakozás"
+    }
+  },
+  "options": {
+    "priorityHigh": "Magas",
+    "priorityNormal": "Normál",
+    "priorityLow": "Alacsony",
+    "seeding": "Seed",
+    "ratio": "Arány",
+    "minutes": "perc",
+    "peers": "Peerek"
+  }
+}

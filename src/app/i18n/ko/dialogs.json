@@ -1,0 +1,32 @@
+{
+  "remove": {
+    "confirm": "제거"
+  },
+  "about": {
+    "title": "정보",
+    "unknown": "알수없음"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "다운로드 중",
+      "network": "네트워크",
+      "queue": "대기",
+      "seeding": "시드 중"
+    },
+    "rows": {
+      "encryption": "암호화",
+      "seedRatioLimit": "비율"
+    },
+    "minutes": "분",
+    "testing": "시험 중…",
+    "port": {
+      "unknown": "알수없음"
+    }
+  },
+  "replace": {
+    "title": "트래커 변경"
+  },
+  "match": {
+    "submit": "시작"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "actions": {
+    "cancel": "Mégsem",
+    "close": "Bezárás",
+    "save": "Mentés"
+  },
+  "connection": {
+    "online": "Kapcsolódva"
+  },
+  "status": {
+    "checking": "Ellenőrzés",
+    "downloading": "Letöltés",
+    "seeding": "Seed",
+    "error": "Hiba"
+  },
+  "a11y": {
+    "loading": "Betöltés"
+  },
+  "regions": {
+    "table": "Torrentek",
+    "statusbar": "Állapot"
+  },
+  "tone": {
+    "warning": "Figyelmeztetés",
+    "error": "Hiba"
+  }
+}

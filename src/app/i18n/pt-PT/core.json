@@ -1,0 +1,26 @@
+{
+  "actions": {
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "save": "Salvar"
+  },
+  "connection": {
+    "online": "Conectado"
+  },
+  "status": {
+    "checking": "Comprovando",
+    "downloading": "Descarregando",
+    "seeding": "Semeando",
+    "error": "Erro"
+  },
+  "a11y": {
+    "loading": "A carregar"
+  },
+  "regions": {
+    "statusbar": "Estado"
+  },
+  "tone": {
+    "warning": "Aviso",
+    "error": "Erro"
+  }
+}

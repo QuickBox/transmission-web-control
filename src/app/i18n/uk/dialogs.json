@@ -1,0 +1,37 @@
+{
+  "add": {
+    "labels": "Мітки",
+    "submit": "Додати"
+  },
+  "remove": {
+    "confirm": "Видалити"
+  },
+  "labels": {
+    "titleOne": "Мітки"
+  },
+  "about": {
+    "title": "Про програму"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Завантаження",
+      "network": "Мережа",
+      "queue": "Черга",
+      "seeding": "Роздача"
+    },
+    "rows": {
+      "encryption": "Шифрування",
+      "seedRatioLimit": "Рейтинг"
+    },
+    "minutes": "хвилин",
+    "testing": "Тестую…",
+    "export": "Експортувати",
+    "import": "Імпортувати"
+  },
+  "replace": {
+    "title": "Замінити трекери"
+  },
+  "match": {
+    "submit": "Старт"
+  }
+}

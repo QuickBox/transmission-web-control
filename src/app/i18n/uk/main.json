@@ -1,0 +1,41 @@
+{
+  "columns": {
+    "name": "Назва",
+    "status": "Стан",
+    "percentDone": "Прогрес",
+    "totalSize": "Обсяг",
+    "uploadRatio": "Рейтинг",
+    "queuePosition": "Черга",
+    "labels": "Мітки",
+    "trackers": "Трекери"
+  },
+  "actions": {
+    "add": "Додати торрент",
+    "start": "Старт",
+    "pause": "Пауза",
+    "reannounce": "Запитати у трекера більше пірів",
+    "remove": "Видалити",
+    "labels": "Мітки",
+    "queue": "Черга",
+    "queueTop": "Перемістити вгору",
+    "queueUp": "Перемістити вище",
+    "queueDown": "Перемістити нижче",
+    "queueBottom": "Перемістити вниз",
+    "about": "Про програму",
+    "replaceTrackers": "Замінити трекери"
+  },
+  "sidebar": {
+    "status": "Стан",
+    "labels": "Мітки",
+    "trackers": "Трекери",
+    "folders": "Директорії",
+    "all": "Всі",
+    "active": "Активні",
+    "stopped": "Припинені",
+    "warning": "З попередженням"
+  },
+  "statusbar": {
+    "down": "Завантаження",
+    "up": "Віддача"
+  }
+}

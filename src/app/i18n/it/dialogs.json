@@ -1,0 +1,41 @@
+{
+  "add": {
+    "labels": "Etichette",
+    "submit": "Aggiungi"
+  },
+  "remove": {
+    "confirm": "Rimuovi"
+  },
+  "labels": {
+    "titleOne": "Etichette"
+  },
+  "about": {
+    "title": "Info su",
+    "unknown": "Sconosciuto"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "In Download",
+      "network": "Rete",
+      "queue": "Coda",
+      "seeding": "In Seed"
+    },
+    "rows": {
+      "encryption": "Crittografia",
+      "seedRatioLimit": "Rapporto condivisione"
+    },
+    "minutes": "minuti",
+    "testing": "Test in corso…",
+    "port": {
+      "unknown": "sconosciuto"
+    },
+    "export": "Esporta",
+    "import": "Importa"
+  },
+  "replace": {
+    "title": "Sostituisci Tracker"
+  },
+  "match": {
+    "submit": "Avvia"
+  }
+}

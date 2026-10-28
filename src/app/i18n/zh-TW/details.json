@@ -1,0 +1,45 @@
+{
+  "tabs": {
+    "files": "檔案",
+    "peers": "連線"
+  },
+  "loading": "正在載入…",
+  "general": {
+    "progress": "進度",
+    "ratio": "分享率",
+    "downloadSpeed": "下載速度",
+    "peers": "連線",
+    "size": "大小",
+    "hash": "雜湊",
+    "comment": "說明"
+  },
+  "files": {
+    "label": "檔案",
+    "name": "名稱",
+    "size": "大小",
+    "priority": "優先順序",
+    "high": "高",
+    "normal": "正常",
+    "low": "低",
+    "rename": "重新命名…"
+  },
+  "peers": {
+    "client": "用戶端"
+  },
+  "trackers": {
+    "editOne": "修改已選取的 Tracker",
+    "remove": "刪除",
+    "health": {
+      "pending": "正在等待"
+    }
+  },
+  "options": {
+    "priorityHigh": "高",
+    "priorityNormal": "正常",
+    "priorityLow": "低",
+    "seeding": "正在做種",
+    "ratio": "分享率",
+    "minutes": "分鐘",
+    "peers": "連線"
+  }
+}

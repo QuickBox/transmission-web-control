@@ -1,0 +1,39 @@
+{
+  "tabs": {
+    "files": "File",
+    "trackers": "Tracker"
+  },
+  "loading": "Caricamento in corso…",
+  "general": {
+    "progress": "Avanzamento",
+    "ratio": "Rapporto condivisione",
+    "downloadSpeed": "Velocità di Download",
+    "size": "Dimensione",
+    "comment": "Commento"
+  },
+  "files": {
+    "label": "File",
+    "name": "Nome",
+    "size": "Dimensione",
+    "priority": "Priorità",
+    "high": "Alta",
+    "normal": "Normale",
+    "low": "Bassa",
+    "rename": "Rinomina…"
+  },
+  "trackers": {
+    "editOne": "Modifica Tracker",
+    "remove": "Rimuovi",
+    "health": {
+      "pending": "In attesa"
+    }
+  },
+  "options": {
+    "priorityHigh": "Alta",
+    "priorityNormal": "Normale",
+    "priorityLow": "Bassa",
+    "seeding": "In Seed",
+    "ratio": "Rapporto condivisione",
+    "minutes": "minuti"
+  }
+}

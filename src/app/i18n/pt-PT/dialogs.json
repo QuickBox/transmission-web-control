@@ -1,0 +1,32 @@
+{
+  "remove": {
+    "confirm": "Remover"
+  },
+  "about": {
+    "title": "Sobre",
+    "unknown": "Desconhecido"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Descarregando",
+      "network": "Rede",
+      "queue": "Fila",
+      "seeding": "Semeando"
+    },
+    "rows": {
+      "encryption": "Encriptação",
+      "seedRatioLimit": "Proporção"
+    },
+    "minutes": "minutos",
+    "testing": "A verificar…",
+    "port": {
+      "unknown": "desconhecido"
+    }
+  },
+  "replace": {
+    "title": "Substituir trackers"
+  },
+  "match": {
+    "submit": "Iniciar"
+  }
+}

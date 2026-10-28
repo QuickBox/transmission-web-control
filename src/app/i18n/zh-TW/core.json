@@ -1,0 +1,33 @@
+{
+  "actions": {
+    "ok": "確定",
+    "cancel": "取消",
+    "close": "關閉",
+    "save": "儲存",
+    "more": "額外設定"
+  },
+  "connection": {
+    "online": "已連線至伺服器"
+  },
+  "status": {
+    "queued": "佇列中",
+    "checking": "正在檢查",
+    "downloading": "正在下載",
+    "seeding": "正在做種",
+    "error": "錯誤"
+  },
+  "language": {
+    "label": "介面語言"
+  },
+  "a11y": {
+    "loading": "正在載入"
+  },
+  "regions": {
+    "table": "種子清單",
+    "statusbar": "狀態"
+  },
+  "tone": {
+    "warning": "警告",
+    "error": "錯誤"
+  }
+}

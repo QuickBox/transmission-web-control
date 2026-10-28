@@ -1,0 +1,28 @@
+{
+  "remove": {
+    "confirm": "Şterge"
+  },
+  "about": {
+    "title": "Despre",
+    "unknown": "Necunoscut"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Descarcă",
+      "network": "Reţea",
+      "seeding": "Trimite date"
+    },
+    "rows": {
+      "encryption": "Encriptare",
+      "seedRatioLimit": "Rația"
+    },
+    "minutes": "minute",
+    "testing": "Testare…",
+    "port": {
+      "unknown": "necunoscut"
+    }
+  },
+  "replace": {
+    "title": "Înlocuiește trackerul"
+  }
+}

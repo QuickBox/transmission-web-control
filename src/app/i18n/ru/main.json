@@ -1,0 +1,41 @@
+{
+  "columns": {
+    "name": "Название",
+    "status": "Состояние",
+    "percentDone": "Прогресс",
+    "totalSize": "Объем",
+    "uploadRatio": "Рейтинг",
+    "queuePosition": "Очередь",
+    "labels": "Метки",
+    "trackers": "Трекеры"
+  },
+  "actions": {
+    "add": "Добавить торрент",
+    "start": "Старт",
+    "pause": "Пауза",
+    "reannounce": "Запросить у трекера больше пиров",
+    "remove": "Удалить",
+    "labels": "Метки",
+    "queue": "Очередь",
+    "queueTop": "Сдвинуть в начало",
+    "queueUp": "Сдвинуть выше",
+    "queueDown": "Сдвинуть ниже",
+    "queueBottom": "Сдвинуть в конец",
+    "about": "О программе",
+    "replaceTrackers": "Заменить трекеры"
+  },
+  "sidebar": {
+    "status": "Статус",
+    "labels": "Метки",
+    "trackers": "Трекеры",
+    "folders": "Папки",
+    "all": "Все",
+    "active": "Активные",
+    "stopped": "Приостановлены",
+    "warning": "С предупреждением"
+  },
+  "statusbar": {
+    "down": "Загрузка",
+    "up": "Отдача"
+  }
+}

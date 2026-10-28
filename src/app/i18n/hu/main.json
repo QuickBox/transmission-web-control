@@ -1,0 +1,37 @@
+{
+  "columns": {
+    "name": "Név",
+    "status": "Állapot",
+    "totalSize": "Méret",
+    "uploadRatio": "Arány",
+    "queuePosition": "Sor",
+    "trackers": "Trackerek"
+  },
+  "actions": {
+    "add": "Torrent(ek) hozzáadása",
+    "start": "Indítás",
+    "pause": "Szünet",
+    "reannounce": "Több peer kérése a trackertől",
+    "remove": "Törlés",
+    "queue": "Sor",
+    "queueTop": "Mozgatás legfelülre",
+    "queueUp": "Mozgatás feljebb",
+    "queueDown": "Mozgatás lejjebb",
+    "queueBottom": "Mozgatás legalulra",
+    "about": "Névjegy",
+    "replaceTrackers": "Trackerek cseréje"
+  },
+  "sidebar": {
+    "status": "Állapot",
+    "trackers": "Trackerek",
+    "folders": "Könyvtárak",
+    "all": "Összes",
+    "active": "Aktív",
+    "stopped": "Szünetel",
+    "warning": "Figyelmeztetés"
+  },
+  "statusbar": {
+    "down": "Letöltési sebesség",
+    "up": "Feltöltési sebesség"
+  }
+}

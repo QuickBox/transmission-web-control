@@ -1,0 +1,33 @@
+{
+  "tabs": {
+    "files": "Bestanden"
+  },
+  "loading": "Bezig met laden…",
+  "general": {
+    "progress": "Voortgang",
+    "downloadSpeed": "Download snelheid",
+    "size": "Totale grootte",
+    "comment": "Commentaar"
+  },
+  "files": {
+    "label": "Bestanden",
+    "name": "Naam",
+    "priority": "Prioriteit",
+    "high": "Hoog",
+    "normal": "Normaal",
+    "low": "Laag"
+  },
+  "trackers": {
+    "remove": "Verwijder",
+    "health": {
+      "pending": "Wachten"
+    }
+  },
+  "options": {
+    "priorityHigh": "Hoog",
+    "priorityNormal": "Normaal",
+    "priorityLow": "Laag",
+    "seeding": "Uploaden",
+    "minutes": "minuten"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "tabs": {
+    "files": "Pliki",
+    "trackers": "Trackery",
+    "peers": "Peery"
+  },
+  "loading": "Ładowanie…",
+  "general": {
+    "ratio": "Proporcje",
+    "downloadSpeed": "Prędkość pobierania",
+    "peers": "Peery",
+    "size": "Rozmiar",
+    "comment": "Komentarz"
+  },
+  "files": {
+    "label": "Pliki",
+    "name": "Nazwa",
+    "size": "Rozmiar",
+    "priority": "Priorytet",
+    "high": "Wysoki",
+    "normal": "Normalny",
+    "low": "Niski",
+    "rename": "Zmień nazwę…"
+  },
+  "peers": {
+    "client": "Klient"
+  },
+  "trackers": {
+    "editOne": "Edytuj tracker",
+    "remove": "Usuń",
+    "health": {
+      "pending": "Oczekiwanie"
+    }
+  },
+  "options": {
+    "priorityHigh": "Wysoki",
+    "priorityNormal": "Normalny",
+    "priorityLow": "Niski",
+    "seeding": "Wysyłanie",
+    "ratio": "Proporcje",
+    "minutes": "minut",
+    "peers": "Peery"
+  }
+}

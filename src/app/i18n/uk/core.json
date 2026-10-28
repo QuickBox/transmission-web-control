@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "cancel": "Скасувати",
+    "close": "Закрити",
+    "save": "Зберегти",
+    "more": "Додатково"
+  },
+  "connection": {
+    "online": "З'єднане"
+  },
+  "status": {
+    "queued": "В черзі",
+    "checking": "Перевірка",
+    "downloading": "Завантаження",
+    "seeding": "Роздача",
+    "error": "З помилкою"
+  },
+  "language": {
+    "label": "Мова"
+  },
+  "a11y": {
+    "loading": "Завантаження"
+  },
+  "regions": {
+    "table": "Торренти",
+    "statusbar": "Стан"
+  }
+}

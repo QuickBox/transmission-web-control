@@ -1,0 +1,28 @@
+{
+  "columns": {
+    "name": "Nume",
+    "percentDone": "Progres",
+    "totalSize": "Mărime",
+    "uploadRatio": "Rația",
+    "trackers": "Trackere"
+  },
+  "actions": {
+    "add": "Adaugă fişier torrent",
+    "pause": "Pauză",
+    "reannounce": "Interoghează pentru mai multe legături",
+    "remove": "Şterge",
+    "about": "Despre",
+    "replaceTrackers": "Înlocuieşte tracker"
+  },
+  "sidebar": {
+    "trackers": "Trackere",
+    "folders": "Directoare",
+    "all": "Toate",
+    "stopped": "În pauză",
+    "warning": "Avertizări"
+  },
+  "statusbar": {
+    "down": "Viteză descărcare",
+    "up": "Viteză încărcare"
+  }
+}

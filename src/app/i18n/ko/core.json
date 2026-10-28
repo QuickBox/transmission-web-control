@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "ok": "확인",
+    "cancel": "취소",
+    "close": "닫기",
+    "save": "저장"
+  },
+  "connection": {
+    "online": "연결 완료"
+  },
+  "status": {
+    "checking": "확인 중",
+    "downloading": "다운로드 중",
+    "seeding": "시드 중",
+    "error": "오류"
+  },
+  "a11y": {
+    "loading": "로딩 중"
+  },
+  "regions": {
+    "table": "토렌트",
+    "statusbar": "상태"
+  },
+  "tone": {
+    "warning": "경고",
+    "error": "오류"
+  }
+}

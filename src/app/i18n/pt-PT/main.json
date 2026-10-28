@@ -1,0 +1,35 @@
+{
+  "columns": {
+    "name": "Nome",
+    "status": "Estado",
+    "percentDone": "Progresso",
+    "totalSize": "Tamanho",
+    "uploadRatio": "Proporção",
+    "queuePosition": "Fila"
+  },
+  "actions": {
+    "add": "Adicionar Torrent",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "remove": "Remover",
+    "queue": "Fila",
+    "queueTop": "Mover para o início",
+    "queueUp": "Mover para cima",
+    "queueDown": "Mover para baixo",
+    "queueBottom": "Mover para o final",
+    "about": "Sobre",
+    "replaceTrackers": "Repor trackers"
+  },
+  "sidebar": {
+    "status": "Estado",
+    "folders": "Pastas",
+    "all": "Todos",
+    "active": "Ativos",
+    "stopped": "Pausados",
+    "warning": "Aviso"
+  },
+  "statusbar": {
+    "down": "Taxa de descarga",
+    "up": "Taxa de envio"
+  }
+}

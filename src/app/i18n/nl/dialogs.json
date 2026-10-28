@@ -1,0 +1,27 @@
+{
+  "remove": {
+    "confirm": "Verwijder"
+  },
+  "about": {
+    "title": "Over",
+    "unknown": "Onbekend"
+  },
+  "settings": {
+    "pages": {
+      "downloading": "Downloaden",
+      "network": "Netwerk",
+      "seeding": "Uploaden"
+    },
+    "rows": {
+      "encryption": "Encryptie"
+    },
+    "minutes": "minuten",
+    "testing": "Testen…",
+    "port": {
+      "unknown": "onbekend"
+    }
+  },
+  "replace": {
+    "title": "Vervang Trackers"
+  }
+}

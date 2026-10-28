@@ -1,0 +1,46 @@
+{
+  "tabs": {
+    "files": "Файли",
+    "trackers": "Трекери",
+    "peers": "Піри"
+  },
+  "loading": "Завантаження…",
+  "general": {
+    "progress": "Прогрес",
+    "ratio": "Рейтинг",
+    "downloadSpeed": "Швидкість завантаження",
+    "peers": "Піри",
+    "size": "Обсяг",
+    "hash": "Хеш",
+    "comment": "Коментар"
+  },
+  "files": {
+    "label": "Файли",
+    "name": "Назва",
+    "size": "Обсяг",
+    "priority": "Пріоритет",
+    "high": "Високий",
+    "normal": "Нормальний",
+    "low": "Низький",
+    "rename": "Перейменувати…"
+  },
+  "peers": {
+    "client": "Клієнт"
+  },
+  "trackers": {
+    "editOne": "Редагувати трекер",
+    "remove": "Видалити",
+    "health": {
+      "pending": "Очікування"
+    }
+  },
+  "options": {
+    "priorityHigh": "Високий",
+    "priorityNormal": "Нормальний",
+    "priorityLow": "Низький",
+    "seeding": "Роздача",
+    "ratio": "Рейтинг",
+    "minutes": "хвилин",
+    "peers": "Піри"
+  }
+}

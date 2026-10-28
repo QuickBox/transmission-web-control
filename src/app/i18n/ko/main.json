@@ -1,0 +1,37 @@
+{
+  "columns": {
+    "name": "이름",
+    "status": "상태",
+    "percentDone": "진행",
+    "totalSize": "크기",
+    "uploadRatio": "비율",
+    "queuePosition": "대기",
+    "trackers": "트래커"
+  },
+  "actions": {
+    "add": "토렌트 추가",
+    "start": "시작",
+    "pause": "정지",
+    "reannounce": "더 많은 피어 탐색",
+    "remove": "제거",
+    "queue": "대기",
+    "queueTop": "가장 위로 이동",
+    "queueUp": "위로 이동",
+    "queueDown": "아래로 이동",
+    "about": "정보",
+    "replaceTrackers": "트래커 변경"
+  },
+  "sidebar": {
+    "status": "상태",
+    "trackers": "트래커",
+    "folders": "폴더",
+    "all": "모두",
+    "active": "활성화 중",
+    "stopped": "정지",
+    "warning": "경고"
+  },
+  "statusbar": {
+    "down": "다운로드 속도",
+    "up": "업로드 속도"
+  }
+}

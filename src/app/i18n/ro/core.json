@@ -1,0 +1,21 @@
+{
+  "actions": {
+    "cancel": "Renunță",
+    "close": "Închide",
+    "save": "Salvează"
+  },
+  "connection": {
+    "online": "Conectat"
+  },
+  "status": {
+    "checking": "Verificare",
+    "downloading": "Descarcă",
+    "seeding": "Trimite date"
+  },
+  "a11y": {
+    "loading": "Încărcare"
+  },
+  "regions": {
+    "table": "Torrente"
+  }
+}

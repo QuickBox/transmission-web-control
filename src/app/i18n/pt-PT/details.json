@@ -1,0 +1,37 @@
+{
+  "tabs": {
+    "files": "Ficheiros"
+  },
+  "loading": "A carregar…",
+  "general": {
+    "progress": "Progresso",
+    "ratio": "Proporção",
+    "downloadSpeed": "Velocidade de descarga",
+    "size": "Tamanho",
+    "comment": "Comentário"
+  },
+  "files": {
+    "label": "Ficheiros",
+    "name": "Nome",
+    "size": "Tamanho",
+    "priority": "Prioridade",
+    "high": "Alto",
+    "low": "Baixo"
+  },
+  "peers": {
+    "client": "Cliente"
+  },
+  "trackers": {
+    "remove": "Remover",
+    "health": {
+      "pending": "Espera"
+    }
+  },
+  "options": {
+    "priorityHigh": "Alto",
+    "priorityLow": "Baixo",
+    "seeding": "Semeando",
+    "ratio": "Proporção",
+    "minutes": "minutos"
+  }
+}
