@@ -255,3 +255,56 @@ test('a tab strip that scrolls marks the side that still hides tabs', async () =
     teardown();
   }
 });
+
+/** Lay the five tabs out in a stub strip `width` px wide, honouring its scrollLeft. */
+function layOutStrip(strip, width, tabWidth = 76) {
+  const buttons = strip.querySelectorAll('[role="tab"]');
+  Object.assign(strip, { clientWidth: width, scrollWidth: tabWidth * buttons.length, scrollLeft: 0 });
+  strip.getBoundingClientRect = () => ({ left: 0, right: width, width });
+  buttons.forEach((b, i) => {
+    b.getBoundingClientRect = () => {
+      const left = i * tabWidth - strip.scrollLeft;
+      return { left, right: left + tabWidth, width: tabWidth };
+    };
+  });
+  return buttons;
+}
+
+const fullyInside = (strip, button) => {
+  const box = button.getBoundingClientRect();
+  return box.left >= 0 && box.right <= strip.clientWidth;
+};
+
+test('at 320px the restored last tab is scrolled fully into view on open and on resize, without taking focus', async () => {
+  const observers = [];
+  globalThis.ResizeObserver = class { constructor(fn) { this.fn = fn; observers.push(this); } observe() {} disconnect() {} };
+  const made = await makeCtx();
+  made.ctx.store.set({ prefs: { ...made.ctx.store.get().prefs, detailsTab: 'options' } });
+  env.media.width = 320;
+  const { app, root } = shell();
+  const teardown = details.mount(root, made.ctx);
+  try {
+    const strip = root.querySelector('[role="tablist"]');
+    const buttons = layOutStrip(strip, 304);
+    const options = buttons.find((b) => b.getAttribute('data-tab') === 'options');
+    const focusBefore = env.doc.activeElement;
+    observers.forEach((o) => o.fn());
+    assert.equal(options.getAttribute('aria-selected'), 'true');
+    assert.ok(fullyInside(strip, options), 'the restored tab is fully inside the strip');
+    assert.equal(strip.hasAttribute('data-more-start'), true, 'the fade marks the hidden first tabs');
+    assert.equal(env.doc.activeElement, focusBefore, 'revealing did not move focus');
+
+    details.showTab('general');
+    const general = buttons.find((b) => b.getAttribute('data-tab') === 'general');
+    assert.ok(fullyInside(strip, general), 'a tab chosen through the API is revealed too');
+
+    strip.scrollLeft = 70;
+    made.ctx.store.set({ torrents: new Map([[1, torrent()]]), focused: 1 });
+    await flush();
+    assert.equal(strip.scrollLeft, 70, 'a render that keeps the same tab leaves the user scroll alone');
+    void app;
+  } finally {
+    teardown();
+    delete globalThis.ResizeObserver;
+  }
+});

@@ -141,7 +141,36 @@ export function mount(root, ctx) {
     mark('data-more-end', max > 1 && left < max - 1);
   }
   tablist.addEventListener('scroll', syncTabEdges, { passive: true });
-  const edgeObserver = typeof globalThis.ResizeObserver === 'function' ? new globalThis.ResizeObserver(syncTabEdges) : null;
+
+  // The active tab is scrolled fully into view, clear of the edge fade, when
+  // it changes from any source (a press, a restored preference, the API) and
+  // when the strip is resized, without moving focus. A poll that keeps the
+  // same tab leaves the user's own scroll position alone.
+  const FADE = 32;
+  let revealedId = null;
+  function revealActiveTab() {
+    const button = tabButtons.get(activeId);
+    const width = tablist.clientWidth || 0;
+    if (!button || width <= 0) return false;
+    const strip = tablist.getBoundingClientRect();
+    const box = button.getBoundingClientRect();
+    const scroll = tablist.scrollLeft || 0;
+    const max = Math.max(0, (tablist.scrollWidth || 0) - width);
+    const left = box.left - strip.left + scroll;
+    const right = left + box.width;
+    let target = scroll;
+    if (left - FADE < scroll) target = left - FADE;
+    else if (right + FADE > scroll + width) target = right + FADE - width;
+    target = Math.min(max, Math.max(0, target));
+    if (target !== scroll) tablist.scrollLeft = target;
+    syncTabEdges();
+    revealedId = activeId;
+    return true;
+  }
+  function onStripResize() {
+    if (!revealActiveTab()) syncTabEdges();
+  }
+  const edgeObserver = typeof globalThis.ResizeObserver === 'function' ? new globalThis.ResizeObserver(onStripResize) : null;
   if (edgeObserver) edgeObserver.observe(tablist);
 
   const panel = el('div', {
@@ -207,6 +236,7 @@ export function mount(root, ctx) {
       button.setAttribute('tabindex', selected ? '0' : '-1');
     }
     panel.setAttribute('aria-labelledby', `${uid}-tab-${activeId}`);
+    if (activeId !== revealedId) revealActiveTab();
   }
 
   function renderView(state) {
@@ -292,9 +322,7 @@ export function mount(root, ctx) {
       renderView();
       fetchDetail(false);
     }
-    const button = tabButtons.get(tabId);
-    if (focusTab) button.focus();
-    if (typeof button.scrollIntoView === 'function') button.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (focusTab) tabButtons.get(tabId).focus({ preventScroll: true });
   }
 
   function onTabKey(e) {
