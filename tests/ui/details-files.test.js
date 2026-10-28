@@ -173,6 +173,10 @@ test('the row menu sets priority with the legacy key, and offers rename', async 
   await flush();
   assert.deepEqual(calls.at(-1), { method: 'torrent-set', args: { ids: [1], 'priority-high': [0, 1] } });
   assert.ok(items.some((i) => i.label === 'Rename…'));
+  const { ICON_NAMES } = await import('../../src/app/js/core/icons.js');
+  const named = items.flatMap((i) => (i.items ? i.items : [i])).filter((i) => i && i.icon);
+  assert.ok(named.length > 0);
+  for (const item of named) assert.ok(ICON_NAMES.includes(item.icon), `menu icon ${item.icon} exists`);
 });
 
 test('without fileStats there is no download toggle and Space sends nothing', async () => {

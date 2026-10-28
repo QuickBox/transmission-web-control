@@ -74,12 +74,13 @@ test('tabs follow the arrow keys, persist in prefs, and fetch their fields', asy
   assert.equal(root.querySelector('[role="tabpanel"]').getAttribute('aria-labelledby'), selected(root).getAttribute('id'));
   await flush();
   assert.deepEqual(calls.at(-1).args.fields, ['id', ...files.fields]);
+  assert.deepEqual(tabs(root).map((tab) => tab.getAttribute('data-tab')), ['general', 'files', 'trackers', 'peers', 'options']);
   list.dispatch('keydown', { key: 'End' });
-  assert.equal(selected(root).getAttribute('data-tab'), 'peers');
+  assert.equal(selected(root).getAttribute('data-tab'), 'options');
   list.dispatch('keydown', { key: 'ArrowRight' });
   assert.equal(selected(root).getAttribute('data-tab'), 'general', 'wraps around');
   list.dispatch('keydown', { key: 'ArrowLeft' });
-  assert.equal(selected(root).getAttribute('data-tab'), 'peers');
+  assert.equal(selected(root).getAttribute('data-tab'), 'options');
   teardown();
 });
 
@@ -202,6 +203,22 @@ test('the resize grip moves by keyboard within bounds and persists in prefs', as
   assert.equal(ctx.store.get().prefs.detailsHeight, 70);
   grip.dispatch('keydown', { key: 'End' });
   assert.equal(ctx.store.get().prefs.detailsHeight, 20);
+  teardown();
+});
+
+test('Options asks for sequential_download only when the caps say so; Trackers fetches nothing', async () => {
+  const { ctx, root, calls, teardown } = await setup(1440, { details: { 1: {} } });
+  ctx.caps = { sequential: true };
+  ctx.store.set({ torrents: new Map([[1, torrent()]]), focused: 1, prefs: { detailsTab: 'general' } });
+  await flush();
+  details.showTab('trackers');
+  await flush();
+  const before = calls.length;
+  details.showTab('options');
+  await flush();
+  assert.equal(calls.length, before + 1);
+  assert.equal(calls.at(-1).args.fields.at(-1), 'sequential_download');
+  void root;
   teardown();
 });
 

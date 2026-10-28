@@ -380,7 +380,7 @@ export function create(ctx, host) {
     const items = [];
     if (node.wanted !== null) {
       items.push(node.wanted === true
-        ? { label: t('details.files.skip'), icon: 'media-pause', onSelect: () => setWanted(node, false) }
+        ? { label: t('details.files.skip'), icon: 'toolbar-pause', onSelect: () => setWanted(node, false) }
         : { label: t('details.files.download'), icon: 'statusbar-download', onSelect: () => setWanted(node, true) });
     }
     if (node.priority !== null) {

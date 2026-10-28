@@ -2,7 +2,9 @@
   "tabs": {
     "general": "General",
     "files": "Files",
-    "peers": "Peers"
+    "trackers": "Trackers",
+    "peers": "Peers",
+    "options": "Options"
   },
   "back": "Back",
   "close": "Close details",
@@ -53,8 +55,14 @@
     "name": "Name",
     "size": "Size",
     "done": "Done",
-    "count": { "one": "{total} file", "other": "{total} files" },
-    "countWanted": { "one": "{total} file, {wanted} to download", "other": "{total} files, {wanted} to download" },
+    "count": {
+      "one": "{total} file",
+      "other": "{total} files"
+    },
+    "countWanted": {
+      "one": "{total} file, {wanted} to download",
+      "other": "{total} files, {wanted} to download"
+    },
     "none": "This torrent has no file list yet.",
     "actions": "Actions for {name}",
     "download": "Download",
@@ -82,6 +90,76 @@
     "up": "Up",
     "flags": "Flags",
     "none": "No peers connected.",
-    "count": { "one": "{total} peer", "other": "{total} peers" }
+    "count": {
+      "one": "{total} peer",
+      "other": "{total} peers"
+    }
+  },
+  "trackers": {
+    "summary": {
+      "one": "{total} tracker in {tiers} tier",
+      "other": "{total} trackers in {tiers} tiers"
+    },
+    "none": "This torrent has no trackers.",
+    "tier": "Tier {n}",
+    "edit": "Edit trackers",
+    "add": "Add tracker",
+    "editTitle": "Edit trackers",
+    "announceList": "Announce URLs",
+    "listHelp": "One URL per line. A blank line starts a new tier.",
+    "invalidLine": "Not an announce URL: {line}",
+    "addTitle": "Add tracker",
+    "editOne": "Edit tracker",
+    "editOneFor": "Edit {host}",
+    "removeFor": "Remove {host}",
+    "removeTitle": "Remove tracker?",
+    "removeMessage": "{host} is removed from this torrent's announce list.",
+    "remove": "Remove",
+    "url": "Announce URL",
+    "urlPlaceholder": "udp://tracker.example:6969/announce",
+    "invalidUrl": "Enter a full announce URL, including its scheme.",
+    "saved": "Trackers saved",
+    "saveFailed": "Could not save trackers: {message}",
+    "notAnnounced": "Not announced yet",
+    "lastAnnounce": "Last announce {when}: {result}",
+    "success": "Success",
+    "failed": "Failed",
+    "health": {
+      "ok": "Working",
+      "warning": "Last announce failed",
+      "pending": "Waiting"
+    },
+    "seeders": "Seeders {count}",
+    "leechers": "Leechers {count}",
+    "downloads": "Downloads {count}",
+    "next": "Next announce in {in}"
+  },
+  "options": {
+    "speed": "Speed",
+    "limitDownload": "Limit download speed",
+    "downloadRate": "Download limit",
+    "limitUpload": "Limit upload speed",
+    "uploadRate": "Upload limit",
+    "kbps": "kB/s",
+    "honorGlobal": "Follow the global speed limits",
+    "priority": "Bandwidth priority",
+    "priorityHigh": "High",
+    "priorityNormal": "Normal",
+    "priorityLow": "Low",
+    "seeding": "Seeding",
+    "ratioMode": "Stop seeding at ratio",
+    "idleMode": "Stop seeding when inactive",
+    "useGlobal": "Use the global setting",
+    "stopAtRatio": "Stop at this torrent's ratio",
+    "stopWhenIdle": "Stop after this torrent's idle time",
+    "unlimited": "Seed regardless",
+    "ratio": "Ratio",
+    "idle": "Idle time",
+    "minutes": "minutes",
+    "peers": "Peers",
+    "peerLimit": "Maximum peers",
+    "order": "Download order",
+    "sequential": "Download pieces in order",
+    "saveFailed": "Could not save the option: {message}"
   }
 }

@@ -15,11 +15,13 @@
 
 import * as general from './general.js?v=__QBV__';
 import * as files from './files.js?v=__QBV__';
+import * as trackers from './trackers.js?v=__QBV__';
 import * as peers from './peers.js?v=__QBV__';
+import * as options from './options.js?v=__QBV__';
 
 /**
  * @typedef {{
- *   id: string, labelKey: string, fields: string[], live: boolean,
+ *   id: string, labelKey: string, fields: string[] | ((caps: object|null) => string[]), live: boolean,
  *   create: (ctx: object, host: TabHost) => TabView,
  * }} DetailsTab
  * @typedef {{ refresh: () => void, torrentId: () => number|null }} TabHost
@@ -29,7 +31,16 @@ import * as peers from './peers.js?v=__QBV__';
  */
 
 /** Tab order. Views that are not built yet are simply absent. */
-export const TABS = Object.freeze([general, files, peers]);
+export const TABS = Object.freeze([general, files, trackers, peers, options]);
+
+/**
+ * The extra `torrent-get` fields a tab needs with the current caps.
+ * @param {DetailsTab} tab
+ * @param {object|null} caps
+ */
+export function tabFields(tab, caps) {
+  return typeof tab.fields === 'function' ? tab.fields(caps) : tab.fields;
+}
 
 const SHEET_QUERY = '(max-width: 959px)';
 const FULL_QUERY = '(max-width: 639px)';
@@ -189,7 +200,7 @@ export function mount(root, ctx) {
     if (panel.firstChild !== view.root) panel.replaceChildren(view.root);
     const detail = cache.get(cacheKey(activeId, shownId)) || null;
     view.render(shownTorrent, detail, state || {
-      loading: activeTab().fields.length > 0 && !detail && !loadErrors.has(activeId),
+      loading: tabFields(activeTab(), ctx.caps).length > 0 && !detail && !loadErrors.has(activeId),
       error: loadErrors.get(activeId) || null,
     });
   }
@@ -226,7 +237,8 @@ export function mount(root, ctx) {
    */
   function fetchDetail(force) {
     const tab = activeTab();
-    if (shownId == null || tab.fields.length === 0) return;
+    const wanted = tabFields(tab, ctx.caps);
+    if (shownId == null || wanted.length === 0) return;
     const key = cacheKey(tab.id, shownId);
     if (!force && !tab.live && cache.has(key)) return;
     if (inflight) {
@@ -239,7 +251,7 @@ export function mount(root, ctx) {
     const tabId = tab.id;
     const mine = ++fetchSeq;
     Promise.resolve()
-      .then(() => ctx.rpc.call('torrent-get', { ids: [id], fields: ['id', ...tab.fields] }))
+      .then(() => ctx.rpc.call('torrent-get', { ids: [id], fields: ['id', ...wanted] }))
       .then((result) => {
         const row = result && Array.isArray(result.torrents)
           ? result.torrents.find((x) => x && x.id === id) || result.torrents[0] : null;

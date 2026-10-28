@@ -1,0 +1,45 @@
+{
+  "add": {
+    "title": "Add torrents",
+    "browse": "Browse…",
+    "dropHint": "Drag .torrent files here, or",
+    "selectedFiles": "Selected files",
+    "removeFile": "Remove {name}",
+    "notTorrent": "Only .torrent files can be added this way.",
+    "links": "Magnet links or URLs",
+    "linksPlaceholder": "One per line",
+    "invalidLink": "Not a magnet link or URL: {line}",
+    "directory": "Download to",
+    "free": "{free} free",
+    "freeOf": "{free} free of {total}",
+    "freeChecking": "Checking free space…",
+    "freeUnknown": "Free space unknown",
+    "labels": "Labels",
+    "labelsPlaceholder": "Comma separated",
+    "labelsFailed": "Added, but the labels were not saved: {message}",
+    "start": "Start when added",
+    "submit": "Add",
+    "noAnswer": "Transmission did not confirm the torrent",
+    "added": { "one": "Added {total} torrent", "other": "Added {total} torrents" },
+    "duplicates": { "one": "{total} torrent was already in the list", "other": "{total} torrents were already in the list" },
+    "someFailed": { "one": "{total} could not be added", "other": "{total} could not be added" },
+    "failedOne": "Could not add {name}: {message}",
+    "failedAll": { "one": "{total} torrent could not be added", "other": "None of the {total} torrents could be added" }
+  },
+  "drop": {
+    "title": "Drop to add torrents",
+    "hint": ".torrent files only"
+  },
+  "remove": {
+    "titleOne": "Remove this torrent?",
+    "titleMany": { "one": "Remove {total} torrent?", "other": "Remove {total} torrents?" },
+    "message": { "one": "It leaves the list. Downloaded data stays on disk unless you delete it below.", "other": "They leave the list. Downloaded data stays on disk unless you delete it below." },
+    "andMore": { "one": "and {total} more", "other": "and {total} more" },
+    "deleteData": "Also delete the downloaded data",
+    "dataWarning": "The files are deleted from disk. This cannot be undone.",
+    "confirm": "Remove",
+    "confirmDelete": "Remove and delete data",
+    "done": { "one": "Removed {total} torrent", "other": "Removed {total} torrents" },
+    "failed": "Could not remove: {message}"
+  }
+}

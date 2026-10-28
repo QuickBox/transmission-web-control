@@ -693,3 +693,131 @@
 	font-size: 12px;
 	color: var(--qb-destructive-text);
 }
+
+/* ---- Trackers --------------------------------------------------------- */
+
+.trackers {
+	display: grid;
+	gap: 16px;
+}
+
+.trackers-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.trackers-summary {
+	font-size: 12px;
+	color: var(--qb-fg-muted);
+}
+
+.tracker-tier {
+	display: grid;
+	gap: 8px;
+}
+
+.tracker-tier h3 {
+	margin: 0;
+}
+
+.tracker-rows {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.tracker {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 10px 8px 10px 12px;
+	border: 1px solid color-mix(in srgb, var(--qb-border) 70%, transparent);
+	border-radius: var(--qb-radius);
+	background: var(--qb-surface-2);
+}
+
+.tracker-glyph {
+	display: inline-flex;
+	padding-top: 2px;
+	color: var(--qb-icon);
+}
+
+.tracker.is-ok .tracker-glyph {
+	color: var(--tr-st-seeding);
+}
+
+.tracker.is-warning .tracker-glyph {
+	color: var(--tr-st-checking);
+}
+
+.tracker-main {
+	display: grid;
+	flex: 1;
+	gap: 2px;
+	min-width: 0;
+}
+
+.tracker-host {
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.tracker-url {
+	color: var(--qb-fg-muted);
+	overflow-wrap: anywhere;
+}
+
+.tracker-last {
+	font-size: 13px;
+	overflow-wrap: anywhere;
+}
+
+.tracker.is-warning .tracker-last {
+	color: var(--qb-foreground);
+}
+
+.tracker-counts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 16px;
+	font-size: 12px;
+	color: var(--qb-fg-muted);
+}
+
+.tracker-actions {
+	display: inline-flex;
+	flex: none;
+	gap: 2px;
+}
+
+/* ---- Options ---------------------------------------------------------- */
+
+.options-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+	gap: 12px;
+	align-items: start;
+}
+
+.options-grid[hidden],
+.option-card[hidden] {
+	display: none;
+}
+
+.option-card {
+	display: grid;
+	gap: 2px;
+	padding: 12px 14px;
+	border: 1px solid color-mix(in srgb, var(--qb-border) 70%, transparent);
+	border-radius: var(--qb-radius);
+	background: var(--qb-surface-2);
+}
+
+.option-card h3 {
+	margin: 0 0 4px;
+}

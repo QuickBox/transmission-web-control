@@ -218,8 +218,21 @@ export function installDom({ width = 1440 } = {}) {
     documentElement: new FakeElement('html'),
     createElement: (tag) => new FakeElement(tag),
     createElementNS: (ns, tag) => new FakeElement(tag, ns),
-    addEventListener() {},
-    removeEventListener() {},
+    listeners: new Map(),
+    addEventListener(type, fn) {
+      if (!this.listeners.has(type)) this.listeners.set(type, []);
+      this.listeners.get(type).push(fn);
+    },
+    removeEventListener(type, fn) {
+      const list = this.listeners.get(type) || [];
+      const i = list.indexOf(fn);
+      if (i !== -1) list.splice(i, 1);
+    },
+    dispatch(type, init = {}) {
+      const event = { type, target: body, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, ...init };
+      for (const fn of [...(this.listeners.get(type) || [])]) fn(event);
+      return event;
+    },
     execCommand: () => true,
   };
   globalThis.document = doc;
@@ -256,7 +269,7 @@ export async function makeCtx({ details = {}, respond } = {}) {
       return null;
     }
   };
-  const t = await loadTranslator({ lang: 'en', namespaces: ['core', 'details'], load });
+  const t = await loadTranslator({ lang: 'en', namespaces: ['core', 'details', 'dialogs'], load });
   const calls = [];
   const rpc = {
     call(method, args) {

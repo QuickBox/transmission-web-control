@@ -1,0 +1,204 @@
+/*
+ * Dialog content: the shared form rows (also used by the Options tab), Add
+ * torrent (drop card, file chips, links, directory, labels), Remove, and the
+ * window drop overlay.
+ */
+
+.field-help {
+	font-size: 12px;
+	color: var(--qb-fg-muted);
+}
+
+.option-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	min-height: 40px;
+}
+
+.option-label {
+	min-width: 0;
+	font-size: 14px;
+	color: var(--qb-foreground);
+}
+
+.option-field {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex: none;
+}
+
+.option-number {
+	width: 104px;
+	text-align: right;
+}
+
+.option-number:disabled,
+.option-select:disabled {
+	opacity: 0.5;
+}
+
+.option-unit {
+	min-width: 40px;
+	font-size: 12px;
+	color: var(--qb-fg-muted);
+}
+
+.option-select {
+	width: auto;
+	min-width: 200px;
+	max-width: 100%;
+	flex: none;
+}
+
+.checkbox {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	flex: none;
+}
+
+.check-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 36px;
+	cursor: pointer;
+}
+
+/* ---- Add torrent ------------------------------------------------------ */
+
+.add-form {
+	display: grid;
+	gap: 16px;
+}
+
+.drop-card {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 20px 16px;
+	border: 1.5px dashed var(--qb-border);
+	border-radius: var(--qb-radius-lg);
+	text-align: center;
+	color: var(--qb-fg-muted);
+	background: color-mix(in srgb, var(--qb-muted) 40%, transparent);
+}
+
+.drop-card-icon {
+	color: var(--qb-icon);
+}
+
+.file-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: -8px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.file-chips[hidden] {
+	display: none;
+}
+
+.file-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	height: 28px;
+	padding: 0 2px 0 8px;
+	border: 1px solid var(--qb-border);
+	border-radius: 999px;
+	font-size: 12px;
+	background: var(--qb-surface-2);
+}
+
+.file-chip-icon {
+	display: inline-flex;
+	color: var(--qb-icon);
+}
+
+.file-chip-name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* ---- Remove ----------------------------------------------------------- */
+
+.remove-names {
+	display: grid;
+	gap: 4px;
+	margin: 0 0 12px;
+	padding: 0;
+	list-style: none;
+}
+
+.remove-name {
+	overflow-wrap: anywhere;
+	font-weight: 500;
+}
+
+.remove-more {
+	color: var(--qb-fg-muted);
+}
+
+.remove-warning {
+	margin-top: 4px;
+	font-size: 13px;
+	color: var(--qb-destructive-text);
+}
+
+.remove-warning[hidden] {
+	display: none;
+}
+
+/* ---- Window drop overlay ---------------------------------------------- */
+
+.drop-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 970;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: color-mix(in srgb, var(--qb-overlay) 55%, transparent);
+	pointer-events: none;
+}
+
+.drop-overlay[hidden] {
+	display: none;
+}
+
+.drop-overlay-card {
+	display: grid;
+	justify-items: center;
+	gap: 8px;
+	width: min(420px, 100%);
+	padding: 32px 24px;
+	border: 2px dashed var(--qb-primary);
+	border-radius: var(--qb-radius-xl);
+	color: var(--qb-primary-text);
+	background: var(--qb-surface);
+	box-shadow: var(--qb-shadow);
+	text-align: center;
+}
+
+.drop-overlay-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--qb-foreground);
+}
+
+.drop-overlay-hint {
+	font-size: 13px;
+	color: var(--qb-fg-muted);
+}
