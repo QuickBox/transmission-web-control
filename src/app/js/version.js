@@ -4,4 +4,4 @@
  * newest `changelogs/index.json` entry. 0.0.0 marks a tree before its first
  * release.
  */
-export const VERSION = '0.0.0';
+export const VERSION = '2.0.0';

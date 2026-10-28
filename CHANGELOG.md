@@ -1,4 +1,56 @@
 # Changelog
 
-Release notes for the QuickBox Transmission web interface, newest first.
-Release notes from before this fork (v1.x) are in CHANGELOG-EN.md and the git history.
+Release notes for the QuickBox Transmission web interface, newest first. Notes from before this fork (v1.x) are in CHANGELOG-EN.md and the git history.
+
+## v2.0.0 (2026-10-28)
+
+The Transmission web interface is now a QuickBox interface. It is a complete rewrite: no jQuery, no EasyUI, no build step, and no calls to anything but your own Transmission daemon. It looks and behaves like the QuickBox dashboard, follows its theme, and works from a 375 px phone to a 1920 px desktop.
+
+### Interface
+
+- Four themes that follow the QuickBox dashboard cookie: Spectre, Smoked, Reel and Light. The palette button in the toolbar overrides the cookie for this browser.
+- One responsive layout. Wide screens get a docked sidebar and a details drawer under the list; medium screens get an off-canvas sidebar and a details sheet; phones get cards, a full-screen details sheet and a sticky action bar for the selection.
+- A torrent list that stays fast with thousands of torrents, since only the rows on screen are rendered. Sort by any column, pick the columns, and choose comfortable or compact rows in Settings.
+- The list is a real grid for screen readers and keyboards: arrow keys, Home and End, Space to select, Enter to open details, Delete to remove, Ctrl or Cmd A to select everything visible, Shift and Ctrl for ranges and toggles.
+- Sidebar filters for status, labels, trackers and folders with live counts, a 64 px rail mode, and a search box with a Ctrl K shortcut.
+- A status bar with live rates and their limits, temporary speed limits, free space, port status, the daemon version and torrent counts. When the daemon cannot be reached, the bar says so at every width.
+- Every control has a name, there are no native tooltips, and polling never steals focus or swallows a click.
+
+### Torrents and details
+
+- Add torrents by file, magnet link or drag and drop, with a download folder and labels. Remove with or without data, with a confirmation.
+- Start, pause, force start, verify, reannounce, and move torrents up and down the queue from the toolbar, the selection bar or the keyboard.
+- A details drawer with General, Files, Trackers, Peers and Options tabs. Set file priorities and which files to download, rename files and folders, edit trackers, and set per-torrent limits and seeding rules.
+- Set the download location, rename a torrent, edit its labels, replace a tracker across every torrent, and point a torrent at data that already exists on disk.
+- Every write shows at once. After a save the changed torrents are re-read from the daemon, so an idle torrent never waits for the next poll.
+
+### Settings
+
+- A Settings dialog for the daemon: downloading, seeding, speed and schedule, network and the peer port test, queue, blocklist and interface preferences.
+- Settings rows appear only when your Transmission reports the setting, so nothing is offered that the daemon cannot do.
+
+### Languages
+
+- English, Danish, German, Spanish, French, Brazilian Portuguese and Simplified Chinese ship complete.
+- Hungarian, Traditional Chinese, Dutch, Russian, Ukrainian, Korean, Italian, Romanian, Polish and European Portuguese carry the translations that existed before, with English for anything new.
+- The language follows the QuickBox dashboard cookie, then the browser language.
+
+### Versions supported
+
+- Transmission 2.94 through 4.1.x, detected once at startup. Nothing is hard coded to a version number.
+- 4.1 and newer speak JSON-RPC 2.0 on the wire, with sequential download and separate IPv4 and IPv6 port checks.
+- 3.00 and newer keep labels in the daemon, shared with every other client; 2.94 keeps them in the browser, and a one-time import offer moves browser labels into the daemon after an upgrade.
+- 4.0 and newer edit the full tracker list as tiered text; older daemons use per-row add, replace and remove.
+
+### Security
+
+- Torrent names, tracker messages, peer client strings and error text are always rendered as text. The app never builds HTML from data.
+- The interface talks to your Transmission daemon and nothing else. The upstream update check, the peer IP lookup service and every third-party link are gone.
+- Browser requests reuse the login you already gave the web directory, so no credentials are stored by the app.
+
+### Install and updates
+
+- The interface ships with QuickBox: `qb install transmission` puts it in place and `qb update transmission` keeps it current. There is nothing to build.
+- The interface that comes with Transmission stays available at `index.original.html`, also linked from About.
+- Releases are tagged from the release branch with a checksummed tarball of the interface files; QuickBox installs pull that tarball.
+- Based on Transmission Web Control by ronggang (MIT). Release notes from before this version are in `CHANGELOG-EN.md`.
